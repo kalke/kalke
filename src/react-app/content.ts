@@ -3,14 +3,14 @@ export type Lang = "pt" | "en";
 export const siteMeta = {
 	brand: "kalke",
 	pt: {
-		title: "kalke — pessoa que constrói coisas",
+		title: "kalke — Henrique Kalke",
 		description:
-			"Kalke: engenheiro de software em Curitiba. Sistemas bancários, IA, gatos, metal e boxe.",
+			"Henrique Kalke, software engineer em Curitiba. Sistemas bancários, APIs, gatos e metal.",
 	},
 	en: {
-		title: "kalke — a person who builds things",
+		title: "kalke — Henrique Kalke",
 		description:
-			"Kalke: software engineer in Curitiba. Banking systems, AI, cats, metal, and boxing.",
+			"Henrique Kalke, software engineer in Curitiba. Banking systems, APIs, cats, and metal.",
 	},
 };
 
@@ -65,93 +65,87 @@ export const copy: Record<Lang, Copy> = {
 		],
 		langSwitch: { pt: "PT", en: "EN" },
 		hero: {
-			headline: "Kalke — e às vezes Henrique.",
+			headline: "Henrique Kalke",
 			support:
-				"Passo o dia construindo sistemas que mexem com dinheiro de verdade. O resto do tempo é metal, boxe, videogame e uma casa lotada de bicho.",
-			primaryCta: { label: "Quem sou", href: "#about" },
-			secondaryCta: { label: "Fala comigo", href: "#contact" },
+				"Software engineer em Curitiba. De dia faço sistemas bancários. De noite é projeto pessoal, metal e uma casa cheia de bicho.",
+			primaryCta: { label: "Sobre mim", href: "#about" },
+			secondaryCta: { label: "Contato", href: "#contact" },
 		},
 		about: {
-			eyebrow: "Quem sou",
-			title: "Mais do que um LinkedIn com tema escuro",
+			eyebrow: "Sobre",
+			title: "Quem eu sou",
 			paragraphs: [
-				"Me chama de Kalke. É sobrenome, mas é o jeito que a internet me encontrou — e eu me acostumei. Henrique também serve, sem drama. Desde moleque eu sabia que ia acabar mexendo com tecnologia; não foi revelação de palestra, foi só… óbvio.",
-				"Morei três anos na Inglaterra. Foi lá que aprendi a ler e escrever — em inglês, antes do português. Até hoje o inglês não parece “segundo idioma”; parece o chão onde as palavras pousaram primeiro.",
-				"Hoje estou em Curitiba, com uns seis anos construindo software no mundo financeiro: recuperação de crédito, accountingtech, e agora infraestrutura bancária de ponta a ponta. O tipo de sistema em que bug não é só ticket — é conta, PIX, boleto, regulação do Bacen.",
-				"O que mais me orgulha não é a stack em si. É ter tirado onboarding de conta do processo manual e deixado rodando sozinho (com due diligence e conformidade), vendo a base crescer ~30% e cada conta nova já sair com PIX, boleto e TED. É ter ajudado a bancar mais de mil boletos por dia e mais de R$ 1 milhão liquidados diariamente. É um motor de tarifas que cobra sozinho e virou receita recorrente sem alguém apertar botão. É validar documento com LLM em vez de alguém reescrever PDF à mão.",
-				"Antes disso, passei anos na fronteira entre plataformas e bancos: integrar API de credor, negociar contrato técnico, fazer o fluxo aguentar volume. Vi a operação saltar de milhões de boletos pagos e milhões de clientes a mais na base — e aprendi na prática que integração bem feita muda o negócio inteiro. Também mentorei júnior, revisei código com carinho (às vezes com rigor) e cortei custo de cloud redesenhando pipeline chato de remessa.",
-				"No começo da carreira brinquei sério com ML: reconhecimento facial, chatbot com NER, modelo em produção na nuvem. Depois a vida puxou pra sistemas distribuídos, eventos, Kafka, Python, TypeScript — mas a curiosidade com IA nunca saiu. Fora do teclado: boxe, metal alto, jogo pra sumir um pouco, e quatro gatos mais uma cachorra que quase se chamou Lurdinha.",
+				"Pode me chamar de Kalke ou Henrique — tanto faz. Trabalho com software faz uns seis anos, quase sempre no mercado financeiro: crédito, accountingtech e, agora, infra bancária de ponta a ponta.",
+				"Morei três anos na Inglaterra. Aprendi a ler e escrever em inglês antes do português, então o inglês nunca me pareceu “segundo idioma”. Hoje moro em Curitiba.",
+				"O que me anima no trabalho é sistema que não pode falhar: conta, PIX, boleto, regra do Bacen. Já ajudei a automatizar onboarding de conta (com compliance), a manter volume alto de boletos e liquidação, e a montar coisa chata mas útil — tipo motor de tarifas e validação de documento com LLM.",
+				"No começo da carreira mexi bastante com ML. Depois a vida me puxou pra API, evento, Kafka, Python, TypeScript. Continuo curioso com IA, só que agora misturado com o resto.",
 			],
 		},
 		likes: {
-			eyebrow: "Coisas que gosto",
-			title: "A parte que não cabe no CV",
+			eyebrow: "Fora do código",
+			title: "O que preenche o resto",
 			items: [
 				{
-					title: "Zaia, Chico, Linhaça e Claire",
-					text: "Quatro gatos. Quatro personalidades. Zero chance de silêncio absoluto em casa — e eu não trocaria.",
+					title: "Os gatos",
+					text: "Zaia, Chico, Linhaça e Claire. Quatro personalidades, zero chance de casa quieta.",
 				},
 				{
-					title: "Meg (quase Lurdinha)",
-					text: "Minha cachorrinha. Eu brigava internamente por Lurdinha. Ganhou Meg. Continua mandando na casa como se o nome fosse título nobiliárquico.",
+					title: "Meg",
+					text: "Minha cachorra. Quase se chamou Lurdinha. Eu perdi essa discussão.",
 				},
 				{
 					title: "Metal",
-					text: "Música, sobretudo metal. Treino, foco, deslocamento, madrugada codeando — tem faixa pra cada estado de espírito, quase sempre com volume indecente.",
+					text: "Escuto metal o tempo todo — no trampo, no caminho, codeando de madrugada.",
 				},
 				{
-					title: "Videogame",
-					text: "Quando solto o notebook, jogo. Não é “passar o tempo”: é pausar a cabeça de verdade. Atmosfera, história, ou só uma partida que exige presença.",
-				},
-				{
-					title: "Boxe",
-					text: "Luto boxe. Tem dia que o código não fecha a conta — o ringue fecha. Ritmo, corpo, e um jeito honesto de cansar.",
+					title: "Games",
+					text: "Quando largo o notebook, jogo. É o jeito mais fácil de desligar a cabeça.",
 				},
 			],
 		},
 		builds: {
-			eyebrow: "O que construo",
-			title: "Coisas que eu quis que existissem",
+			eyebrow: "Projetos",
+			title: "O que eu ando construindo",
 			intro:
-				"No trabalho eu vivo de sistema crítico. Em casa, experimento — Go, LLM, API bancária de brinquedo — pra aprender do meu jeito, sem slide.",
+				"No trabalho é sistema crítico. Em casa eu experimento — Go, LLM, API — no meu ritmo.",
 			items: [
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"Uma obsessão profissional virou hobby: pegar documento brasileiro (RG, comprovante, NF) e devolver JSON limpo. Go, LLM, Postgres, Redis — o mesmo tipo de problema que já resolvi em produção, só que no meu ritmo.",
+						"Pega documento brasileiro (RG, comprovante, NF) e devolve JSON. Go, LLM, Postgres, Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"API bancária enxuta em FastAPI (depósito, saque, transferência) com Swagger e testes. Um playground pra modelar domínio sem o peso de um monólito real.",
+						"API bancária simples em FastAPI: depósito, saque, transferência. Com Swagger e testes.",
 					tags: ["Python", "FastAPI"],
 				},
 				{
 					name: "personal-compose",
-					href: "https://github.com/kalke",
+					href: "https://github.com/kalke/personal-compose",
 					blurb:
-						"Docker Compose pra subir banco e broker local sem ritual. DX chata, mas é a diferença entre “vou tentar” e “já estou rodando”.",
+						"Docker Compose pra subir banco e broker local sem drama.",
 					tags: ["Docker", "DX"],
 				},
 			],
 		},
 		contact: {
 			eyebrow: "Contato",
-			title: "Se quiser puxar assunto",
-			text: "Pode ser vaga, ideia, dúvida técnica, metal, gato, ou só um oi. Não prometo responder em cinco minutos — prometo responder de verdade.",
+			title: "Fala comigo",
+			text: "Vaga, ideia, dúvida técnica ou só um oi. Respondo quando der — de verdade.",
 			links: [
 				{
 					label: "GitHub",
 					href: "https://github.com/kalke",
-					note: "código e experimentos",
+					note: "código",
 				},
 				{
 					label: "LinkedIn",
 					href: "https://www.linkedin.com/in/henriquekalke/",
-					note: "o lado formal",
+					note: "trabalho",
 				},
 				{
 					label: "Spotify",
@@ -165,105 +159,99 @@ export const copy: Record<Lang, Copy> = {
 				},
 			],
 		},
-		footer: "feito com React, Vite e Cloudflare",
+		footer: "React · Vite · Cloudflare",
 	},
 	en: {
 		navAria: "Primary",
 		nav: [
 			{ label: "About", href: "#about" },
 			{ label: "Likes", href: "#likes" },
-			{ label: "Builds", href: "#builds" },
+			{ label: "Projects", href: "#builds" },
 			{ label: "Contact", href: "#contact" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
 		hero: {
-			headline: "Kalke — Henrique, sometimes.",
+			headline: "Henrique Kalke",
 			support:
-				"I spend my days building systems that move real money. The rest is metal, boxing, games, and a house full of animals.",
+				"Software engineer in Curitiba. Banking systems by day. Side projects, metal, and a house full of animals by night.",
 			primaryCta: { label: "About me", href: "#about" },
-			secondaryCta: { label: "Say hi", href: "#contact" },
+			secondaryCta: { label: "Contact", href: "#contact" },
 		},
 		about: {
 			eyebrow: "About",
-			title: "More than a dark-mode LinkedIn",
+			title: "Who I am",
 			paragraphs: [
-				"Call me Kalke. It’s my last name, but it’s how the internet found me — and it stuck. Henrique works too, no fuss. I’ve known since I was a kid that I’d end up in tech. Not a TED Talk moment. Just… obvious.",
-				"I lived in England for three years. That’s where I learned to read and write — in English, before Portuguese. English still doesn’t feel like a “second language”; it feels like the first floor the words landed on.",
-				"I’m based in Curitiba now, with about six years building software in finance: credit recovery, accountingtech, and lately full banking infrastructure. The kind of systems where a bug isn’t just a ticket — it’s an account, a PIX transfer, a boleto, Central Bank rules.",
-				"What I’m proudest of isn’t the stack. It’s taking account onboarding off a manual track and making it run on its own (due diligence and compliance included), watching the customer base grow ~30%, and having every new account ship with PIX, boleto, and TED ready. It’s helping carry 1,000+ boletos a day and over R$1M settled daily. It’s a fee engine that bills itself and became recurring revenue without someone clicking a button. It’s validating documents with LLMs instead of rewriting PDFs by hand.",
-				"Before that, I lived on the edge between platforms and banks: creditor APIs, technical contracts, flows that had to survive volume. I watched ops jump by millions of paid boletos and millions more customers — and learned the hard way that a solid integration can move the whole business. I also mentored juniors, reviewed code carefully (sometimes strictly), and cut cloud cost by redesigning a boring remittance pipeline.",
-				"Early on I got serious with ML: facial recognition, a NER chatbot, models in production on the cloud. Life later pulled me into distributed systems, events, Kafka, Python, TypeScript — but the AI itch never left. Off the keyboard: boxing, loud metal, games to disappear for a bit, and four cats plus a dog who almost got named Lurdinha.",
+				"Call me Kalke or Henrique — either works. I’ve been building software for about six years, mostly in finance: credit, accountingtech, and now full banking infrastructure.",
+				"I lived in England for three years and learned to read and write in English before Portuguese, so English never felt like a “second language.” I’m based in Curitiba now.",
+				"I like systems that can’t casually break: accounts, PIX, boleto, Central Bank rules. I’ve helped automate account onboarding (with compliance), keep high boleto and settlement volume moving, and ship unglamorous but useful stuff — fee engines, LLM document checks.",
+				"Early on I did a lot of ML. Later the work pulled me into APIs, events, Kafka, Python, TypeScript. Still curious about AI — just mixed into everything else.",
 			],
 		},
 		likes: {
-			eyebrow: "Things I like",
-			title: "The part that doesn’t fit on a résumé",
+			eyebrow: "Off the keyboard",
+			title: "What fills the rest",
 			items: [
 				{
-					title: "Zaia, Chico, Linhaça & Claire",
-					text: "Four cats. Four personalities. Zero chance of absolute silence at home — and I wouldn’t trade it.",
+					title: "The cats",
+					text: "Zaia, Chico, Linhaça, and Claire. Four personalities. Quiet house? Not happening.",
 				},
 				{
-					title: "Meg (almost Lurdinha)",
-					text: "My dog. I fought hard internally for Lurdinha. Meg won. She still runs the house like the name came with a title.",
+					title: "Meg",
+					text: "My dog. Almost named Lurdinha. I lost that argument.",
 				},
 				{
 					title: "Metal",
-					text: "Music, mostly metal. Training, focus, commuting, late-night coding — there’s a track for every mood, usually at an indecent volume.",
+					text: "Metal most of the time — commuting, working, late-night coding.",
 				},
 				{
-					title: "Video games",
-					text: "When I put the laptop down, I play. Not “killing time” — actually parking my brain. Atmosphere, story, or a match that demands presence.",
-				},
-				{
-					title: "Boxing",
-					text: "I train boxing. Some days the code doesn’t settle the score — the ring does. Rhythm, body, an honest way to get tired.",
+					title: "Games",
+					text: "When the laptop’s down, I play. Easiest way to switch my brain off.",
 				},
 			],
 		},
 		builds: {
-			eyebrow: "What I build",
-			title: "Things I wanted to exist",
+			eyebrow: "Projects",
+			title: "What I’ve been building",
 			intro:
-				"At work I live in critical systems. At home I experiment — Go, LLMs, a toy bank API — learning my way, without the slide deck.",
+				"At work it’s critical systems. At home I experiment — Go, LLMs, APIs — at my own pace.",
 			items: [
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"A work obsession turned hobby: take a Brazilian document (ID, proof of address, invoice) and return clean JSON. Go, LLM, Postgres, Redis — the same class of problem I’ve shipped in production, on my own clock.",
+						"Brazilian documents (ID, address proof, invoices) in → clean JSON out. Go, LLM, Postgres, Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"A lean FastAPI bank API (deposit, withdraw, transfer) with Swagger and tests. A playground for modeling domain without the weight of a real monolith.",
+						"Small FastAPI bank API: deposit, withdraw, transfer. Swagger and tests included.",
 					tags: ["Python", "FastAPI"],
 				},
 				{
 					name: "personal-compose",
-					href: "https://github.com/kalke",
+					href: "https://github.com/kalke/personal-compose",
 					blurb:
-						"Docker Compose to spin up local databases and brokers without ritual. Unglamorous DX — and the difference between “I’ll try later” and “it’s already running.”",
+						"Docker Compose to spin up local databases and brokers without fuss.",
 					tags: ["Docker", "DX"],
 				},
 			],
 		},
 		contact: {
 			eyebrow: "Contact",
-			title: "If you want to talk",
-			text: "A role, an idea, a technical question, metal, cats, or just hello. I won’t promise a five-minute reply — I will promise a real one.",
+			title: "Say hi",
+			text: "A role, an idea, a technical question, or just hello. I’ll reply when I can — for real.",
 			links: [
 				{
 					label: "GitHub",
 					href: "https://github.com/kalke",
-					note: "code & experiments",
+					note: "code",
 				},
 				{
 					label: "LinkedIn",
 					href: "https://www.linkedin.com/in/henriquekalke/",
-					note: "the formal side",
+					note: "work",
 				},
 				{
 					label: "Spotify",
@@ -277,7 +265,7 @@ export const copy: Record<Lang, Copy> = {
 				},
 			],
 		},
-		footer: "built with React, Vite & Cloudflare",
+		footer: "React · Vite · Cloudflare",
 	},
 };
 

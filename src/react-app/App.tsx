@@ -81,7 +81,7 @@ export default function App() {
 			<main>
 				<section id="top" className="hero">
 					<div className="hero-copy">
-						<p className="brand-hero">{siteMeta.brand}</p>
+						<p className="hero-brand">{siteMeta.brand}</p>
 						<h1 className="hero-title">{t.hero.headline}</h1>
 						<p className="hero-support">{t.hero.support}</p>
 						<div className="hero-actions">

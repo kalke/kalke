@@ -135,24 +135,24 @@
 	animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.brand-hero {
-	margin: 0 0 1.25rem;
+.hero-brand {
+	margin: 0 0 0.85rem;
 	font-family: var(--font-display);
-	font-size: clamp(3.4rem, 12vw, 7rem);
+	font-size: 0.95rem;
 	font-weight: 600;
-	line-height: 0.9;
-	letter-spacing: -0.04em;
+	letter-spacing: 0.14em;
+	text-transform: lowercase;
 	color: var(--accent);
 }
 
 .hero-title {
 	margin: 0 0 1rem;
 	font-family: var(--font-display);
-	font-size: clamp(1.65rem, 4.2vw, 2.55rem);
-	font-weight: 500;
-	line-height: 1.15;
-	letter-spacing: -0.02em;
-	max-width: 16ch;
+	font-size: clamp(2.4rem, 8vw, 4.25rem);
+	font-weight: 600;
+	line-height: 1.05;
+	letter-spacing: -0.03em;
+	max-width: 12ch;
 }
 
 .hero-support {
@@ -160,7 +160,7 @@
 	color: var(--muted);
 	font-size: clamp(1rem, 2.2vw, 1.125rem);
 	line-height: 1.55;
-	max-width: 36ch;
+	max-width: 34ch;
 }
 
 .hero-actions {
@@ -456,10 +456,6 @@
 	.hero {
 		align-items: center;
 		min-height: calc(100svh - 3.5rem);
-	}
-
-	.brand-hero {
-		font-size: clamp(3rem, 18vw, 4.5rem);
 	}
 }
 
