@@ -2,7 +2,7 @@
 
 Henrique Kalke — software engineer.
 
-→ **[kalke.dev](https://kalke.dev)** — who I am, what I like, what I build, and a live **sandbox** (OIDC login via [kalke-auth](https://github.com/kalke/kalke-auth)).
+→ **[kalke.dev](https://kalke.dev)** — who I am, what I like, what I build.
 
 ---
 
@@ -36,15 +36,6 @@ npm install
 npm run dev
 npm run build
 npm run deploy   # or push to main → GitHub Actions
-```
-
-Optional Vite env (defaults target production hosts):
-
-```bash
-VITE_OIDC_AUTHORITY=https://auth.kalke.dev/realms/kalke
-VITE_OIDC_CLIENT_ID=kalke-spa
-VITE_EBANK_API_URL=https://ebank.kalke.dev
-VITE_PDE_API_URL=https://pde.kalke.dev
 ```
 
 Push to `main` → lint, build, deploy on Cloudflare.

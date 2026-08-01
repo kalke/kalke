@@ -45,31 +45,6 @@ type Copy = {
 			tags: string[];
 		}[];
 	};
-	sandbox: {
-		eyebrow: string;
-		title: string;
-		intro: string;
-		login: string;
-		logout: string;
-		signedInAs: string;
-		loading: string;
-		ebankTitle: string;
-		ebankHint: string;
-		pdeTitle: string;
-		pdeHint: string;
-		accountId: string;
-		amount: string;
-		destination: string;
-		balance: string;
-		deposit: string;
-		withdraw: string;
-		transfer: string;
-		docType: string;
-		chooseFile: string;
-		extract: string;
-		result: string;
-		needLogin: string;
-	};
 	contact: {
 		eyebrow: string;
 		title: string;
@@ -86,7 +61,6 @@ export const copy: Record<Lang, Copy> = {
 			{ label: "Sobre", href: "#about" },
 			{ label: "Gostos", href: "#likes" },
 			{ label: "Projetos", href: "#builds" },
-			{ label: "Sandbox", href: "#sandbox" },
 			{ label: "Contato", href: "#contact" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
@@ -164,32 +138,6 @@ export const copy: Record<Lang, Copy> = {
 				},
 			],
 		},
-		sandbox: {
-			eyebrow: "Sandbox",
-			title: "Testa o que eu estou construindo",
-			intro:
-				"Entra com kalke-auth e chama as APIs de verdade. Conta de sandbox sob convite — sem senha pública.",
-			login: "Entrar",
-			logout: "Sair",
-			signedInAs: "Logado como",
-			loading: "Carregando sessão…",
-			ebankTitle: "e-bank-api",
-			ebankHint: "Depósito, saque, transferência e saldo (JWT exigido).",
-			pdeTitle: "personal-document-extractor",
-			pdeHint: "Envia um PDF/imagem e recebe JSON tipado.",
-			accountId: "Conta",
-			amount: "Valor",
-			destination: "Destino",
-			balance: "Saldo",
-			deposit: "Depositar",
-			withdraw: "Sacar",
-			transfer: "Transferir",
-			docType: "Tipo de documento",
-			chooseFile: "Arquivo",
-			extract: "Extrair",
-			result: "Resposta",
-			needLogin: "Faz login pra chamar as APIs.",
-		},
 		contact: {
 			eyebrow: "Contato",
 			title: "Fala comigo",
@@ -230,7 +178,6 @@ export const copy: Record<Lang, Copy> = {
 			{ label: "About", href: "#about" },
 			{ label: "Likes", href: "#likes" },
 			{ label: "Projects", href: "#builds" },
-			{ label: "Sandbox", href: "#sandbox" },
 			{ label: "Contact", href: "#contact" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
@@ -307,32 +254,6 @@ export const copy: Record<Lang, Copy> = {
 					tags: ["Docker", "DX"],
 				},
 			],
-		},
-		sandbox: {
-			eyebrow: "Sandbox",
-			title: "Try what I’m building",
-			intro:
-				"Sign in with kalke-auth and hit the live APIs. Sandbox accounts are invite-only — no public password.",
-			login: "Sign in",
-			logout: "Sign out",
-			signedInAs: "Signed in as",
-			loading: "Loading session…",
-			ebankTitle: "e-bank-api",
-			ebankHint: "Deposit, withdraw, transfer, and balance (JWT required).",
-			pdeTitle: "personal-document-extractor",
-			pdeHint: "Upload a PDF/image and get typed JSON back.",
-			accountId: "Account",
-			amount: "Amount",
-			destination: "Destination",
-			balance: "Balance",
-			deposit: "Deposit",
-			withdraw: "Withdraw",
-			transfer: "Transfer",
-			docType: "Document type",
-			chooseFile: "File",
-			extract: "Extract",
-			result: "Response",
-			needLogin: "Sign in to call the APIs.",
 		},
 		contact: {
 			eyebrow: "Contact",

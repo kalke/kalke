@@ -13,7 +13,6 @@
 	},
 	"dependencies": {
 		"hono": "4.11.1",
-		"oidc-client-ts": "^3.1.0",
 		"react": "19.2.1",
 		"react-dom": "19.2.1"
 	},
