@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { copy, detectLang, siteMeta, type Lang } from "./content";
 import { useReveal } from "./hooks/useReveal";
-import { Sandbox } from "./Sandbox";
 import "./App.css";
 
 function RevealSection({
@@ -145,10 +144,6 @@ export default function App() {
 							</li>
 						))}
 					</ul>
-				</RevealSection>
-
-				<RevealSection id="sandbox" className="sandbox">
-					<Sandbox lang={lang} />
 				</RevealSection>
 
 				<RevealSection id="contact" className="contact">

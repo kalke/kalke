@@ -1,4 +1,4 @@
-# Deploy kalke.dev + sandbox secrets checklist
+# Deploy kalke.dev secrets checklist
 
 ## Cloudflare (already live)
 
@@ -40,12 +40,12 @@ Required for Containers (~$5/mo). Enable before deploying auth / ebank / pde.
 
 | Host | Repo |
 |---|---|
-| `kalke.dev` | kalke (this site + sandbox) |
+| `kalke.dev` | kalke (this site) |
 | `auth.kalke.dev` | kalke-auth |
 | `ebank.kalke.dev` | e-bank-api |
 | `pde.kalke.dev` | personal-document-extractor |
 
-Deploy order: **kalke-auth → e-bank-api & PDE → kalke** (sandbox needs the IdP + APIs).
+Deploy order: **kalke-auth → e-bank-api & PDE → kalke**.
 
 ## GitHub secrets by repo
 
@@ -64,9 +64,3 @@ Deploy order: **kalke-auth → e-bank-api & PDE → kalke** (sandbox needs the I
 ### personal-document-extractor
 
 `CLOUDFLARE_*`, `DATABASE_URL`, `REDIS_ADDR`, `REDIS_PASSWORD`, `OIDC_ISSUER`, `GROQ_API_KEY`
-
-## Sandbox users
-
-Do **not** publish passwords on kalke.dev. Create invite-only users in Keycloak
-Admin (private access) with the minimum roles needed. Never reuse local Compose
-defaults (`DemoPass123!`, `*-dev-secret`) on production hosts.
