@@ -18,7 +18,7 @@ export const about = {
 	eyebrow: "Quem sou",
 	title: "Uma pessoa atrás do username",
 	paragraphs: [
-		"Sou o kalke — alguém que gosta de entender como as coisas funcionam e, quando possível, construir a própria versão delas. Passo bastante tempo entre código, ideias pela metade e café.",
+		"Sou o Henrique Kalke — kalke pra quem me encontra online. Gosto de entender como as coisas funcionam e, quando possível, construir a própria versão delas. Passo bastante tempo entre código, ideias pela metade e café.",
 		"Profissionalmente caminho pelo backend e por sistemas que precisam funcionar de verdade. Pessoalmente, gosto de espaço pra aprender sem pressa, de projetos que fazem sentido pra mim e de conversas honestas sobre o processo — não só sobre o resultado.",
 		"Este site é um rascunho vivo: dá pra melhorar o texto, trocar fotos, acrescentar obsessões novas. A ideia é que você me conheça um pouco além do LinkedIn.",
 	],
@@ -90,8 +90,8 @@ export const contact = {
 		},
 		{
 			label: "Email",
-			href: "mailto:ola@kalke.dev",
-			note: "ola@kalke.dev",
+			href: "mailto:henriquekalke@icloud.com",
+			note: "henriquekalke@icloud.com",
 		},
 	],
 };
