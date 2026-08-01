@@ -66,8 +66,7 @@ export const copy: Record<Lang, Copy> = {
 		langSwitch: { pt: "PT", en: "EN" },
 		hero: {
 			headline: "Henrique Kalke",
-			support:
-				"Software engineer em Curitiba. De dia faço sistemas bancários. De noite é projeto pessoal, metal e uma casa cheia de bicho.",
+			support: "Ou só kalke. Software engineer em Curitiba.",
 			primaryCta: { label: "Sobre mim", href: "#about" },
 			secondaryCta: { label: "Contato", href: "#contact" },
 		},
@@ -95,7 +94,7 @@ export const copy: Record<Lang, Copy> = {
 				},
 				{
 					title: "Metal",
-					text: "Escuto metal o tempo todo — no trampo, no caminho, codeando de madrugada.",
+					text: "Escuto metal o tempo todo — no trampo, no caminho, codando e jogando de madrugada.",
 				},
 				{
 					title: "Games",
@@ -177,8 +176,7 @@ export const copy: Record<Lang, Copy> = {
 		langSwitch: { pt: "PT", en: "EN" },
 		hero: {
 			headline: "Henrique Kalke",
-			support:
-				"Software engineer in Curitiba. Banking systems by day. Side projects, metal, and a house full of animals by night.",
+			support: "Or just kalke. Software engineer in Curitiba.",
 			primaryCta: { label: "About me", href: "#about" },
 			secondaryCta: { label: "Contact", href: "#contact" },
 		},
@@ -206,7 +204,7 @@ export const copy: Record<Lang, Copy> = {
 				},
 				{
 					title: "Metal",
-					text: "Metal most of the time — commuting, working, late-night coding.",
+					text: "Metal most of the time — commuting, working, coding and gaming late at night.",
 				},
 				{
 					title: "Games",
