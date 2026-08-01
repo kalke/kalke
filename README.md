@@ -2,42 +2,54 @@
 
 Henrique Kalke — software engineer.
 
-→ **[kalke.dev](https://kalke.dev)** — quem sou, o que gosto, o que construo.
+→ **[kalke.dev](https://kalke.dev)** — who I am, what I like, what I build, and a live **sandbox** (OIDC login via [kalke-auth](https://github.com/kalke/kalke-auth)).
 
 ---
 
 ## Stack
 
-| Área | Tecnologias |
-|------|-------------|
+| Area | Tech |
+|------|------|
 | Backend | Go, Python, FastAPI, TypeScript |
-| Dados | PostgreSQL, Redis, Kafka |
-| Cloud | AWS, Docker, Cloudflare Workers |
+| Data | PostgreSQL, Redis, Kafka |
+| Cloud | AWS, Docker, Cloudflare Workers / Containers |
 | Auth / APIs | OIDC, OpenAPI |
-| Frontend (este repo) | React 19, Vite, Hono |
+| Frontend (this repo) | React 19, Vite, Hono |
 
 ---
 
-## Projetos
+## Projects
 
 | Repo | Stack | |
 |------|-------|---|
-| [personal-document-extractor](https://github.com/kalke/personal-document-extractor) | Go · LLM · Postgres · Redis | Documentos BR → JSON |
-| [e-bank-api](https://github.com/kalke/e-bank-api) | Python · FastAPI | API bancária (depósito / saque / transferência) |
-| [kalke](https://github.com/kalke/kalke) | React · Vite · Workers | Código de [kalke.dev](https://kalke.dev) |
+| [kalke-auth](https://github.com/kalke/kalke-auth) | Keycloak · OIDC · Docker | Shared IdP (`auth.kalke.dev`) |
+| [personal-document-extractor](https://github.com/kalke/personal-document-extractor) | Go · LLM · Postgres · Redis | BR docs → JSON (`pde.kalke.dev`) |
+| [e-bank-api](https://github.com/kalke/e-bank-api) | Python · FastAPI | Bank events API (`ebank.kalke.dev`) |
+| [kalke](https://github.com/kalke/kalke) | React · Vite · Workers | Code for [kalke.dev](https://kalke.dev) |
 
 ---
 
-## Este repositório
+## This repository
 
 ```bash
 npm install
 npm run dev
 npm run build
-npm run deploy   # ou push em main → GitHub Actions
+npm run deploy   # or push to main → GitHub Actions
 ```
 
-Push em `main` → lint, build e deploy no Cloudflare.
+Optional Vite env (defaults target production hosts):
+
+```bash
+VITE_OIDC_AUTHORITY=https://auth.kalke.dev/realms/kalke
+VITE_OIDC_CLIENT_ID=kalke-spa
+VITE_EBANK_API_URL=https://ebank.kalke.dev
+VITE_PDE_API_URL=https://pde.kalke.dev
+```
+
+Push to `main` → lint, build, deploy on Cloudflare.
+
+See [DEPLOY.md](DEPLOY.md) and [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md).
 
 ---
 
