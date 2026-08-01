@@ -8,19 +8,23 @@ import {
 	logout,
 	me,
 	revokeToken,
+	signup,
 	type Me,
 	type TokenRow,
 } from "./api";
 import { copy, siteMeta, type Lang } from "./content";
 
 type Props = { lang: Lang; onLang: (l: Lang) => void };
+type AuthMode = "login" | "signup";
 
 export function Playground({ lang, onLang }: Props) {
 	const t = copy[lang].playground;
 	const [user, setUser] = useState<Me | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [mode, setMode] = useState<AuthMode>("login");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [inviteCode, setInviteCode] = useState("");
 	const [error, setError] = useState("");
 	const [tokens, setTokens] = useState<TokenRow[]>([]);
 	const [newTokenName, setNewTokenName] = useState("playground");
@@ -42,20 +46,37 @@ export function Playground({ lang, onLang }: Props) {
 			.finally(() => setLoading(false));
 	}, [t.pageTitle]);
 
+	async function afterAuth(u: Me) {
+		setUser(u);
+		setPassword("");
+		setInviteCode("");
+		const created = await createToken("playground-session");
+		setWorkingPat(created.token);
+		setCreatedToken(created.token);
+		setTokens(await listTokens());
+	}
+
 	async function onLogin(e: FormEvent) {
 		e.preventDefault();
 		setError("");
 		setBusy(true);
 		try {
-			const u = await login(email, password);
-			setUser(u);
-			setPassword("");
-			const created = await createToken("playground-session");
-			setWorkingPat(created.token);
-			setCreatedToken(created.token);
-			setTokens(await listTokens());
+			await afterAuth(await login(email, password));
 		} catch {
 			setError(t.loginError);
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function onSignup(e: FormEvent) {
+		e.preventDefault();
+		setError("");
+		setBusy(true);
+		try {
+			await afterAuth(await signup(email, password, inviteCode));
+		} catch {
+			setError(t.signupError);
 		} finally {
 			setBusy(false);
 		}
@@ -162,31 +183,75 @@ export function Playground({ lang, onLang }: Props) {
 				{loading ? (
 					<p className="playground-muted">{t.loading}</p>
 				) : !user ? (
-					<form className="playground-form" onSubmit={onLogin}>
-						<label>
-							{t.email}
-							<input
-								type="email"
-								autoComplete="username"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-							/>
-						</label>
-						<label>
-							{t.password}
-							<input
-								type="password"
-								autoComplete="current-password"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								required
-							/>
-						</label>
-						<button className="btn btn-primary" type="submit" disabled={busy}>
-							{t.login}
-						</button>
-					</form>
+					<>
+						<div className="playground-modes" role="tablist" aria-label="Auth">
+							<button
+								type="button"
+								role="tab"
+								aria-selected={mode === "login"}
+								className={mode === "login" ? "is-active" : undefined}
+								onClick={() => {
+									setMode("login");
+									setError("");
+								}}
+							>
+								{t.modeLogin}
+							</button>
+							<button
+								type="button"
+								role="tab"
+								aria-selected={mode === "signup"}
+								className={mode === "signup" ? "is-active" : undefined}
+								onClick={() => {
+									setMode("signup");
+									setError("");
+								}}
+							>
+								{t.modeSignup}
+							</button>
+						</div>
+						<form
+							className="playground-form"
+							onSubmit={mode === "login" ? onLogin : onSignup}
+						>
+							<label>
+								{t.email}
+								<input
+									type="email"
+									autoComplete="username"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+									required
+								/>
+							</label>
+							<label>
+								{t.password}
+								<input
+									type="password"
+									autoComplete={mode === "login" ? "current-password" : "new-password"}
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									minLength={mode === "signup" ? 10 : undefined}
+									required
+								/>
+							</label>
+							{mode === "signup" ? (
+								<label>
+									{t.inviteCode}
+									<input
+										type="text"
+										autoComplete="one-time-code"
+										value={inviteCode}
+										onChange={(e) => setInviteCode(e.target.value)}
+										required
+									/>
+								</label>
+							) : null}
+							<button className="btn btn-primary" type="submit" disabled={busy}>
+								{mode === "login" ? t.login : t.signup}
+							</button>
+						</form>
+					</>
 				) : (
 					<>
 						<div className="playground-auth">

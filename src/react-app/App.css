@@ -274,6 +274,36 @@
 	margin-bottom: 2rem;
 }
 
+.stack-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0;
+}
+
+.stack-list li {
+	padding: 1.25rem 0;
+	border-top: 1px solid var(--line);
+}
+
+.stack-list li:last-child {
+	border-bottom: 1px solid var(--line);
+}
+
+.stack-list h3 {
+	margin: 0 0 0.35rem;
+	font-family: var(--font-display);
+	font-size: 1.2rem;
+	font-weight: 550;
+}
+
+.stack-list p {
+	margin: 0;
+	color: var(--muted);
+	line-height: 1.55;
+}
+
 .likes-list {
 	list-style: none;
 	margin: 0;
@@ -449,6 +479,32 @@
 	margin: 0 0 1.25rem;
 	color: var(--muted);
 	line-height: 1.55;
+}
+
+.playground-modes {
+	display: inline-flex;
+	gap: 0.35rem;
+	margin: 0 0 1.25rem;
+	padding: 0.2rem;
+	border: 1px solid var(--line);
+	border-radius: 0.45rem;
+	background: rgba(20, 18, 16, 0.45);
+}
+
+.playground-modes button {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: var(--muted);
+	padding: 0.45rem 0.85rem;
+	border-radius: 0.3rem;
+	cursor: pointer;
+	font: inherit;
+}
+
+.playground-modes button.is-active {
+	background: rgba(196, 163, 90, 0.16);
+	color: var(--ink);
 }
 
 .playground-form {
