@@ -1,45 +1,55 @@
-# kalke.dev
+# kalke
 
-Portfolio pessoal em [kalke.dev](https://kalke.dev).
+**Kalke — e às vezes Henrique.**
 
-Site simples, bilíngue (PT/EN), com quem eu sou, o que gosto, o que construo e como falar comigo.
+Passo o dia construindo sistemas que mexem com dinheiro de verdade. O resto do tempo é metal, boxe, videogame e uma casa lotada de bicho.
 
-## Por que existe
+Site: **[kalke.dev](https://kalke.dev)**
 
-Dois motivos, no mesmo projeto:
+---
 
-1. **Estudar na prática** — React (Vite + TypeScript) e o ecossistema Cloudflare (Workers, Assets, Wrangler, domínio customizado).
-2. **Ter um portfólio no ar** — um lugar próprio, com meu domínio, em vez de só um perfil no GitHub ou LinkedIn.
+## Quem sou
 
-A ideia não era um template genérico. Era montar algo meu, publicar de verdade e aprender o caminho completo: código → build → deploy → DNS/TLS.
+Me chama de Kalke. É sobrenome, mas é o jeito que a internet me encontrou — e eu me acostumei. Henrique também serve.
 
-## Stack
+Backend / software engineer em **Curitiba**. Uns seis anos no mundo financeiro: recuperação de crédito, accountingtech e infraestrutura bancária de ponta a ponta. O tipo de sistema em que bug não é só ticket — é conta, PIX, boleto, regulação do Bacen.
 
-| Camada | Tecnologia |
-|--------|------------|
-| Frontend | React 19, Vite, TypeScript |
-| Edge | Cloudflare Workers + Static Assets |
-| API mínima | Hono (`/api/health`) |
-| Deploy | Wrangler |
-| Domínio | `kalke.dev` / `www.kalke.dev` |
+Morei três anos na Inglaterra. Foi lá que aprendi a ler e escrever — em inglês, antes do português.
 
-## Desenvolvimento
+Fora do teclado: boxe, metal alto, jogo pra sumir um pouco, e quatro gatos (Zaia, Chico, Linhaça, Claire) mais a Meg — que quase se chamou Lurdinha.
+
+---
+
+## O que construo
+
+| Projeto | O que é |
+|---------|---------|
+| **[personal-document-extractor](https://github.com/kalke/personal-document-extractor)** | Documento brasileiro → JSON limpo. Go, LLM, Postgres, Redis. |
+| **[e-bank-api](https://github.com/kalke/e-bank-api)** | API bancária enxuta em FastAPI (depósito, saque, transferência). |
+| **[kalke.dev](https://kalke.dev)** | Este portfólio — React, Vite, Cloudflare Workers. |
+
+---
+
+## Este repositório
+
+Código-fonte de [kalke.dev](https://kalke.dev).
 
 ```bash
 npm install
 npm run dev      # local
-npm run build    # build de produção
-npm run deploy   # sobe para a Cloudflare
+npm run build    # produção
+npm run deploy   # Cloudflare (ou push em main → Actions)
 ```
 
-## Estrutura
+Push em `main` faz lint, build e deploy automático no Worker.
 
-```text
-src/
-  react-app/   # UI do portfólio
-  worker/      # Worker (healthcheck + assets)
-```
+---
 
-## Licença
+## Contato
 
-Projeto pessoal. Código disponível para leitura e referência.
+- [GitHub](https://github.com/kalke)
+- [LinkedIn](https://www.linkedin.com/in/henriquekalke/)
+- [Spotify](https://open.spotify.com/user/12149692772?si=09f6c534878040e1)
+- [henriquekalke@icloud.com](mailto:henriquekalke@icloud.com)
+
+Pode ser vaga, ideia, dúvida técnica, metal, gato, ou só um oi. Não prometo responder em cinco minutos — prometo responder de verdade.

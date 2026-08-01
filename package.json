@@ -1,6 +1,6 @@
 {
-	"name": "kalke-dev",
-	"description": "Portfolio pessoal de kalke — React, Vite e Cloudflare Workers",
+	"name": "kalke",
+	"description": "kalke.dev — portfolio pessoal (React + Cloudflare Workers)",
 	"cloudflare": {
 		"label": "Vite React Template",
 		"products": [
