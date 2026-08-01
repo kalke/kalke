@@ -12,7 +12,11 @@ app.use(
 			styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
 			fontSrc: ["'self'", "https://fonts.gstatic.com"],
 			imgSrc: ["'self'", "data:"],
-			connectSrc: ["'self'"],
+			connectSrc: [
+				"'self'",
+				"https://auth.kalke.dev",
+				"https://pde.kalke.dev",
+			],
 			frameAncestors: ["'none'"],
 			baseUri: ["'self'"],
 			formAction: ["'self'"],
