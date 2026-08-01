@@ -65,9 +65,8 @@ Deploy order: **kalke-auth → e-bank-api & PDE → kalke** (sandbox needs the I
 
 `CLOUDFLARE_*`, `DATABASE_URL`, `REDIS_ADDR`, `REDIS_PASSWORD`, `OIDC_ISSUER`, `GROQ_API_KEY`
 
-## Demo sandbox user
+## Sandbox users
 
-Imported with the realm (change after first shared use):
-
-- `demo@kalke.local` / `DemoPass123!`
-- Roles: `extract:write`, `bank:write`
+Do **not** publish passwords on kalke.dev. Create invite-only users in Keycloak
+Admin (private access) with the minimum roles needed. Never reuse local Compose
+defaults (`DemoPass123!`, `*-dev-secret`) on production hosts.

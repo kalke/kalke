@@ -64,7 +64,6 @@ type Copy = {
 		deposit: string;
 		withdraw: string;
 		transfer: string;
-		reset: string;
 		docType: string;
 		chooseFile: string;
 		extract: string;
@@ -169,7 +168,7 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "Sandbox",
 			title: "Testa o que eu estou construindo",
 			intro:
-				"Entra com kalke-auth e chama as APIs de verdade. Demo: demo@kalke.local / DemoPass123!",
+				"Entra com kalke-auth e chama as APIs de verdade. Conta de sandbox sob convite — sem senha pública.",
 			login: "Entrar",
 			logout: "Sair",
 			signedInAs: "Logado como",
@@ -185,7 +184,6 @@ export const copy: Record<Lang, Copy> = {
 			deposit: "Depositar",
 			withdraw: "Sacar",
 			transfer: "Transferir",
-			reset: "Resetar",
 			docType: "Tipo de documento",
 			chooseFile: "Arquivo",
 			extract: "Extrair",
@@ -314,7 +312,7 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "Sandbox",
 			title: "Try what I’m building",
 			intro:
-				"Sign in with kalke-auth and hit the live APIs. Demo: demo@kalke.local / DemoPass123!",
+				"Sign in with kalke-auth and hit the live APIs. Sandbox accounts are invite-only — no public password.",
 			login: "Sign in",
 			logout: "Sign out",
 			signedInAs: "Signed in as",
@@ -330,7 +328,6 @@ export const copy: Record<Lang, Copy> = {
 			deposit: "Deposit",
 			withdraw: "Withdraw",
 			transfer: "Transfer",
-			reset: "Reset",
 			docType: "Document type",
 			chooseFile: "File",
 			extract: "Extract",

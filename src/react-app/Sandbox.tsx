@@ -218,14 +218,6 @@ export function Sandbox({ lang }: Props) {
 						>
 							{t.transfer}
 						</button>
-						<button
-							type="button"
-							className="btn btn-ghost"
-							disabled={busy || !user}
-							onClick={() => callEbank("POST", "/reset")}
-						>
-							{t.reset}
-						</button>
 					</div>
 				</section>
 
