@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
-import { about, builds, contact, hero, likes, nav, site } from "./content";
+import { useEffect, useState, type ReactNode } from "react";
+import { copy, detectLang, siteMeta, type Lang } from "./content";
 import { useReveal } from "./hooks/useReveal";
 import "./App.css";
 
@@ -25,35 +25,71 @@ function RevealSection({
 }
 
 export default function App() {
+	const [lang, setLang] = useState<Lang>(() => detectLang());
+	const t = copy[lang];
+	const meta = siteMeta[lang];
+
+	useEffect(() => {
+		document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+		document.title = meta.title;
+		const description = document.querySelector('meta[name="description"]');
+		description?.setAttribute("content", meta.description);
+		window.localStorage.setItem("kalke-lang", lang);
+	}, [lang, meta.description, meta.title]);
+
+	function switchLang(next: Lang) {
+		setLang(next);
+	}
+
 	return (
 		<div className="page">
 			<div className="atmosphere" aria-hidden="true" />
 
 			<header className="topbar">
-				<a className="brand-mark" href="#topo">
-					{site.brand}
+				<a className="brand-mark" href="#top">
+					{siteMeta.brand}
 				</a>
-				<nav className="nav" aria-label="Principal">
-					{nav.map((item) => (
-						<a key={item.href} href={item.href}>
-							{item.label}
-						</a>
-					))}
-				</nav>
+				<div className="topbar-end">
+					<nav className="nav" aria-label={t.navAria}>
+						{t.nav.map((item) => (
+							<a key={item.href} href={item.href}>
+								{item.label}
+							</a>
+						))}
+					</nav>
+					<div className="lang-switch" role="group" aria-label="Language">
+						<button
+							type="button"
+							className={lang === "pt" ? "is-active" : undefined}
+							onClick={() => switchLang("pt")}
+							aria-pressed={lang === "pt"}
+						>
+							{t.langSwitch.pt}
+						</button>
+						<button
+							type="button"
+							className={lang === "en" ? "is-active" : undefined}
+							onClick={() => switchLang("en")}
+							aria-pressed={lang === "en"}
+						>
+							{t.langSwitch.en}
+						</button>
+					</div>
+				</div>
 			</header>
 
 			<main>
-				<section id="topo" className="hero">
+				<section id="top" className="hero">
 					<div className="hero-copy">
-						<p className="brand-hero">{site.brand}</p>
-						<h1 className="hero-title">{hero.headline}</h1>
-						<p className="hero-support">{hero.support}</p>
+						<p className="brand-hero">{siteMeta.brand}</p>
+						<h1 className="hero-title">{t.hero.headline}</h1>
+						<p className="hero-support">{t.hero.support}</p>
 						<div className="hero-actions">
-							<a className="btn btn-primary" href={hero.primaryCta.href}>
-								{hero.primaryCta.label}
+							<a className="btn btn-primary" href={t.hero.primaryCta.href}>
+								{t.hero.primaryCta.label}
 							</a>
-							<a className="btn btn-ghost" href={hero.secondaryCta.href}>
-								{hero.secondaryCta.label}
+							<a className="btn btn-ghost" href={t.hero.secondaryCta.href}>
+								{t.hero.secondaryCta.label}
 							</a>
 						</div>
 					</div>
@@ -63,21 +99,21 @@ export default function App() {
 					</div>
 				</section>
 
-				<RevealSection id="sobre" className="about">
-					<p className="eyebrow">{about.eyebrow}</p>
-					<h2>{about.title}</h2>
+				<RevealSection id="about" className="about">
+					<p className="eyebrow">{t.about.eyebrow}</p>
+					<h2>{t.about.title}</h2>
 					<div className="prose">
-						{about.paragraphs.map((p) => (
-							<p key={p.slice(0, 24)}>{p}</p>
+						{t.about.paragraphs.map((p) => (
+							<p key={p.slice(0, 32)}>{p}</p>
 						))}
 					</div>
 				</RevealSection>
 
-				<RevealSection id="gostos" className="likes">
-					<p className="eyebrow">{likes.eyebrow}</p>
-					<h2>{likes.title}</h2>
+				<RevealSection id="likes" className="likes">
+					<p className="eyebrow">{t.likes.eyebrow}</p>
+					<h2>{t.likes.title}</h2>
 					<ul className="likes-list">
-						{likes.items.map((item) => (
+						{t.likes.items.map((item) => (
 							<li key={item.title}>
 								<h3>{item.title}</h3>
 								<p>{item.text}</p>
@@ -86,15 +122,19 @@ export default function App() {
 					</ul>
 				</RevealSection>
 
-				<RevealSection id="projetos" className="builds">
-					<p className="eyebrow">{builds.eyebrow}</p>
-					<h2>{builds.title}</h2>
-					<p className="section-intro">{builds.intro}</p>
+				<RevealSection id="builds" className="builds">
+					<p className="eyebrow">{t.builds.eyebrow}</p>
+					<h2>{t.builds.title}</h2>
+					<p className="section-intro">{t.builds.intro}</p>
 					<ul className="builds-list">
-						{builds.items.map((item) => (
+						{t.builds.items.map((item) => (
 							<li key={item.name}>
 								<div className="build-head">
-									<h3>{item.name}</h3>
+									<h3>
+										<a href={item.href} target="_blank" rel="noreferrer">
+											{item.name}
+										</a>
+									</h3>
 									<div className="tags">
 										{item.tags.map((tag) => (
 											<span key={tag}>{tag}</span>
@@ -107,14 +147,19 @@ export default function App() {
 					</ul>
 				</RevealSection>
 
-				<RevealSection id="contato" className="contact">
-					<p className="eyebrow">{contact.eyebrow}</p>
-					<h2>{contact.title}</h2>
-					<p className="section-intro">{contact.text}</p>
+				<RevealSection id="contact" className="contact">
+					<p className="eyebrow">{t.contact.eyebrow}</p>
+					<h2>{t.contact.title}</h2>
+					<p className="section-intro">{t.contact.text}</p>
 					<ul className="contact-links">
-						{contact.links.map((link) => (
+						{t.contact.links.map((link) => (
 							<li key={link.label}>
-								<a href={link.href}>
+								<a
+									href={link.href}
+									{...(link.href.startsWith("mailto:")
+										? {}
+										: { target: "_blank", rel: "noreferrer" })}
+								>
 									<span className="contact-label">{link.label}</span>
 									<span className="contact-note">{link.note}</span>
 								</a>
@@ -126,9 +171,9 @@ export default function App() {
 
 			<footer className="footer">
 				<p>
-					<span className="brand-mark">{site.brand}</span>
+					<span className="brand-mark">{siteMeta.brand}</span>
 					<span className="footer-sep">·</span>
-					<span>feito com React, Vite e Cloudflare</span>
+					<span>{t.footer}</span>
 				</p>
 			</footer>
 		</div>
