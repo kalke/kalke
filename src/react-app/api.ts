@@ -33,6 +33,23 @@ export async function login(email: string, password: string): Promise<Me> {
 	return res.json();
 }
 
+export async function signup(
+	email: string,
+	password: string,
+	inviteCode: string,
+): Promise<Me> {
+	const res = await authFetch("/v1/auth/signup", {
+		method: "POST",
+		body: JSON.stringify({
+			email,
+			password,
+			invite_code: inviteCode,
+		}),
+	});
+	if (!res.ok) throw new Error("signup_failed");
+	return res.json();
+}
+
 export async function logout(): Promise<void> {
 	await authFetch("/v1/auth/logout", { method: "POST" });
 }

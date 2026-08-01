@@ -34,6 +34,12 @@ type Copy = {
 		title: string;
 		items: { title: string; text: string }[];
 	};
+	stack: {
+		eyebrow: string;
+		title: string;
+		intro: string;
+		groups: { area: string; items: string[] }[];
+	};
 	builds: {
 		eyebrow: string;
 		title: string;
@@ -62,10 +68,16 @@ type Copy = {
 		loading: string;
 		email: string;
 		password: string;
+		inviteCode: string;
 		login: string;
+		signup: string;
 		logout: string;
 		signedInAs: string;
 		loginError: string;
+		signupError: string;
+		signupOk: string;
+		modeLogin: string;
+		modeSignup: string;
 		tokensTitle: string;
 		tokensHint: string;
 		tokenName: string;
@@ -89,6 +101,7 @@ export const copy: Record<Lang, Copy> = {
 		navAria: "Principal",
 		nav: [
 			{ label: "Sobre", href: "#about" },
+			{ label: "Stack", href: "#stack" },
 			{ label: "Gostos", href: "#likes" },
 			{ label: "Projetos", href: "#builds" },
 			{ label: "Playground", href: "/playground" },
@@ -131,6 +144,18 @@ export const copy: Record<Lang, Copy> = {
 					title: "Games",
 					text: "Quando largo o notebook, jogo. É o jeito mais fácil de desligar a cabeça.",
 				},
+			],
+		},
+		stack: {
+			eyebrow: "Stack",
+			title: "Com o que eu trabalho",
+			intro: "Backend, dados e cloud — o dia a dia e o que aparece nos projetos.",
+			groups: [
+				{ area: "Backend", items: ["Go", "Python", "FastAPI", "TypeScript"] },
+				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
+				{ area: "Cloud", items: ["AWS", "Docker", "Cloudflare Workers / Containers"] },
+				{ area: "Auth / APIs", items: ["OIDC", "OpenAPI"] },
+				{ area: "Frontend", items: ["React", "Vite", "Hono"] },
 			],
 		},
 		builds: {
@@ -212,10 +237,16 @@ export const copy: Record<Lang, Copy> = {
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
+			inviteCode: "Código de convite",
 			login: "Entrar",
+			signup: "Criar conta",
 			logout: "Sair",
 			signedInAs: "Logado como",
 			loginError: "Não deu pra entrar. Confere email e senha.",
+			signupError: "Não deu pra criar a conta. Confere os dados e o código.",
+			signupOk: "Conta criada. Você já está logado.",
+			modeLogin: "Entrar",
+			modeSignup: "Criar conta",
 			tokensTitle: "API tokens",
 			tokensHint: "O valor completo aparece uma vez. Guarda com cuidado.",
 			tokenName: "Nome",
@@ -237,6 +268,7 @@ export const copy: Record<Lang, Copy> = {
 		navAria: "Primary",
 		nav: [
 			{ label: "About", href: "#about" },
+			{ label: "Stack", href: "#stack" },
 			{ label: "Likes", href: "#likes" },
 			{ label: "Projects", href: "#builds" },
 			{ label: "Playground", href: "/playground" },
@@ -279,6 +311,18 @@ export const copy: Record<Lang, Copy> = {
 					title: "Games",
 					text: "When the laptop’s down, I play. Easiest way to switch my brain off.",
 				},
+			],
+		},
+		stack: {
+			eyebrow: "Stack",
+			title: "What I work with",
+			intro: "Backend, data, and cloud — day job and side projects.",
+			groups: [
+				{ area: "Backend", items: ["Go", "Python", "FastAPI", "TypeScript"] },
+				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
+				{ area: "Cloud", items: ["AWS", "Docker", "Cloudflare Workers / Containers"] },
+				{ area: "Auth / APIs", items: ["OIDC", "OpenAPI"] },
+				{ area: "Frontend", items: ["React", "Vite", "Hono"] },
 			],
 		},
 		builds: {
@@ -360,10 +404,16 @@ export const copy: Record<Lang, Copy> = {
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
+			inviteCode: "Invite code",
 			login: "Sign in",
+			signup: "Create account",
 			logout: "Sign out",
 			signedInAs: "Signed in as",
 			loginError: "Could not sign in. Check email and password.",
+			signupError: "Could not create the account. Check details and invite code.",
+			signupOk: "Account created. You’re signed in.",
+			modeLogin: "Sign in",
+			modeSignup: "Create account",
 			tokensTitle: "API tokens",
 			tokensHint: "The full value is shown once. Store it carefully.",
 			tokenName: "Name",

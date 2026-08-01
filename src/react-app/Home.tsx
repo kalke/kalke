@@ -102,6 +102,20 @@ export function Home({ lang, onLang }: Props) {
 					</div>
 				</RevealSection>
 
+				<RevealSection id="stack" className="stack">
+					<p className="eyebrow">{t.stack.eyebrow}</p>
+					<h2>{t.stack.title}</h2>
+					<p className="section-intro">{t.stack.intro}</p>
+					<ul className="stack-list">
+						{t.stack.groups.map((group) => (
+							<li key={group.area}>
+								<h3>{group.area}</h3>
+								<p>{group.items.join(" · ")}</p>
+							</li>
+						))}
+					</ul>
+				</RevealSection>
+
 				<RevealSection id="likes" className="likes">
 					<p className="eyebrow">{t.likes.eyebrow}</p>
 					<h2>{t.likes.title}</h2>
