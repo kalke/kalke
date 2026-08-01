@@ -17,8 +17,19 @@ if ! command -v gh >/dev/null; then
 fi
 
 ACTOR_ID="$(gh api "users/${ACTOR_LOGIN}" --jq .id)"
+ME="$(gh api user --jq .login 2>/dev/null || true)"
+if [[ -z "${ME}" || "${ME}" == *"message"* ]]; then
+  echo "Not authenticated with a user PAT/OAuth token." >&2
+  echo "The Cursor cloud GitHub App cannot create rulesets (403)." >&2
+  echo "Run: gh auth login -h github.com   # as ${ACTOR_LOGIN}" >&2
+  exit 1
+fi
+if [[ "${ME}" != "${ACTOR_LOGIN}" ]]; then
+  echo "Authenticated as '${ME}', but this script must run as '${ACTOR_LOGIN}'." >&2
+  exit 1
+fi
 echo "Bypass actor: ${ACTOR_LOGIN} (id=${ACTOR_ID})"
-echo "Authenticated as: $(gh api user --jq .login)"
+echo "Authenticated as: ${ME}"
 
 apply_repo() {
   local repo="$1"
