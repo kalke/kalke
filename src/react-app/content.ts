@@ -148,6 +148,11 @@ export const copy: Record<Lang, Copy> = {
 					note: "trabalho",
 				},
 				{
+					label: "WhatsApp",
+					href: "https://wa.me/5541991071908",
+					note: "(41) 99107-1908",
+				},
+				{
 					label: "Spotify",
 					href: "https://open.spotify.com/user/12149692772?si=09f6c534878040e1",
 					note: "o que eu escuto",
@@ -252,6 +257,11 @@ export const copy: Record<Lang, Copy> = {
 					label: "LinkedIn",
 					href: "https://www.linkedin.com/in/henriquekalke/",
 					note: "work",
+				},
+				{
+					label: "WhatsApp",
+					href: "https://wa.me/5541991071908",
+					note: "+55 41 99107-1908",
 				},
 				{
 					label: "Spotify",
