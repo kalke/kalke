@@ -52,6 +52,36 @@ type Copy = {
 		links: { label: string; href: string; note: string }[];
 	};
 	footer: string;
+	playground: {
+		pageTitle: string;
+		navAria: string;
+		backHome: string;
+		eyebrow: string;
+		title: string;
+		intro: string;
+		loading: string;
+		email: string;
+		password: string;
+		login: string;
+		logout: string;
+		signedInAs: string;
+		loginError: string;
+		tokensTitle: string;
+		tokensHint: string;
+		tokenName: string;
+		createToken: string;
+		tokenOnce: string;
+		revoke: string;
+		tokenError: string;
+		needToken: string;
+		pdeTitle: string;
+		pdeHint: string;
+		docType: string;
+		chooseFile: string;
+		extract: string;
+		extractError: string;
+		result: string;
+	};
 };
 
 export const copy: Record<Lang, Copy> = {
@@ -61,6 +91,7 @@ export const copy: Record<Lang, Copy> = {
 			{ label: "Sobre", href: "#about" },
 			{ label: "Gostos", href: "#likes" },
 			{ label: "Projetos", href: "#builds" },
+			{ label: "Playground", href: "/playground" },
 			{ label: "Contato", href: "#contact" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
@@ -171,6 +202,36 @@ export const copy: Record<Lang, Copy> = {
 			],
 		},
 		footer: "React · Vite · Cloudflare",
+		playground: {
+			pageTitle: "kalke — playground",
+			navAria: "Playground",
+			backHome: "Início",
+			eyebrow: "Playground",
+			title: "Área logada",
+			intro: "Login privado pra gerar API tokens e testar o personal-document-extractor.",
+			loading: "Carregando…",
+			email: "Email",
+			password: "Senha",
+			login: "Entrar",
+			logout: "Sair",
+			signedInAs: "Logado como",
+			loginError: "Não deu pra entrar. Confere email e senha.",
+			tokensTitle: "API tokens",
+			tokensHint: "O valor completo aparece uma vez. Guarda com cuidado.",
+			tokenName: "Nome",
+			createToken: "Criar token",
+			tokenOnce: "Copia agora — não mostra de novo: ",
+			revoke: "Revogar",
+			tokenError: "Falha ao gerenciar token.",
+			needToken: "Cria um token antes de extrair.",
+			pdeTitle: "Document extractor",
+			pdeHint: "Envia PDF/imagem e recebe JSON.",
+			docType: "Tipo",
+			chooseFile: "Arquivo",
+			extract: "Extrair",
+			extractError: "Falha na extração.",
+			result: "Resposta",
+		},
 	},
 	en: {
 		navAria: "Primary",
@@ -178,6 +239,7 @@ export const copy: Record<Lang, Copy> = {
 			{ label: "About", href: "#about" },
 			{ label: "Likes", href: "#likes" },
 			{ label: "Projects", href: "#builds" },
+			{ label: "Playground", href: "/playground" },
 			{ label: "Contact", href: "#contact" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
@@ -288,6 +350,36 @@ export const copy: Record<Lang, Copy> = {
 			],
 		},
 		footer: "React · Vite · Cloudflare",
+		playground: {
+			pageTitle: "kalke — playground",
+			navAria: "Playground",
+			backHome: "Home",
+			eyebrow: "Playground",
+			title: "Signed-in area",
+			intro: "Private login to mint API tokens and try personal-document-extractor.",
+			loading: "Loading…",
+			email: "Email",
+			password: "Password",
+			login: "Sign in",
+			logout: "Sign out",
+			signedInAs: "Signed in as",
+			loginError: "Could not sign in. Check email and password.",
+			tokensTitle: "API tokens",
+			tokensHint: "The full value is shown once. Store it carefully.",
+			tokenName: "Name",
+			createToken: "Create token",
+			tokenOnce: "Copy now — it won’t be shown again: ",
+			revoke: "Revoke",
+			tokenError: "Could not manage token.",
+			needToken: "Create a token before extracting.",
+			pdeTitle: "Document extractor",
+			pdeHint: "Upload a PDF/image and get JSON back.",
+			docType: "Type",
+			chooseFile: "File",
+			extract: "Extract",
+			extractError: "Extraction failed.",
+			result: "Response",
+		},
 	},
 };
 
