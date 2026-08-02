@@ -219,9 +219,11 @@ export function Home({ lang, onLang }: Props) {
 								<a
 									className="contact-card"
 									href={link.href}
-									{...(link.href.startsWith("mailto:")
-										? {}
-										: { target: "_blank", rel: "noreferrer" })}
+									{...(link.download
+										? { download: link.download }
+										: link.href.startsWith("mailto:")
+											? {}
+											: { target: "_blank", rel: "noreferrer" })}
 								>
 									<span className="contact-label">{link.label}</span>
 									<span className="contact-note">{link.note}</span>

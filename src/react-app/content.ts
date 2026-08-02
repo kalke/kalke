@@ -186,7 +186,7 @@ type Copy = {
 		eyebrow: string;
 		title: string;
 		text: string;
-		links: { label: string; href: string; note: string }[];
+		links: { label: string; href: string; note: string; download?: string }[];
 	};
 	footer: string;
 	playground: PlaygroundCopy;
@@ -320,8 +320,20 @@ export const copy: Record<Lang, Copy> = {
 		contact: {
 			eyebrow: "~/contact",
 			title: "Contato",
-			text: "Quer bater um papo sobre código, infraestrutura bancária, projetos paralelos ou novas oportunidades? Me manda uma mensagem. Costumo ser mais rápido no WhatsApp.",
+			text: "Quer bater um papo sobre código, infraestrutura bancária, projetos paralelos ou novas oportunidades? Me manda uma mensagem. Costumo ser mais rápido no WhatsApp. O currículo em PDF também está aqui.",
 			links: [
+				{
+					label: "Currículo (PDF)",
+					href: "/cv/Henrique_Kalke_Engenheiro_de_Software_Senior.pdf",
+					note: "Português · download",
+					download: "Henrique_Kalke_Curriculo_PT.pdf",
+				},
+				{
+					label: "Resume (PDF)",
+					href: "/cv/Henrique_Kalke_Senior_Software_Engineer.pdf",
+					note: "English · download",
+					download: "Henrique_Kalke_Resume_EN.pdf",
+				},
 				{
 					label: "Email",
 					href: "mailto:henriquekalke@icloud.com",
@@ -616,8 +628,20 @@ export const copy: Record<Lang, Copy> = {
 		contact: {
 			eyebrow: "~/contact",
 			title: "Contact",
-			text: "Want to talk code, banking infrastructure, side projects, or new roles? Send a message. I'm usually fastest on WhatsApp.",
+			text: "Want to talk code, banking infrastructure, side projects, or new roles? Send a message. I'm usually fastest on WhatsApp. Résumé PDFs are available below.",
 			links: [
+				{
+					label: "Resume (PDF)",
+					href: "/cv/Henrique_Kalke_Senior_Software_Engineer.pdf",
+					note: "English · download",
+					download: "Henrique_Kalke_Resume_EN.pdf",
+				},
+				{
+					label: "Currículo (PDF)",
+					href: "/cv/Henrique_Kalke_Engenheiro_de_Software_Senior.pdf",
+					note: "Portuguese · download",
+					download: "Henrique_Kalke_Curriculo_PT.pdf",
+				},
 				{
 					label: "Email",
 					href: "mailto:henriquekalke@icloud.com",
