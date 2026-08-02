@@ -20,6 +20,7 @@ import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 type AuthMode = "login" | "signup" | "passwordless" | "forgot";
+type LoginStep = "methods" | "email";
 type VerifyKind = "signup" | "passwordless" | "reset";
 
 export function AuthGate({ lang }: Props) {
@@ -27,6 +28,7 @@ export function AuthGate({ lang }: Props) {
 	const { afterAuth, busy, setBusy, error, setError } = useDashboard();
 	const { capsOn, onKeyEvent } = useCapsLock();
 	const [mode, setMode] = useState<AuthMode>("login");
+	const [loginStep, setLoginStep] = useState<LoginStep>("methods");
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -64,6 +66,7 @@ export function AuthGate({ lang }: Props) {
 
 	function switchMode(next: AuthMode) {
 		setMode(next);
+		setLoginStep(next === "login" ? "methods" : "email");
 		setError("");
 		setVerifyKind(null);
 		setOtpCode("");
@@ -167,11 +170,7 @@ export function AuthGate({ lang }: Props) {
 					await finishAuth(out);
 				} else {
 					setVerifyKind(null);
-					setMode("login");
-					setPassword("");
-					setConfirmPassword("");
-					setOtpCode("");
-					setError("");
+					switchMode("login");
 				}
 			}
 		} catch (err) {
@@ -207,7 +206,14 @@ export function AuthGate({ lang }: Props) {
 		}
 	}
 
-	const primaryTab = mode === "signup" ? "signup" : "login";
+	const showTabs = mode === "login" || mode === "signup";
+	const showMethodChooser = mode === "login" && loginStep === "methods";
+	const showEmailForm =
+		mode === "signup" ||
+		(mode === "login" && loginStep === "email") ||
+		mode === "passwordless" ||
+		mode === "forgot";
+
 	const formSubmit =
 		mode === "login"
 			? onLogin
@@ -216,6 +222,15 @@ export function AuthGate({ lang }: Props) {
 				: mode === "passwordless"
 					? onPasswordless
 					: onForgot;
+
+	const panelTitle =
+		mode === "forgot"
+			? t.forgotTitle
+			: mode === "passwordless"
+				? t.passwordlessTitle
+				: mode === "login" && loginStep === "email"
+					? t.continueWithEmail
+					: null;
 
 	const verifyTitle =
 		verifyKind === "reset"
@@ -234,13 +249,13 @@ export function AuthGate({ lang }: Props) {
 			<h1>{t.title}</h1>
 			<p className="section-intro">{t.intro}</p>
 
-			{mode === "login" || mode === "signup" ? (
+			{showTabs ? (
 				<div className="playground-modes" role="tablist" aria-label="Auth">
 					<button
 						type="button"
 						role="tab"
-						aria-selected={primaryTab === "login"}
-						className={primaryTab === "login" ? "is-active" : undefined}
+						aria-selected={mode === "login"}
+						className={mode === "login" ? "is-active" : undefined}
 						onClick={() => switchMode("login")}
 					>
 						{t.modeLogin}
@@ -248,141 +263,165 @@ export function AuthGate({ lang }: Props) {
 					<button
 						type="button"
 						role="tab"
-						aria-selected={primaryTab === "signup"}
-						className={primaryTab === "signup" ? "is-active" : undefined}
+						aria-selected={mode === "signup"}
+						className={mode === "signup" ? "is-active" : undefined}
 						onClick={() => switchMode("signup")}
 					>
 						{t.modeSignup}
 					</button>
 				</div>
-			) : (
-				<p className="eyebrow">
-					{mode === "forgot" ? t.forgotTitle : t.passwordlessTitle}
-				</p>
-			)}
-
-			{mode === "login" || mode === "signup" ? (
-				<div className="playground-oauth">
-					<a className="playground-oauth-google" href={oauthStartURL("google")}>
-						{t.continueWithGoogle}
-					</a>
-					<p className="playground-oauth-or" aria-hidden="true">
-						—
-					</p>
-				</div>
 			) : null}
 
-			<form className="playground-form" onSubmit={formSubmit}>
+			<div className="auth-panel">
+				{panelTitle ? <p className="auth-panel-title">{panelTitle}</p> : null}
+
+				{showMethodChooser ? (
+					<div className="auth-methods" role="group" aria-label={t.modeLogin}>
+						<a className="auth-method" href={oauthStartURL("google")}>
+							{t.continueWithGoogle}
+						</a>
+						<button
+							type="button"
+							className="auth-method"
+							onClick={() => {
+								setError("");
+								setLoginStep("email");
+							}}
+						>
+							{t.continueWithEmail}
+						</button>
+					</div>
+				) : null}
+
 				{mode === "signup" ? (
-					<label>
-						{t.name}
-						<input
-							type="text"
-							autoComplete="name"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							required
-							minLength={2}
-							maxLength={80}
-						/>
-					</label>
+					<div className="auth-methods">
+						<a className="auth-method" href={oauthStartURL("google")}>
+							{t.continueWithGoogle}
+						</a>
+						<p className="auth-divider">
+							<span>{t.authOr}</span>
+						</p>
+					</div>
 				) : null}
-				<label>
-					{t.email}
-					<input
-						type="email"
-						autoComplete="username"
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-						required
-					/>
-				</label>
-				{mode === "login" || mode === "signup" ? (
-					<label>
-						{t.password}
-						<input
-							type="password"
-							autoComplete={
-								mode === "login" ? "current-password" : "new-password"
-							}
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							onKeyDown={onKeyEvent}
-							onKeyUp={onKeyEvent}
-							minLength={mode === "signup" ? 10 : undefined}
-							required
-						/>
-					</label>
+
+				{showEmailForm ? (
+					<form className="playground-form" onSubmit={formSubmit}>
+						{mode === "signup" ? (
+							<label>
+								{t.name}
+								<input
+									type="text"
+									autoComplete="name"
+									value={name}
+									onChange={(e) => setName(e.target.value)}
+									required
+									minLength={2}
+									maxLength={80}
+								/>
+							</label>
+						) : null}
+						<label>
+							{t.email}
+							<input
+								type="email"
+								autoComplete="username"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								required
+							/>
+						</label>
+						{mode === "login" || mode === "signup" ? (
+							<label>
+								{t.password}
+								<input
+									type="password"
+									autoComplete={
+										mode === "login" ? "current-password" : "new-password"
+									}
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+									onKeyDown={onKeyEvent}
+									onKeyUp={onKeyEvent}
+									minLength={mode === "signup" ? 10 : undefined}
+									required
+								/>
+							</label>
+						) : null}
+						{capsOn && (mode === "login" || mode === "signup") ? (
+							<p
+								className="caps-indicator is-on"
+								role="status"
+								aria-live="polite"
+							>
+								{t.capsOn}
+							</p>
+						) : null}
+						{mode === "signup" ? (
+							<ul className="password-rules" aria-label={t.password}>
+								<li className={signupRules.minLength ? "is-ok" : undefined}>
+									{t.passwordRuleLen}
+								</li>
+								<li className={signupRules.hasLetter ? "is-ok" : undefined}>
+									{t.passwordRuleLetter}
+								</li>
+								<li className={signupRules.hasNumber ? "is-ok" : undefined}>
+									{t.passwordRuleNumber}
+								</li>
+							</ul>
+						) : null}
+						{mode === "passwordless" ? (
+							<p className="auth-hint">{t.passwordlessHint}</p>
+						) : null}
+						{mode === "forgot" ? <p className="auth-hint">{t.forgotHint}</p> : null}
+						<button
+							className="btn btn-primary auth-submit"
+							type="submit"
+							disabled={busy || (mode === "signup" && !signupStrong)}
+						>
+							{mode === "login"
+								? t.login
+								: mode === "signup"
+									? t.signup
+									: mode === "passwordless"
+										? t.passwordlessSubmit
+										: t.forgotSubmit}
+						</button>
+					</form>
 				) : null}
-				{capsOn && (mode === "login" || mode === "signup") ? (
-					<p className="caps-indicator is-on" role="status" aria-live="polite">
-						{t.capsOn}
+
+				{mode === "login" && loginStep === "email" ? (
+					<p className="auth-footnotes">
+						<button type="button" onClick={() => switchMode("passwordless")}>
+							{t.passwordless}
+						</button>
+						<span aria-hidden="true">·</span>
+						<button type="button" onClick={() => switchMode("forgot")}>
+							{t.forgotPassword}
+						</button>
+						<span aria-hidden="true">·</span>
+						<button
+							type="button"
+							onClick={() => {
+								setError("");
+								setLoginStep("methods");
+								setPassword("");
+							}}
+						>
+							{t.authOtherMethods}
+						</button>
 					</p>
 				) : null}
-				{mode === "signup" ? (
-					<ul className="password-rules" aria-label={t.password}>
-						<li className={signupRules.minLength ? "is-ok" : undefined}>
-							{t.passwordRuleLen}
-						</li>
-						<li className={signupRules.hasLetter ? "is-ok" : undefined}>
-							{t.passwordRuleLetter}
-						</li>
-						<li className={signupRules.hasNumber ? "is-ok" : undefined}>
-							{t.passwordRuleNumber}
-						</li>
-					</ul>
-				) : null}
-				{mode === "passwordless" ? (
-					<p className="section-intro playground-auth-hint">{t.passwordlessHint}</p>
-				) : null}
-				{mode === "forgot" ? (
-					<p className="section-intro playground-auth-hint">{t.forgotHint}</p>
-				) : null}
-				<button
-					className="btn btn-primary"
-					type="submit"
-					disabled={busy || (mode === "signup" && !signupStrong)}
-				>
-					{mode === "login"
-						? t.login
-						: mode === "signup"
-							? t.signup
-							: mode === "passwordless"
-								? t.passwordlessSubmit
-								: t.forgotSubmit}
-				</button>
-			</form>
 
-			{mode === "login" ? (
-				<div className="playground-auth-links">
-					<button
-						type="button"
-						className="btn btn-ghost"
-						onClick={() => switchMode("passwordless")}
-					>
-						{t.passwordless}
-					</button>
-					<button
-						type="button"
-						className="btn btn-ghost"
-						onClick={() => switchMode("forgot")}
-					>
-						{t.forgotPassword}
-					</button>
-				</div>
-			) : null}
+				{mode === "passwordless" || mode === "forgot" ? (
+					<p className="auth-footnotes">
+						<button type="button" onClick={() => switchMode("login")}>
+							{mode === "forgot" ? t.forgotBack : t.passwordlessBack}
+						</button>
+					</p>
+				) : null}
 
-			{mode === "passwordless" || mode === "forgot" ? (
-				<button
-					type="button"
-					className="btn btn-ghost playground-auth-back"
-					onClick={() => switchMode("login")}
-				>
-					{mode === "forgot" ? t.forgotBack : t.passwordlessBack}
-				</button>
-			) : null}
-
-			{error ? <p className="playground-error">{error}</p> : null}
+				{error ? <p className="playground-error">{error}</p> : null}
+			</div>
 
 			{verifyKind ? (
 				<div
@@ -464,7 +503,7 @@ export function AuthGate({ lang }: Props) {
 								</>
 							) : null}
 							<button
-								className="btn btn-primary"
+								className="btn btn-primary auth-submit"
 								type="submit"
 								disabled={
 									busy ||
@@ -475,30 +514,31 @@ export function AuthGate({ lang }: Props) {
 								{verifyKind === "reset" ? t.resetSubmit : t.verifySubmit}
 							</button>
 						</form>
-						<button
-							type="button"
-							className="btn btn-ghost playground-resend"
-							onClick={onResend}
-							disabled={busy || resendIn > 0}
-						>
-							{resendIn > 0
-								? t.resendIn.replace("{seconds}", String(resendIn))
-								: t.resend}
-						</button>
-						<button
-							type="button"
-							className="btn btn-ghost"
-							onClick={() => {
-								setVerifyKind(null);
-								setOtpCode("");
-								setConfirmPassword("");
-								if (verifyKind === "reset" || verifyKind === "passwordless") {
-									setPassword("");
-								}
-							}}
-						>
-							{t.verifyClose}
-						</button>
+						<p className="auth-footnotes">
+							<button
+								type="button"
+								onClick={onResend}
+								disabled={busy || resendIn > 0}
+							>
+								{resendIn > 0
+									? t.resendIn.replace("{seconds}", String(resendIn))
+									: t.resend}
+							</button>
+							<span aria-hidden="true">·</span>
+							<button
+								type="button"
+								onClick={() => {
+									setVerifyKind(null);
+									setOtpCode("");
+									setConfirmPassword("");
+									if (verifyKind === "reset" || verifyKind === "passwordless") {
+										setPassword("");
+									}
+								}}
+							>
+								{t.verifyClose}
+							</button>
+						</p>
 					</div>
 				</div>
 			) : null}
