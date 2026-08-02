@@ -1,64 +1,84 @@
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
-import { Suspense, useEffect, useRef, useState } from "react";
-import type { Mesh } from "three";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Billboard, useTexture } from "@react-three/drei";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { SRGBColorSpace, type Group } from "three";
 
 import chico from "../assets/cats/chico.jpg";
 import claire from "../assets/cats/claire.jpg";
 import linhaca from "../assets/cats/linhaca.jpg";
 import zaia from "../assets/cats/zaia.jpg";
 
-const textures = [zaia, chico, linhaca, claire];
-
-function CatOrb({
-	url,
-	radius,
-	speed,
-	phase,
-	y,
-}: {
+type Photo = {
 	url: string;
-	radius: number;
+	position: [number, number, number];
+	scale: number;
 	speed: number;
 	phase: number;
-	y: number;
-}) {
-	const mesh = useRef<Mesh>(null);
+};
+
+const basePhotos: Photo[] = [
+	{ url: zaia, position: [1.15, 0.35, 0.1], scale: 1.55, speed: 0.55, phase: 0 },
+	{ url: chico, position: [2.55, 0.95, -0.35], scale: 1.15, speed: 0.42, phase: 1.2 },
+	{ url: linhaca, position: [2.45, -0.55, -0.2], scale: 1.25, speed: 0.48, phase: 2.1 },
+	{ url: claire, position: [0.85, -0.7, -0.45], scale: 1.05, speed: 0.5, phase: 0.7 },
+];
+
+function CatPhoto({ url, position, scale, speed, phase }: Photo) {
+	const group = useRef<Group>(null);
 	const map = useTexture(url);
+	map.colorSpace = SRGBColorSpace;
 
 	useFrame((state) => {
-		if (!mesh.current) return;
+		if (!group.current) return;
 		const t = state.clock.elapsedTime * speed + phase;
-		mesh.current.position.x = Math.cos(t) * radius;
-		mesh.current.position.z = Math.sin(t) * radius * 0.55;
-		mesh.current.position.y = y + Math.sin(t * 1.4) * 0.12;
-		mesh.current.rotation.y = t * 0.35;
+		group.current.position.y = Math.sin(t) * 0.07;
+		group.current.rotation.z = Math.sin(t * 0.55) * 0.03;
 	});
 
+	const width = scale;
+	const height = scale * 1.28;
+
 	return (
-		<mesh ref={mesh}>
-			<sphereGeometry args={[0.55, 48, 48]} />
-			<meshStandardMaterial map={map} roughness={0.45} metalness={0.15} />
-		</mesh>
+		<group position={position}>
+			<Billboard follow>
+				<group ref={group}>
+					<mesh position={[0, 0, -0.015]}>
+						<planeGeometry args={[width + 0.08, height + 0.08]} />
+						<meshBasicMaterial color="#100e0c" toneMapped={false} />
+					</mesh>
+					<mesh>
+						<planeGeometry args={[width, height]} />
+						<meshBasicMaterial map={map} toneMapped={false} />
+					</mesh>
+				</group>
+			</Billboard>
+		</group>
 	);
 }
 
 function Scene() {
+	const { viewport } = useThree();
+	const narrow = viewport.width < 6.2;
+
+	const photos = useMemo(
+		() =>
+			basePhotos.map((photo) => ({
+				...photo,
+				position: [
+					photo.position[0] + (narrow ? 0.55 : 0),
+					photo.position[1] + (narrow ? 0.35 : 0),
+					photo.position[2],
+				] as [number, number, number],
+				scale: photo.scale * (narrow ? 0.82 : 1),
+			})),
+		[narrow],
+	);
+
 	return (
 		<>
-			<color attach="background" args={["#141210"]} />
-			<ambientLight intensity={0.45} />
-			<directionalLight position={[4, 6, 2]} intensity={1.1} color="#f0e2b8" />
-			<pointLight position={[-3, 1, -2]} intensity={0.55} color="#c4a35a" />
-			{textures.map((url, i) => (
-				<CatOrb
-					key={url}
-					url={url}
-					radius={1.35 + i * 0.22}
-					speed={0.18 + i * 0.04}
-					phase={(i * Math.PI) / 2}
-					y={0.15 - i * 0.08}
-				/>
+			<ambientLight intensity={1} />
+			{photos.map((photo) => (
+				<CatPhoto key={photo.url} {...photo} />
 			))}
 		</>
 	);
@@ -96,8 +116,8 @@ export default function CatScene() {
 		<div ref={host} className="cat-scene" aria-hidden="true">
 			{visible ? (
 				<Canvas
-					dpr={[1, 1.5]}
-					camera={{ position: [0, 0.35, 4.2], fov: 42 }}
+					dpr={[1, 1.75]}
+					camera={{ position: [0.55, 0.05, 5.4], fov: 38 }}
 					gl={{ antialias: true, alpha: true }}
 				>
 					<Suspense fallback={null}>

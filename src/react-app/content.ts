@@ -21,7 +21,6 @@ type Copy = {
 	hero: {
 		headline: string;
 		support: string;
-		sceneCaption: string;
 		primaryCta: { label: string; href: string };
 		secondaryCta: { label: string; href: string };
 	};
@@ -124,8 +123,6 @@ export const copy: Record<Lang, Copy> = {
 		hero: {
 			headline: "Henrique Kalke",
 			support: "Ou só kalke. Software engineer em Curitiba.",
-			sceneCaption:
-				"Zaia, Chico, Linhaça e Claire — o mesmo cuidado que vai pro produto.",
 			primaryCta: { label: "Playground", href: "/playground" },
 			secondaryCta: { label: "Sobre mim", href: "#about" },
 		},
@@ -164,7 +161,7 @@ export const copy: Record<Lang, Copy> = {
 		stack: {
 			eyebrow: "Stack",
 			title: "Com o que eu trabalho",
-			intro: "Backend, dados e cloud — o dia a dia e o que aparece nos projetos.",
+			intro: "O dia a dia: backend, dados e cloud. O resto entra quando o projeto pede.",
 			groups: [
 				{ area: "Backend", items: ["Go", "Python", "FastAPI", "TypeScript"] },
 				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
@@ -177,34 +174,34 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "Projetos",
 			title: "O que eu ando construindo",
 			intro:
-				"No trabalho é sistema crítico. Em casa eu experimento — Go, LLM, API — no meu ritmo.",
+				"No trampo é sistema que não pode cair. Em casa eu mexo no que me dá vontade — Go, LLM, API — no meu ritmo.",
 			items: [
 				{
 					name: "kalke-auth",
 					href: "https://github.com/kalke/kalke-auth",
 					blurb:
-						"IdP OIDC (Keycloak) pra autenticar os apps Kalke — humano e M2M, sem chave proprietária.",
+						"Auth dos apps Kalke com Keycloak/OIDC. Login de gente e máquina, sem inventar chave esquisita.",
 					tags: ["Keycloak", "OIDC", "Docker"],
 				},
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"Pega documento brasileiro (RG, comprovante, NF) e devolve JSON. Go, LLM, Postgres, Redis.",
+						"Joga um RG, comprovante ou NF e sai JSON. Go + LLM + Postgres + Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"API bancária simples em FastAPI: depósito, saque, transferência. Com Swagger e testes.",
+						"API bancária simples em FastAPI — depósito, saque, transferência. Tem Swagger e teste.",
 					tags: ["Python", "FastAPI"],
 				},
 				{
 					name: "personal-compose",
 					href: "https://github.com/kalke/personal-compose",
 					blurb:
-						"Docker Compose pra subir banco e broker local sem drama.",
+						"Docker Compose pra subir banco e broker local sem encheção.",
 					tags: ["Docker", "DX"],
 				},
 			],
@@ -212,7 +209,7 @@ export const copy: Record<Lang, Copy> = {
 		contact: {
 			eyebrow: "Contato",
 			title: "Fala comigo",
-			text: "Vaga, ideia, dúvida técnica ou só um oi. Respondo quando der — de verdade.",
+			text: "Vaga, ideia, dúvida técnica ou só um oi. Respondo quando der — sério.",
 			links: [
 				{
 					label: "GitHub",
@@ -247,9 +244,8 @@ export const copy: Record<Lang, Copy> = {
 			navAria: "Playground",
 			backHome: "Início",
 			eyebrow: "Playground",
-			title: "Document playground",
-			intro:
-				"Entre com qualquer conta kalke, gere um token e teste o extrator. Arquivo não é guardado; hash/resultado/auditoria podem ser.",
+			title: "Brincar com documentos",
+			intro: "Só um cantinho pra testar a API de extração. Nada sério — entra, manda um arquivo e vê o JSON sair.",
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
@@ -257,39 +253,39 @@ export const copy: Record<Lang, Copy> = {
 			login: "Entrar",
 			signup: "Criar conta",
 			logout: "Sair",
-			signedInAs: "Logado como",
-			loginError: "Não deu pra entrar. Confere email e senha.",
-			signupError: "Não deu pra criar a conta. Confere os dados.",
-			signupOk: "Conta criada. Você já está logado.",
+			signedInAs: "Entrou como",
+			loginError: "Não rolou entrar. Confere email e senha?",
+			signupError: "Não rolou criar a conta. Dá uma olhada nos dados.",
+			signupOk: "Pronto — conta criada e você já tá dentro.",
 			verifyTitle: "Confirma teu email",
-			verifyHint: "Enviamos um código para {email}. Digita ele abaixo.",
+			verifyHint: "Mandei um código pra {email}. Cola ele aqui.",
 			verifyCode: "Código",
 			verifySubmit: "Confirmar",
-			verifyError: "Código inválido ou expirado.",
+			verifyError: "Código errado ou já expirou.",
 			verifyClose: "Fechar",
-			resend: "Reenviar código",
-			resendIn: "Reenviar em {seconds}s",
-			resendWait: "Espera um pouco pra reenviar.",
-			resendError: "Não deu pra reenviar o código.",
+			resend: "Mandar de novo",
+			resendIn: "Dá pra reenviar em {seconds}s",
+			resendWait: "Calma — espera um pouco pra pedir outro.",
+			resendError: "Não consegui reenviar o código.",
 			modeLogin: "Entrar",
 			modeSignup: "Criar conta",
-			tokensTitle: "API tokens",
-			tokensHint: "O valor completo aparece uma vez. Guarda com cuidado.",
+			tokensTitle: "Tokens da API",
+			tokensHint: "O token completo só aparece uma vez. Salva em algum lugar se for usar depois.",
 			tokenName: "Nome do token",
 			createToken: "Criar token",
-			tokenOnce: "Copia agora — não mostra de novo: ",
+			tokenOnce: "Copia agora — depois some: ",
 			revoke: "Revogar",
-			tokenError: "Falha ao gerenciar token.",
+			tokenError: "Deu ruim com o token.",
 			needToken: "Cria um token antes de extrair.",
-			pdeTitle: "Document extractor",
-			pdeHint: "Envia PDF/imagem e recebe JSON. Qualquer usuário autenticado pode extrair.",
+			pdeTitle: "Extrator",
+			pdeHint: "Manda um PDF ou imagem e volta JSON. Qualquer conta logada serve.",
 			consentLabel:
-				"Li e aceito: o arquivo não é armazenado; o conteúdo pode ser processado por LLM; hash, resultado estruturado e metadados de auditoria (incluindo IP) podem ser mantidos (política lgpd-extract-v1).",
-			consentRequired: "Aceite o termo LGPD para extrair.",
+				"Beleza: o arquivo em si não fica salvo. O conteúdo pode passar por um LLM, e eu posso guardar hash, resultado e um registro de auditoria (com IP).",
+			consentRequired: "Marca o aceite pra continuar.",
 			docType: "Tipo",
 			chooseFile: "Arquivo",
 			extract: "Extrair",
-			extractError: "Falha na extração.",
+			extractError: "A extração falhou.",
 			result: "Resposta",
 		},
 	},
@@ -307,8 +303,6 @@ export const copy: Record<Lang, Copy> = {
 		hero: {
 			headline: "Henrique Kalke",
 			support: "Or just kalke. Software engineer in Curitiba.",
-			sceneCaption:
-				"Zaia, Chico, Linhaça, and Claire — the same care that goes into the product.",
 			primaryCta: { label: "Playground", href: "/playground" },
 			secondaryCta: { label: "About me", href: "#about" },
 		},
@@ -347,7 +341,7 @@ export const copy: Record<Lang, Copy> = {
 		stack: {
 			eyebrow: "Stack",
 			title: "What I work with",
-			intro: "Backend, data, and cloud — day job and side projects.",
+			intro: "Day to day: backend, data, and cloud. Everything else shows up when the project needs it.",
 			groups: [
 				{ area: "Backend", items: ["Go", "Python", "FastAPI", "TypeScript"] },
 				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
@@ -360,34 +354,34 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "Projects",
 			title: "What I’ve been building",
 			intro:
-				"At work it’s critical systems. At home I experiment — Go, LLMs, APIs — at my own pace.",
+				"At work it’s systems that can’t casually break. At home I tinker — Go, LLMs, APIs — at my own pace.",
 			items: [
 				{
 					name: "kalke-auth",
 					href: "https://github.com/kalke/kalke-auth",
 					blurb:
-						"OIDC IdP (Keycloak) that authenticates Kalke apps — human and M2M, no proprietary API keys.",
+						"Auth for Kalke apps with Keycloak/OIDC. People and machines, no weird proprietary keys.",
 					tags: ["Keycloak", "OIDC", "Docker"],
 				},
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"Brazilian documents (ID, address proof, invoices) in → clean JSON out. Go, LLM, Postgres, Redis.",
+						"Drop in a Brazilian ID, address proof, or invoice — get JSON back. Go + LLM + Postgres + Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"Small FastAPI bank API: deposit, withdraw, transfer. Swagger and tests included.",
+						"Tiny FastAPI bank API — deposit, withdraw, transfer. Swagger and tests included.",
 					tags: ["Python", "FastAPI"],
 				},
 				{
 					name: "personal-compose",
 					href: "https://github.com/kalke/personal-compose",
 					blurb:
-						"Docker Compose to spin up local databases and brokers without fuss.",
+						"Docker Compose to spin up local DB and broker without the usual pain.",
 					tags: ["Docker", "DX"],
 				},
 			],
@@ -430,9 +424,8 @@ export const copy: Record<Lang, Copy> = {
 			navAria: "Playground",
 			backHome: "Home",
 			eyebrow: "Playground",
-			title: "Document playground",
-			intro:
-				"Sign in with any kalke account, mint a token, and try the extractor. Files are not stored; hash/result/audit metadata may be.",
+			title: "Mess around with documents",
+			intro: "Just a corner to try the extraction API. Nothing fancy — sign in, drop a file, get JSON back.",
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
@@ -441,34 +434,34 @@ export const copy: Record<Lang, Copy> = {
 			signup: "Create account",
 			logout: "Sign out",
 			signedInAs: "Signed in as",
-			loginError: "Could not sign in. Check email and password.",
-			signupError: "Could not create the account. Check your details.",
-			signupOk: "Account created. You’re signed in.",
+			loginError: "Couldn’t sign in. Double-check email and password?",
+			signupError: "Couldn’t create the account. Check what you typed.",
+			signupOk: "You’re in — account created.",
 			verifyTitle: "Confirm your email",
-			verifyHint: "We sent a code to {email}. Enter it below.",
+			verifyHint: "I sent a code to {email}. Paste it here.",
 			verifyCode: "Code",
 			verifySubmit: "Confirm",
-			verifyError: "Invalid or expired code.",
+			verifyError: "Wrong code, or it expired.",
 			verifyClose: "Close",
-			resend: "Resend code",
-			resendIn: "Resend in {seconds}s",
-			resendWait: "Wait a bit before resending.",
-			resendError: "Could not resend the code.",
+			resend: "Send again",
+			resendIn: "You can resend in {seconds}s",
+			resendWait: "Give it a second before asking again.",
+			resendError: "Couldn’t resend the code.",
 			modeLogin: "Sign in",
 			modeSignup: "Create account",
 			tokensTitle: "API tokens",
-			tokensHint: "The full value is shown once. Store it carefully.",
+			tokensHint: "The full token shows once. Save it if you’ll need it later.",
 			tokenName: "Token name",
 			createToken: "Create token",
-			tokenOnce: "Copy now — it won’t be shown again: ",
+			tokenOnce: "Copy now — it’s gone after this: ",
 			revoke: "Revoke",
-			tokenError: "Could not manage token.",
-			needToken: "Create a token before extracting.",
-			pdeTitle: "Document extractor",
-			pdeHint: "Upload a PDF/image and get JSON back. Any authenticated user can extract.",
+			tokenError: "Something went wrong with the token.",
+			needToken: "Make a token before extracting.",
+			pdeTitle: "Extractor",
+			pdeHint: "Send a PDF or image, get JSON. Any signed-in account works.",
 			consentLabel:
-				"I understand: the file is not stored; content may be processed by an LLM; hash, structured result, and audit metadata (including IP) may be retained (policy lgpd-extract-v1).",
-			consentRequired: "Accept the LGPD notice to extract.",
+				"Cool: the file itself isn’t stored. Content may go through an LLM, and I may keep a hash, the result, and an audit trail (including IP).",
+			consentRequired: "Tick the consent box to continue.",
 			docType: "Type",
 			chooseFile: "File",
 			extract: "Extract",

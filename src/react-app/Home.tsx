@@ -87,7 +87,6 @@ export function Home({ lang, onLang }: Props) {
 						<p className="hero-brand">{siteMeta.brand}</p>
 						<h1 className="hero-title">{t.hero.headline}</h1>
 						<p className="hero-support">{t.hero.support}</p>
-						<p className="hero-scene-caption">{t.hero.sceneCaption}</p>
 						<div className="hero-actions">
 							{t.hero.primaryCta.href.startsWith("/") ? (
 								<Link className="btn btn-primary" to={t.hero.primaryCta.href}>
