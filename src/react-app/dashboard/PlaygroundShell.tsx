@@ -19,46 +19,55 @@ function ShellInner({ lang, onLang }: Props) {
 	return (
 		<div className="page playground-page">
 			<div className="atmosphere" aria-hidden="true" />
-			<header className="topbar">
-				<Link className="brand-mark" to="/">
-					{siteMeta.brand}
-				</Link>
-				<div className="topbar-end">
-					<nav className="nav dash-nav" aria-label={t.navAria}>
-						<NavLink to="/playground" end>
-							{t.pathOverview}
-						</NavLink>
-						{user ? (
-							<>
-								<NavLink to="/playground/api">{t.pathApi}</NavLink>
-								<NavLink to="/playground/extract">{t.pathExtract}</NavLink>
-							</>
-						) : null}
-						<Link to="/">{t.backHome}</Link>
-					</nav>
-					<div className="lang-switch" role="group" aria-label="Language">
-						<button
-							type="button"
-							className={lang === "pt" ? "is-active" : undefined}
-							onClick={() => onLang("pt")}
-							aria-pressed={lang === "pt"}
-						>
-							PT
-						</button>
-						<button
-							type="button"
-							className={lang === "en" ? "is-active" : undefined}
-							onClick={() => onLang("en")}
-							aria-pressed={lang === "en"}
-						>
-							EN
-						</button>
+			<header className="topbar playground-topbar">
+				<div className="playground-topbar-row">
+					<Link className="brand-mark" to="/">
+						{siteMeta.brand}
+					</Link>
+					<div className="topbar-end">
+						<div className="lang-switch" role="group" aria-label="Language">
+							<button
+								type="button"
+								className={lang === "pt" ? "is-active" : undefined}
+								onClick={() => onLang("pt")}
+								aria-pressed={lang === "pt"}
+							>
+								PT
+							</button>
+							<button
+								type="button"
+								className={lang === "en" ? "is-active" : undefined}
+								onClick={() => onLang("en")}
+								aria-pressed={lang === "en"}
+							>
+								EN
+							</button>
+						</div>
+						{user ? <ProfileMenu lang={lang} /> : null}
 					</div>
-					{user ? <ProfileMenu lang={lang} /> : null}
 				</div>
+				<nav className="nav dash-nav" aria-label={t.navAria}>
+					<NavLink to="/playground" end>
+						<span className="nav-label-full">{t.pathOverview}</span>
+						<span className="nav-label-short">{t.pathOverviewShort}</span>
+					</NavLink>
+					{user ? (
+						<>
+							<NavLink to="/playground/api">
+								<span className="nav-label-full">{t.pathApi}</span>
+								<span className="nav-label-short">{t.pathApiShort}</span>
+							</NavLink>
+							<NavLink to="/playground/extract">
+								<span className="nav-label-full">{t.pathExtract}</span>
+								<span className="nav-label-short">{t.pathExtractShort}</span>
+							</NavLink>
+						</>
+					) : null}
+					<Link to="/">{t.backHome}</Link>
+				</nav>
 			</header>
 
-			<main className={`playground-main ${user ? "has-profile" : ""}`}>
+			<main className="playground-main">
 				{loading ? (
 					<p className="playground-muted">{t.loading}</p>
 				) : !user ? (

@@ -9,12 +9,13 @@ type Props = { lang: Lang };
 
 export function PasswordPanel({ lang }: Props) {
 	const t = copy[lang].playground;
-	const { busy, setBusy, setError } = useDashboard();
+	const { busy, setBusy } = useDashboard();
 	const { capsOn, onKeyEvent } = useCapsLock();
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [passwordMsg, setPasswordMsg] = useState("");
+	const [localError, setLocalError] = useState("");
 
 	const rules = useMemo(
 		() => evaluatePassword(newPassword, confirmPassword),
@@ -24,14 +25,14 @@ export function PasswordPanel({ lang }: Props) {
 
 	async function onChangePassword(e: FormEvent) {
 		e.preventDefault();
-		setError("");
+		setLocalError("");
 		setPasswordMsg("");
 		if (!strong) {
-			setError(t.passwordWeak);
+			setLocalError(t.passwordWeak);
 			return;
 		}
 		if (currentPassword === newPassword) {
-			setError(t.passwordSame);
+			setLocalError(t.passwordSame);
 			return;
 		}
 		setBusy(true);
@@ -43,14 +44,14 @@ export function PasswordPanel({ lang }: Props) {
 			setPasswordMsg(t.passwordOk);
 		} catch (err) {
 			const code = err instanceof Error ? err.message : "";
-			if (code === "password too short") setError(t.passwordShort);
+			if (code === "password too short") setLocalError(t.passwordShort);
 			else if (
 				code === "password needs a letter" ||
 				code === "password needs a number"
 			) {
-				setError(t.passwordWeak);
-			} else if (code === "new password must differ") setError(t.passwordSame);
-			else setError(t.passwordError);
+				setLocalError(t.passwordWeak);
+			} else if (code === "new password must differ") setLocalError(t.passwordSame);
+			else setLocalError(t.passwordError);
 		} finally {
 			setBusy(false);
 		}
@@ -99,19 +100,18 @@ export function PasswordPanel({ lang }: Props) {
 						required
 					/>
 				</label>
-				<p
-					className={`caps-indicator ${capsOn ? "is-on" : "is-off"}`}
-					role="status"
-					aria-live="polite"
-				>
-					{capsOn ? t.capsOn : t.capsOff}
-				</p>
+				{capsOn ? (
+					<p className="caps-indicator is-on" role="status" aria-live="polite">
+						{t.capsOn}
+					</p>
+				) : null}
 				<ul className="password-rules" aria-label={t.passwordTitle}>
 					<li className={rules.minLength ? "is-ok" : undefined}>{t.passwordRuleLen}</li>
 					<li className={rules.hasLetter ? "is-ok" : undefined}>{t.passwordRuleLetter}</li>
 					<li className={rules.hasNumber ? "is-ok" : undefined}>{t.passwordRuleNumber}</li>
 					<li className={rules.matches ? "is-ok" : undefined}>{t.passwordRuleMatch}</li>
 				</ul>
+				{localError ? <p className="playground-error">{localError}</p> : null}
 				<button className="btn btn-primary" type="submit" disabled={busy || !strong}>
 					{t.changePassword}
 				</button>

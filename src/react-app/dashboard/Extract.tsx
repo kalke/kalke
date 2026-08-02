@@ -5,8 +5,18 @@ import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
-function summarize(data: unknown, docType: string): { title: string; rows: { k: string; v: string }[] } {
-	const rows: { k: string; v: string }[] = [{ k: "doc_type", v: docType }];
+function labelFor(key: string, labels: Record<string, string>): string {
+	return labels[key] ?? key.replace(/_/g, " ");
+}
+
+function summarize(
+	data: unknown,
+	docType: string,
+	labels: Record<string, string>,
+): { title: string; rows: { k: string; label: string; v: string }[] } {
+	const rows: { k: string; label: string; v: string }[] = [
+		{ k: "doc_type", label: labelFor("doc_type", labels), v: docType },
+	];
 	if (!data || typeof data !== "object") {
 		return { title: "result", rows };
 	}
@@ -37,14 +47,14 @@ function summarize(data: unknown, docType: string): { title: string; rows: { k: 
 	for (const key of prefer) {
 		const val = nested[key];
 		if (val != null && val !== "") {
-			rows.push({ k: key, v: String(val) });
+			rows.push({ k: key, label: labelFor(key, labels), v: String(val) });
 		}
 	}
 
 	if (rows.length === 1) {
 		for (const [k, v] of Object.entries(nested)) {
 			if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
-				rows.push({ k, v: String(v) });
+				rows.push({ k, label: labelFor(k, labels), v: String(v) });
 				if (rows.length >= 8) break;
 			}
 		}
@@ -79,8 +89,8 @@ export function Extract({ lang }: Props) {
 	}, [ensureWorkingPat, setError, t.needToken]);
 
 	const summary = useMemo(
-		() => (result != null ? summarize(result, docType) : null),
-		[result, docType],
+		() => (result != null ? summarize(result, docType, t.fieldLabels) : null),
+		[result, docType, t.fieldLabels],
 	);
 
 	async function onExtract(e: FormEvent) {
@@ -161,7 +171,7 @@ export function Extract({ lang }: Props) {
 					<dl className="extract-summary">
 						{summary.rows.map((row) => (
 							<div key={row.k}>
-								<dt>{row.k}</dt>
+								<dt>{row.label}</dt>
 								<dd>{row.v}</dd>
 							</div>
 						))}

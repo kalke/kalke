@@ -1,4 +1,4 @@
-import { lazy, Suspense, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { TerminalHero } from "./components/TerminalHero";
 import { copy, siteMeta, type Lang } from "./content";
@@ -31,24 +31,60 @@ type Props = { lang: Lang; onLang: (l: Lang) => void };
 
 export function Home({ lang, onLang }: Props) {
 	const t = copy[lang];
+	const [navOpen, setNavOpen] = useState(false);
+	const navId = useId();
+	const topbarRef = useRef<HTMLElement>(null);
+
+	useEffect(() => {
+		if (!navOpen) return;
+		function onDoc(e: MouseEvent) {
+			if (!topbarRef.current?.contains(e.target as Node)) setNavOpen(false);
+		}
+		function onKey(e: KeyboardEvent) {
+			if (e.key === "Escape") setNavOpen(false);
+		}
+		document.addEventListener("mousedown", onDoc);
+		document.addEventListener("keydown", onKey);
+		return () => {
+			document.removeEventListener("mousedown", onDoc);
+			document.removeEventListener("keydown", onKey);
+		};
+	}, [navOpen]);
 
 	return (
 		<div className="page">
 			<div className="atmosphere" aria-hidden="true" />
 
-			<header className="topbar">
+			<header className={`topbar ${navOpen ? "nav-open" : ""}`} ref={topbarRef}>
 				<a className="brand-mark" href="#top">
 					{siteMeta.brand}
 				</a>
 				<div className="topbar-end">
-					<nav className="nav" aria-label={t.navAria}>
+					<button
+						type="button"
+						className="nav-toggle"
+						aria-expanded={navOpen}
+						aria-controls={navId}
+						onClick={() => setNavOpen((v) => !v)}
+					>
+						{t.navMenu}
+					</button>
+					<nav className="nav" id={navId} aria-label={t.navAria}>
 						{t.nav.map((item) =>
 							item.href.startsWith("/") ? (
-								<Link key={item.href} to={item.href}>
+								<Link
+									key={item.href}
+									to={item.href}
+									onClick={() => setNavOpen(false)}
+								>
 									{item.label}
 								</Link>
 							) : (
-								<a key={item.href} href={item.href}>
+								<a
+									key={item.href}
+									href={item.href}
+									onClick={() => setNavOpen(false)}
+								>
 									{item.label}
 								</a>
 							),
@@ -134,6 +170,13 @@ export function Home({ lang, onLang }: Props) {
 									</div>
 								</div>
 								<p>{item.blurb}</p>
+								{item.cta && item.href.startsWith("/") ? (
+									<p className="build-cta">
+										<Link className="btn btn-primary" to={item.href}>
+											{item.cta}
+										</Link>
+									</p>
+								) : null}
 							</li>
 						))}
 					</ul>

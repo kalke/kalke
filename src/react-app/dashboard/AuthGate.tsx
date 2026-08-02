@@ -177,13 +177,11 @@ export function AuthGate({ lang }: Props) {
 						required
 					/>
 				</label>
-				<p
-					className={`caps-indicator ${capsOn ? "is-on" : "is-off"}`}
-					role="status"
-					aria-live="polite"
-				>
-					{capsOn ? t.capsOn : t.capsOff}
-				</p>
+				{capsOn ? (
+					<p className="caps-indicator is-on" role="status" aria-live="polite">
+						{t.capsOn}
+					</p>
+				) : null}
 				{mode === "signup" ? (
 					<ul className="password-rules" aria-label={t.password}>
 						<li className={signupRules.minLength ? "is-ok" : undefined}>
