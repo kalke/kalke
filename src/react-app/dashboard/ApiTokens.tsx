@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import {
+	clearWorkingPat,
 	createToken,
 	PDE_BASE,
 	revokeToken,
@@ -39,6 +40,7 @@ export function ApiTokens({ lang }: Props) {
 		setError("");
 		try {
 			await revokeToken(id);
+			clearWorkingPat();
 			await refreshTokens();
 		} catch {
 			setError(t.tokenError);

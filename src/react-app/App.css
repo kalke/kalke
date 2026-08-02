@@ -1156,6 +1156,10 @@
 	word-break: break-word;
 }
 
+.extract-summary dd.is-multiline {
+	white-space: pre-line;
+}
+
 .playground-modal {
 	position: fixed;
 	inset: 0;

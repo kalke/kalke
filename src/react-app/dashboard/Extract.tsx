@@ -1,66 +1,171 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { extractDocument } from "../api";
+import {
+	clearWorkingPat,
+	extractDocument,
+} from "../api";
 import { copy, type Lang } from "../content";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
+type SummaryRow = { k: string; label: string; v: string };
+
 function labelFor(key: string, labels: Record<string, string>): string {
 	return labels[key] ?? key.replace(/_/g, " ");
+}
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+	return v != null && typeof v === "object" && !Array.isArray(v);
+}
+
+function formatScalar(v: unknown): string | null {
+	if (v == null || v === "") return null;
+	if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+		return String(v);
+	}
+	return null;
+}
+
+function pushRow(
+	rows: SummaryRow[],
+	seen: Set<string>,
+	key: string,
+	value: unknown,
+	labels: Record<string, string>,
+) {
+	if (seen.has(key)) return;
+	const formatted = formatScalar(value);
+	if (formatted == null) return;
+	seen.add(key);
+	rows.push({ k: key, label: labelFor(key, labels), v: formatted });
+}
+
+function flattenObject(
+	obj: Record<string, unknown>,
+	labels: Record<string, string>,
+	prefix = "",
+): SummaryRow[] {
+	const rows: SummaryRow[] = [];
+	const seen = new Set<string>();
+
+	const preferred = [
+		"tipo",
+		"nome",
+		"full_name",
+		"name",
+		"cpf",
+		"rg",
+		"cnpj",
+		"numero_documento",
+		"document_number",
+		"data_nascimento",
+		"orgao_emissor",
+		"validade",
+		"expiry_date",
+		"logradouro",
+		"numero",
+		"bairro",
+		"cidade",
+		"uf",
+		"cep",
+		"emissor",
+		"data",
+		"issue_date",
+		"serie",
+		"valor_total",
+		"total",
+		"invoice_number",
+		"data_emissao",
+		"address",
+		"endereco",
+	];
+
+	for (const key of preferred) {
+		pushRow(rows, seen, prefix ? `${prefix}.${key}` : key, obj[key], labels);
+	}
+
+	for (const [key, value] of Object.entries(obj)) {
+		const path = prefix ? `${prefix}.${key}` : key;
+		if (seen.has(path) || seen.has(key)) continue;
+
+		if (isPlainObject(value)) {
+			const nestedPreferred = ["nome", "cpf", "cnpj"];
+			for (const nk of nestedPreferred) {
+				const nestedKey = `${key}_${nk}`;
+				pushRow(rows, seen, nestedKey, value[nk], labels);
+			}
+			for (const [nk, nv] of Object.entries(value)) {
+				const nestedKey = `${key}_${nk}`;
+				pushRow(rows, seen, nestedKey, nv, labels);
+			}
+			continue;
+		}
+
+		if (Array.isArray(value)) {
+			if (value.length === 0) continue;
+			const lines = value.map((item, i) => {
+				if (!isPlainObject(item)) return formatScalar(item) ?? "";
+				const desc = formatScalar(item.descricao) ?? `Item ${i + 1}`;
+				const qty = formatScalar(item.quantidade);
+				const valor = formatScalar(item.valor);
+				const bits = [desc];
+				if (qty) bits.push(`qtd ${qty}`);
+				if (valor) bits.push(`R$ ${valor}`);
+				return bits.join(" · ");
+			}).filter(Boolean);
+			if (lines.length) {
+				seen.add(path);
+				rows.push({
+					k: path,
+					label: labelFor(key, labels),
+					v: lines.join("\n"),
+				});
+			}
+			continue;
+		}
+
+		pushRow(rows, seen, key, value, labels);
+	}
+
+	return rows;
 }
 
 function summarize(
 	data: unknown,
 	docType: string,
 	labels: Record<string, string>,
-): { title: string; rows: { k: string; label: string; v: string }[] } {
-	const rows: { k: string; label: string; v: string }[] = [
-		{ k: "doc_type", label: labelFor("doc_type", labels), v: docType },
+): { title: string; rows: SummaryRow[] } {
+	const rows: SummaryRow[] = [
+		{
+			k: "doc_type",
+			label: labelFor("doc_type", labels),
+			v: labelFor(docType, labels) !== docType ? labelFor(docType, labels) : docType,
+		},
 	];
-	if (!data || typeof data !== "object") {
-		return { title: "result", rows };
-	}
-	const obj = data as Record<string, unknown>;
-	const nested =
-		obj.data && typeof obj.data === "object"
-			? (obj.data as Record<string, unknown>)
-			: obj.fields && typeof obj.fields === "object"
-				? (obj.fields as Record<string, unknown>)
-				: obj;
-
-	const prefer = [
-		"full_name",
-		"name",
-		"nome",
-		"document_number",
-		"cpf",
-		"rg",
-		"cnpj",
-		"address",
-		"endereco",
-		"issue_date",
-		"expiry_date",
-		"invoice_number",
-		"total",
-	];
-
-	for (const key of prefer) {
-		const val = nested[key];
-		if (val != null && val !== "") {
-			rows.push({ k: key, label: labelFor(key, labels), v: String(val) });
-		}
+	if (!isPlainObject(data)) {
+		return { title: docType, rows };
 	}
 
-	if (rows.length === 1) {
-		for (const [k, v] of Object.entries(nested)) {
-			if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
-				rows.push({ k, label: labelFor(k, labels), v: String(v) });
-				if (rows.length >= 8) break;
-			}
-		}
-	}
+	const payload = isPlainObject(data.data)
+		? data.data
+		: isPlainObject(data.fields)
+			? data.fields
+			: data;
 
-	return { title: String(obj.doc_type ?? nested.doc_type ?? docType), rows };
+	const resolvedType = String(data.doc_type ?? payload.doc_type ?? docType);
+	rows[0].v =
+		labelFor(resolvedType, labels) !== resolvedType
+			? labelFor(resolvedType, labels)
+			: resolvedType;
+
+	rows.push(...flattenObject(payload, labels));
+	return { title: resolvedType, rows };
+}
+
+function isUnauthorized(err: unknown): boolean {
+	if (!(err instanceof Error)) return false;
+	const msg = err.message.toLowerCase();
+	return msg === "unauthorized" || msg.includes("unauthorized");
 }
 
 export function Extract({ lang }: Props) {
@@ -108,9 +213,15 @@ export function Extract({ lang }: Props) {
 		setResult(null);
 		setShowJson(false);
 		try {
-			const pat = await ensureWorkingPat();
-			const data = await extractDocument(pat, file, docType, consent);
-			setResult(data);
+			let pat = await ensureWorkingPat();
+			try {
+				setResult(await extractDocument(pat, file, docType, consent));
+			} catch (err) {
+				if (!isUnauthorized(err)) throw err;
+				clearWorkingPat();
+				pat = await ensureWorkingPat();
+				setResult(await extractDocument(pat, file, docType, consent));
+			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.extractError);
 		} finally {
@@ -172,7 +283,9 @@ export function Extract({ lang }: Props) {
 						{summary.rows.map((row) => (
 							<div key={row.k}>
 								<dt>{row.label}</dt>
-								<dd>{row.v}</dd>
+								<dd className={row.v.includes("\n") ? "is-multiline" : undefined}>
+									{row.v}
+								</dd>
 							</div>
 						))}
 					</dl>
