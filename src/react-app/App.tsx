@@ -1,21 +1,44 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { detectLang, siteMeta, type Lang } from "./content";
+import { ApiTokens } from "./dashboard/ApiTokens";
+import { Extract } from "./dashboard/Extract";
+import { Overview } from "./dashboard/Overview";
+import { PlaygroundShell } from "./dashboard/PlaygroundShell";
 import { Home } from "./Home";
-import { Playground } from "./Playground";
 import "./App.css";
+
+function syncMeta(lang: Lang) {
+	const meta = siteMeta[lang];
+	document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+	document.title = meta.title;
+	document
+		.querySelector('meta[name="description"]')
+		?.setAttribute("content", meta.description);
+	document
+		.querySelector('meta[property="og:title"]')
+		?.setAttribute("content", meta.title);
+	document
+		.querySelector('meta[property="og:description"]')
+		?.setAttribute("content", meta.description);
+	document
+		.querySelector('meta[name="twitter:title"]')
+		?.setAttribute("content", meta.title);
+	document
+		.querySelector('meta[name="twitter:description"]')
+		?.setAttribute("content", meta.description);
+	document
+		.querySelector('meta[name="theme-color"]')
+		?.setAttribute("content", "#15120F");
+}
 
 export default function App() {
 	const [lang, setLang] = useState<Lang>(() => detectLang());
-	const meta = siteMeta[lang];
 
 	useEffect(() => {
-		document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
-		document.title = meta.title;
-		const description = document.querySelector('meta[name="description"]');
-		description?.setAttribute("content", meta.description);
+		syncMeta(lang);
 		window.localStorage.setItem("kalke-lang", lang);
-	}, [lang, meta.description, meta.title]);
+	}, [lang]);
 
 	return (
 		<BrowserRouter>
@@ -23,8 +46,12 @@ export default function App() {
 				<Route path="/" element={<Home lang={lang} onLang={setLang} />} />
 				<Route
 					path="/playground"
-					element={<Playground lang={lang} onLang={setLang} />}
-				/>
+					element={<PlaygroundShell lang={lang} onLang={setLang} />}
+				>
+					<Route index element={<Overview lang={lang} />} />
+					<Route path="api" element={<ApiTokens lang={lang} />} />
+					<Route path="extract" element={<Extract lang={lang} />} />
+				</Route>
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Routes>
 		</BrowserRouter>

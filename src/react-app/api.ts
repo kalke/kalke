@@ -1,7 +1,30 @@
-const AUTH_BASE =
+export const AUTH_BASE =
 	import.meta.env.VITE_AUTH_API_URL ?? "https://auth.kalke.dev";
-const PDE_BASE =
+export const PDE_BASE =
 	import.meta.env.VITE_PDE_API_URL ?? "https://pde.kalke.dev";
+
+const WORKING_PAT_KEY = "kalke-working-pat";
+
+export function getWorkingPat(): string {
+	try {
+		return sessionStorage.getItem(WORKING_PAT_KEY) ?? "";
+	} catch {
+		return "";
+	}
+}
+
+export function setWorkingPat(token: string): void {
+	try {
+		if (token) sessionStorage.setItem(WORKING_PAT_KEY, token);
+		else sessionStorage.removeItem(WORKING_PAT_KEY);
+	} catch {
+		/* ignore */
+	}
+}
+
+export function clearWorkingPat(): void {
+	setWorkingPat("");
+}
 
 async function authFetch(path: string, init: RequestInit = {}): Promise<Response> {
 	return fetch(`${AUTH_BASE}${path}`, {

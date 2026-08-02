@@ -1,5 +1,6 @@
 import { lazy, Suspense, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { TerminalHero } from "./components/TerminalHero";
 import { copy, siteMeta, type Lang } from "./content";
 import { useReveal } from "./hooks/useReveal";
 
@@ -81,22 +82,17 @@ export function Home({ lang, onLang }: Props) {
 							<CatScene />
 						</Suspense>
 						<div className="hero-glow" />
-						<div className="hero-grain" />
+						<div className="hero-scrim" />
 					</div>
 					<div className="hero-copy">
 						<p className="hero-brand">{siteMeta.brand}</p>
 						<h1 className="hero-title">{t.hero.headline}</h1>
 						<p className="hero-support">{t.hero.support}</p>
+						<TerminalHero lang={lang} />
 						<div className="hero-actions">
-							{t.hero.primaryCta.href.startsWith("/") ? (
-								<Link className="btn btn-primary" to={t.hero.primaryCta.href}>
-									{t.hero.primaryCta.label}
-								</Link>
-							) : (
-								<a className="btn btn-primary" href={t.hero.primaryCta.href}>
-									{t.hero.primaryCta.label}
-								</a>
-							)}
+							<a className="btn btn-primary" href={t.hero.primaryCta.href}>
+								{t.hero.primaryCta.label}
+							</a>
 							<a className="btn btn-ghost" href={t.hero.secondaryCta.href}>
 								{t.hero.secondaryCta.label}
 							</a>
@@ -112,6 +108,35 @@ export function Home({ lang, onLang }: Props) {
 							<p key={p.slice(0, 32)}>{p}</p>
 						))}
 					</div>
+				</RevealSection>
+
+				<RevealSection id="work" className="builds">
+					<p className="eyebrow">{t.builds.eyebrow}</p>
+					<h2>{t.builds.title}</h2>
+					<p className="section-intro">{t.builds.intro}</p>
+					<ul className="builds-list">
+						{t.builds.items.map((item) => (
+							<li key={item.name} className={item.featured ? "is-featured" : undefined}>
+								<div className="build-head">
+									<h3>
+										{item.href.startsWith("/") ? (
+											<Link to={item.href}>{item.name}</Link>
+										) : (
+											<a href={item.href} target="_blank" rel="noreferrer">
+												{item.name}
+											</a>
+										)}
+									</h3>
+									<div className="tags">
+										{item.tags.map((tag) => (
+											<span key={tag}>{tag}</span>
+										))}
+									</div>
+								</div>
+								<p>{item.blurb}</p>
+							</li>
+						))}
+					</ul>
 				</RevealSection>
 
 				<RevealSection id="stack" className="stack">
@@ -136,31 +161,6 @@ export function Home({ lang, onLang }: Props) {
 							<li key={item.title}>
 								<h3>{item.title}</h3>
 								<p>{item.text}</p>
-							</li>
-						))}
-					</ul>
-				</RevealSection>
-
-				<RevealSection id="builds" className="builds">
-					<p className="eyebrow">{t.builds.eyebrow}</p>
-					<h2>{t.builds.title}</h2>
-					<p className="section-intro">{t.builds.intro}</p>
-					<ul className="builds-list">
-						{t.builds.items.map((item) => (
-							<li key={item.name}>
-								<div className="build-head">
-									<h3>
-										<a href={item.href} target="_blank" rel="noreferrer">
-											{item.name}
-										</a>
-									</h3>
-									<div className="tags">
-										{item.tags.map((tag) => (
-											<span key={tag}>{tag}</span>
-										))}
-									</div>
-								</div>
-								<p>{item.blurb}</p>
 							</li>
 						))}
 					</ul>

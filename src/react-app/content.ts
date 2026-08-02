@@ -3,15 +3,97 @@ export type Lang = "pt" | "en";
 export const siteMeta = {
 	brand: "kalke",
 	pt: {
-		title: "kalke — Henrique Kalke",
+		title: "Henrique Kalke — engenheiro de software",
 		description:
-			"Henrique Kalke, software engineer em Curitiba. Sistemas bancários, APIs, gatos e metal.",
+			"Henrique Kalke, engenheiro de software em Curitiba. Sistemas bancários, APIs e um extrator de documentos ao vivo.",
 	},
 	en: {
-		title: "kalke — Henrique Kalke",
+		title: "Henrique Kalke — software engineer",
 		description:
-			"Henrique Kalke, software engineer in Curitiba. Banking systems, APIs, cats, and metal.",
+			"Henrique Kalke, software engineer in Curitiba. Banking systems, APIs, and a live document extractor.",
 	},
+};
+
+export type PlaygroundCopy = {
+	pageTitle: string;
+	navAria: string;
+	backHome: string;
+	eyebrow: string;
+	title: string;
+	intro: string;
+	loading: string;
+	email: string;
+	password: string;
+	name: string;
+	login: string;
+	signup: string;
+	logout: string;
+	signedInAs: string;
+	loginError: string;
+	signupError: string;
+	signupOk: string;
+	verifyTitle: string;
+	verifyHint: string;
+	verifyCode: string;
+	verifySubmit: string;
+	verifyError: string;
+	verifyClose: string;
+	resend: string;
+	resendIn: string;
+	resendWait: string;
+	resendError: string;
+	modeLogin: string;
+	modeSignup: string;
+	pathOverview: string;
+	pathApi: string;
+	pathExtract: string;
+	overviewTitle: string;
+	overviewIntro: string;
+	overviewApiCard: string;
+	overviewApiHint: string;
+	overviewExtractCard: string;
+	overviewExtractHint: string;
+	passwordTitle: string;
+	passwordHint: string;
+	currentPassword: string;
+	newPassword: string;
+	confirmPassword: string;
+	changePassword: string;
+	passwordOk: string;
+	passwordMismatch: string;
+	passwordSame: string;
+	passwordShort: string;
+	passwordError: string;
+	tokensTitle: string;
+	tokensHint: string;
+	tokenName: string;
+	createToken: string;
+	copyToken: string;
+	copied: string;
+	tokenOnce: string;
+	revoke: string;
+	tokenError: string;
+	needToken: string;
+	apiHowTitle: string;
+	apiHowBody: string;
+	pdeTitle: string;
+	pdeHint: string;
+	consentLabel: string;
+	consentRequired: string;
+	docType: string;
+	docTypeIdentity: string;
+	docTypeAddress: string;
+	docTypeInvoice: string;
+	chooseFile: string;
+	extract: string;
+	extracting: string;
+	extracted: string;
+	extractError: string;
+	extractEmpty: string;
+	resultSummary: string;
+	resultJson: string;
+	resultHideJson: string;
+	preparingToken: string;
 };
 
 type Copy = {
@@ -23,6 +105,13 @@ type Copy = {
 		support: string;
 		primaryCta: { label: string; href: string };
 		secondaryCta: { label: string; href: string };
+		terminal: {
+			prompt: string;
+			lines: { cmd: string; out: string; href?: string }[];
+			hint: string;
+			inputPlaceholder: string;
+			unknown: string;
+		};
 	};
 	about: {
 		eyebrow: string;
@@ -49,6 +138,7 @@ type Copy = {
 			href: string;
 			blurb: string;
 			tags: string[];
+			featured?: boolean;
 		}[];
 	};
 	contact: {
@@ -58,159 +148,140 @@ type Copy = {
 		links: { label: string; href: string; note: string }[];
 	};
 	footer: string;
-	playground: {
-		pageTitle: string;
-		navAria: string;
-		backHome: string;
-		eyebrow: string;
-		title: string;
-		intro: string;
-		loading: string;
-		email: string;
-		password: string;
-		name: string;
-		login: string;
-		signup: string;
-		logout: string;
-		signedInAs: string;
-		loginError: string;
-		signupError: string;
-		signupOk: string;
-		verifyTitle: string;
-		verifyHint: string;
-		verifyCode: string;
-		verifySubmit: string;
-		verifyError: string;
-		verifyClose: string;
-		resend: string;
-		resendIn: string;
-		resendWait: string;
-		resendError: string;
-		modeLogin: string;
-		modeSignup: string;
-		tokensTitle: string;
-		tokensHint: string;
-		tokenName: string;
-		createToken: string;
-		tokenOnce: string;
-		revoke: string;
-		tokenError: string;
-		needToken: string;
-		pdeTitle: string;
-		pdeHint: string;
-		consentLabel: string;
-		consentRequired: string;
-		docType: string;
-		chooseFile: string;
-		extract: string;
-		extractError: string;
-		result: string;
-	};
+	playground: PlaygroundCopy;
 };
 
 export const copy: Record<Lang, Copy> = {
 	pt: {
 		navAria: "Principal",
 		nav: [
-			{ label: "Sobre", href: "#about" },
-			{ label: "Stack", href: "#stack" },
-			{ label: "Gostos", href: "#likes" },
-			{ label: "Projetos", href: "#builds" },
-			{ label: "Playground", href: "/playground" },
-			{ label: "Contato", href: "#contact" },
+			{ label: "~/about", href: "#about" },
+			{ label: "~/work", href: "#work" },
+			{ label: "~/stack", href: "#stack" },
+			{ label: "~/contact", href: "#contact" },
+			{ label: "~/dashboard", href: "/playground" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
 		hero: {
 			headline: "Henrique Kalke",
-			support: "Ou só kalke. Software engineer em Curitiba.",
-			primaryCta: { label: "Playground", href: "/playground" },
-			secondaryCta: { label: "Sobre mim", href: "#about" },
+			support:
+				"Engenheiro de software em Curitiba. Sistemas bancários, APIs e produtos que precisam funcionar de verdade.",
+			primaryCta: { label: "Ver trabalho", href: "#work" },
+			secondaryCta: { label: "Falar comigo", href: "#contact" },
+			terminal: {
+				prompt: "kalke@dev:~$",
+				lines: [
+					{
+						cmd: "whoami",
+						out: "Henrique Kalke — backend, auth e infra em fintech.",
+						href: "#about",
+					},
+					{
+						cmd: "ls ~/work",
+						out: "document-extractor/  kalke-auth/  e-bank-api/",
+						href: "#work",
+					},
+					{
+						cmd: "cat contact.md",
+						out: "email · github · linkedin · whatsapp",
+						href: "#contact",
+					},
+				],
+				hint: "Clique num comando ou digite whoami, ls, contact",
+				inputPlaceholder: "comando…",
+				unknown: "comando não encontrado. tente: whoami | ls | contact",
+			},
 		},
 		about: {
-			eyebrow: "Sobre",
-			title: "Quem eu sou",
+			eyebrow: "~/about",
+			title: "Quem sou",
 			paragraphs: [
-				"Pode me chamar de Kalke ou Henrique — tanto faz. Trabalho com software faz uns seis anos, quase sempre no mercado financeiro: crédito, accountingtech e, agora, infra bancária de ponta a ponta.",
-				"Morei três anos na Inglaterra. Aprendi a ler e escrever em inglês antes do português, então o inglês nunca me pareceu “segundo idioma”. Hoje moro em Curitiba.",
-				"O que me anima no trabalho é sistema que não pode falhar: conta, PIX, boleto, regra do Bacen. Já ajudei a automatizar onboarding de conta (com compliance), a manter volume alto de boletos e liquidação, e a montar coisa chata mas útil — tipo motor de tarifas e validação de documento com LLM.",
-				"No começo da carreira mexi bastante com ML. Depois a vida me puxou pra API, evento, Kafka, Python, TypeScript. Continuo curioso com IA, só que agora misturado com o resto.",
+				"Me chama de Kalke ou Henrique. Há uns seis anos construo software — a maior parte em finanças: crédito, contabilidade e agora infraestrutura bancária de ponta a ponta.",
+				"Moro em Curitiba. Já morei três anos na Inglaterra e aprendi a ler e escrever em inglês antes do português — então inglês nunca foi “segunda língua”.",
+				"Gosto de sistemas que não podem falhar à toa: contas, PIX, boleto, regras do Banco Central. Já ajudei a automatizar abertura de conta (com compliance), a manter volume alto de boleto e liquidação, e a entregar coisas pouco glamourosas mas úteis — motor de tarifas, checagem de documentos com LLM.",
+				"Também faço sites para clientes em WordPress/Elementor quando o projeto pede velocidade e autonomia editorial — e apps sob medida (como este) quando o problema precisa de código próprio. A faixa é o pitch: do page builder ao cluster.",
 			],
 		},
 		likes: {
-			eyebrow: "Fora do código",
-			title: "O que preenche o resto",
+			eyebrow: "~/likes",
+			title: "Fora do teclado",
 			items: [
 				{
 					title: "Os gatos",
-					text: "Zaia, Chico, Linhaça e Claire. Quatro personalidades, zero chance de casa quieta.",
+					text: "Zaia, Chico, Linhaça e Claire. Quatro personalidades. Casa quieta? Nem pensar.",
 				},
 				{
 					title: "Meg",
-					text: "Minha cachorra. Quase se chamou Lurdinha. Eu perdi essa discussão.",
+					text: "Minha cachorra. Quase se chamou Lurdinha. Perdi essa discussão.",
 				},
 				{
 					title: "Metal",
-					text: "Escuto metal o tempo todo — no trampo, no caminho, codando e jogando de madrugada.",
+					text: "Metal a maior parte do tempo — no caminho, no trampo, codando e jogando de madrugada.",
 				},
 				{
 					title: "Games",
-					text: "Quando largo o notebook, jogo. É o jeito mais fácil de desligar a cabeça.",
+					text: "Quando o laptop fecha, eu jogo. Jeito mais fácil de desligar a cabeça.",
 				},
 			],
 		},
 		stack: {
-			eyebrow: "Stack",
-			title: "Com o que eu trabalho",
-			intro: "O dia a dia: backend, dados e cloud. O resto entra quando o projeto pede.",
+			eyebrow: "~/stack",
+			title: "Com o que trabalho",
+			intro: "Agrupado pelo tipo de problema — não por buzzword.",
 			groups: [
-				{ area: "Backend", items: ["Go", "Python", "FastAPI", "TypeScript"] },
-				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
-				{ area: "Cloud", items: ["AWS", "Docker", "Cloudflare Workers / Containers"] },
-				{ area: "Auth / APIs", items: ["OIDC", "OpenAPI"] },
-				{ area: "Frontend", items: ["React", "Vite", "Hono"] },
+				{ area: "Código sob medida", items: ["Go", "Python", "FastAPI", "TypeScript", "React"] },
+				{ area: "Dados e eventos", items: ["PostgreSQL", "Redis", "Kafka"] },
+				{ area: "Infra e hosting", items: ["AWS", "Docker", "Cloudflare Workers"] },
+				{ area: "Auth e APIs", items: ["OIDC", "Keycloak", "OpenAPI"] },
+				{ area: "Sites de cliente", items: ["WordPress", "Elementor"] },
 			],
 		},
 		builds: {
-			eyebrow: "Projetos",
-			title: "O que eu ando construindo",
-			intro:
-				"No trampo é sistema que não pode cair. Em casa eu mexo no que me dá vontade — Go, LLM, API — no meu ritmo.",
+			eyebrow: "~/work",
+			title: "Trabalho",
+			intro: "Projetos que dá pra clicar. O extrator é demo ao vivo — conta, token e documento de verdade.",
 			items: [
+				{
+					name: "Document extractor",
+					href: "/playground",
+					blurb:
+						"App autenticado: gera token, manda PDF ou imagem, recebe dados estruturados. LGPD explícito. Roda de verdade em kalke.dev.",
+					tags: ["Live demo", "Go", "LLM", "OIDC"],
+					featured: true,
+				},
 				{
 					name: "kalke-auth",
 					href: "https://github.com/kalke/kalke-auth",
 					blurb:
-						"Auth dos apps Kalke com Keycloak/OIDC. Login de gente e máquina, sem inventar chave esquisita.",
-					tags: ["Keycloak", "OIDC", "Docker"],
+						"Auth dos apps Kalke com Keycloak/OIDC. Login de pessoa e máquina, cookie de sessão, PAT e introspect.",
+					tags: ["Keycloak", "OIDC", "Go"],
 				},
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"Joga um RG, comprovante ou NF e sai JSON. Go + LLM + Postgres + Redis.",
+						"API por trás do playground. Extrai RG, comprovante ou NF em JSON — Go, LLM, Postgres, Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"API bancária simples em FastAPI — depósito, saque, transferência. Tem Swagger e teste.",
+						"API bancária simples em FastAPI — depósito, saque, transferência. Tem Swagger e testes.",
 					tags: ["Python", "FastAPI"],
-				},
-				{
-					name: "personal-compose",
-					href: "https://github.com/kalke/personal-compose",
-					blurb:
-						"Docker Compose pra subir banco e broker local sem encheção.",
-					tags: ["Docker", "DX"],
 				},
 			],
 		},
 		contact: {
-			eyebrow: "Contato",
+			eyebrow: "~/contact",
 			title: "Fala comigo",
-			text: "Vaga, ideia, dúvida técnica ou só um oi. Respondo quando der — sério.",
+			text: "Vaga, freela, dúvida técnica ou só um oi. Email é o caminho mais rápido.",
 			links: [
+				{
+					label: "Email",
+					href: "mailto:henriquekalke@icloud.com",
+					note: "henriquekalke@icloud.com",
+				},
 				{
 					label: "GitHub",
 					href: "https://github.com/kalke",
@@ -226,26 +297,16 @@ export const copy: Record<Lang, Copy> = {
 					href: "https://wa.me/5541991071908",
 					note: "(41) 99107-1908",
 				},
-				{
-					label: "Spotify",
-					href: "https://open.spotify.com/user/12149692772?si=09f6c534878040e1",
-					note: "o que eu escuto",
-				},
-				{
-					label: "Email",
-					href: "mailto:henriquekalke@icloud.com",
-					note: "henriquekalke@icloud.com",
-				},
 			],
 		},
 		footer: "React · Vite · Cloudflare",
 		playground: {
-			pageTitle: "kalke — playground",
-			navAria: "Playground",
-			backHome: "Início",
-			eyebrow: "Playground",
-			title: "Brincar com documentos",
-			intro: "Só um cantinho pra testar a API de extração. Nada sério — entra, manda um arquivo e vê o JSON sair.",
+			pageTitle: "Henrique Kalke — dashboard",
+			navAria: "Dashboard",
+			backHome: "~/",
+			eyebrow: "~/dashboard",
+			title: "Dashboard",
+			intro: "Tokens da API e o extrator de documentos — cada um no seu lugar.",
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
@@ -253,8 +314,31 @@ export const copy: Record<Lang, Copy> = {
 			login: "Entrar",
 			signup: "Criar conta",
 			logout: "Sair",
-			signedInAs: "Entrou como",
-			loginError: "Não rolou entrar. Confere email e senha?",
+			signedInAs: "Sessão",
+			loginError: "Não entrou. Confere email e senha.",
+			signupError: "Não criou a conta. Confere os dados.",
+			signupOk: "Conta criada. Você já está dentro.",
+			verifyTitle: "Confirma o email",
+			verifyHint: "Mandei um código para {email}. Cola ele aqui.",
+			verifyCode: "Código",
+			verifySubmit: "Confirmar",
+			verifyError: "Código errado ou expirado. Pede outro se precisar.",
+			verifyClose: "Fechar",
+			resend: "Mandar de novo",
+			resendIn: "Reenviar em {seconds}s",
+			resendWait: "Espera um pouco antes de pedir outro código.",
+			resendError: "Não reenviou o código. Tenta de novo.",
+			modeLogin: "Entrar",
+			modeSignup: "Criar conta",
+			pathOverview: "~/dashboard",
+			pathApi: "~/dashboard/api",
+			pathExtract: "~/dashboard/extract",
+			overviewTitle: "Visão geral",
+			overviewIntro: "Escolhe o que quer fazer. Sem números inventados — só o que existe.",
+			overviewApiCard: "API tokens",
+			overviewApiHint: "Gerar, copiar e revogar tokens para chamar a API.",
+			overviewExtractCard: "Extrator",
+			overviewExtractHint: "Enviar um documento e ver o resultado estruturado.",
 			passwordTitle: "Trocar senha",
 			passwordHint: "Mínimo 10 caracteres. A sessão continua aberta.",
 			currentPassword: "Senha atual",
@@ -265,71 +349,95 @@ export const copy: Record<Lang, Copy> = {
 			passwordMismatch: "A confirmação não bate com a nova senha.",
 			passwordSame: "A nova senha tem que ser diferente da atual.",
 			passwordShort: "A nova senha precisa ter pelo menos 10 caracteres.",
-			passwordError: "Não rolou trocar a senha. Confere a senha atual?",
-			signupError: "Não rolou criar a conta. Dá uma olhada nos dados.",
-			signupOk: "Pronto — conta criada e você já tá dentro.",
-			verifyTitle: "Confirma teu email",
-			verifyHint: "Mandei um código pra {email}. Cola ele aqui.",
-			verifyCode: "Código",
-			verifySubmit: "Confirmar",
-			verifyError: "Código errado ou já expirou.",
-			verifyClose: "Fechar",
-			resend: "Mandar de novo",
-			resendIn: "Dá pra reenviar em {seconds}s",
-			resendWait: "Calma — espera um pouco pra pedir outro.",
-			resendError: "Não consegui reenviar o código.",
-			modeLogin: "Entrar",
-			modeSignup: "Criar conta",
+			passwordError: "Não trocou a senha. Confere a senha atual.",
 			tokensTitle: "Tokens da API",
-			tokensHint: "O token completo só aparece uma vez. Salva em algum lugar se for usar depois.",
+			tokensHint:
+				"O token completo aparece uma vez. Copia agora se for usar fora do site. No extrator o token da sessão já é usado automaticamente.",
 			tokenName: "Nome do token",
-			createToken: "Criar token",
-			tokenOnce: "Copia agora — depois some: ",
+			createToken: "Gerar token",
+			copyToken: "Copiar token",
+			copied: "Copiado.",
+			tokenOnce: "Copia agora — depois some:",
 			revoke: "Revogar",
-			tokenError: "Deu ruim com o token.",
-			needToken: "Cria um token antes de extrair.",
-			pdeTitle: "Extrator",
-			pdeHint: "Manda um PDF ou imagem e volta JSON. Qualquer conta logada serve.",
+			tokenError: "Algo deu errado com o token. Tenta de novo.",
+			needToken: "Gera um token em ~/dashboard/api antes de extrair.",
+			apiHowTitle: "Como chamar",
+			apiHowBody:
+				"Authorization: Bearer <token> no header. POST multipart em /v1/extract com o arquivo e o consentimento LGPD.",
+			pdeTitle: "Extrair documento",
+			pdeHint: "Escolhe o tipo, manda PDF ou imagem, aceita o termo. O resultado aparece abaixo.",
 			consentLabel:
-				"Beleza: o arquivo em si não fica salvo. O conteúdo pode passar por um LLM, e eu posso guardar hash, resultado e um registro de auditoria (com IP).",
-			consentRequired: "Marca o aceite pra continuar.",
-			docType: "Tipo",
+				"O arquivo em si não fica salvo. O conteúdo pode passar por um LLM; posso guardar hash, resultado e auditoria (com IP).",
+			consentRequired: "Marca o aceite para continuar.",
+			docType: "Tipo de documento",
+			docTypeIdentity: "Documento de identidade",
+			docTypeAddress: "Comprovante de endereço",
+			docTypeInvoice: "Nota fiscal",
 			chooseFile: "Arquivo",
 			extract: "Extrair",
-			extractError: "A extração falhou.",
-			result: "Resposta",
+			extracting: "Extraindo…",
+			extracted: "Extraído",
+			extractError: "A extração falhou. Confere o arquivo e tenta de novo.",
+			extractEmpty: "Ainda sem resultado. Manda um arquivo e clica em Extrair.",
+			resultSummary: "Resumo",
+			resultJson: "Ver JSON",
+			resultHideJson: "Esconder JSON",
+			preparingToken: "Preparando acesso…",
 		},
 	},
 	en: {
 		navAria: "Primary",
 		nav: [
-			{ label: "About", href: "#about" },
-			{ label: "Stack", href: "#stack" },
-			{ label: "Likes", href: "#likes" },
-			{ label: "Projects", href: "#builds" },
-			{ label: "Playground", href: "/playground" },
-			{ label: "Contact", href: "#contact" },
+			{ label: "~/about", href: "#about" },
+			{ label: "~/work", href: "#work" },
+			{ label: "~/stack", href: "#stack" },
+			{ label: "~/contact", href: "#contact" },
+			{ label: "~/dashboard", href: "/playground" },
 		],
 		langSwitch: { pt: "PT", en: "EN" },
 		hero: {
 			headline: "Henrique Kalke",
-			support: "Or just kalke. Software engineer in Curitiba.",
-			primaryCta: { label: "Playground", href: "/playground" },
-			secondaryCta: { label: "About me", href: "#about" },
+			support:
+				"Software engineer in Curitiba. Banking systems, APIs, and products that have to actually work.",
+			primaryCta: { label: "View work", href: "#work" },
+			secondaryCta: { label: "Get in touch", href: "#contact" },
+			terminal: {
+				prompt: "kalke@dev:~$",
+				lines: [
+					{
+						cmd: "whoami",
+						out: "Henrique Kalke — backend, auth, and fintech infra.",
+						href: "#about",
+					},
+					{
+						cmd: "ls ~/work",
+						out: "document-extractor/  kalke-auth/  e-bank-api/",
+						href: "#work",
+					},
+					{
+						cmd: "cat contact.md",
+						out: "email · github · linkedin · whatsapp",
+						href: "#contact",
+					},
+				],
+				hint: "Click a command or type whoami, ls, contact",
+				inputPlaceholder: "command…",
+				unknown: "command not found. try: whoami | ls | contact",
+			},
 		},
 		about: {
-			eyebrow: "About",
+			eyebrow: "~/about",
 			title: "Who I am",
 			paragraphs: [
-				"Call me Kalke or Henrique — either works. I’ve been building software for about six years, mostly in finance: credit, accountingtech, and now full banking infrastructure.",
-				"I lived in England for three years and learned to read and write in English before Portuguese, so English never felt like a “second language.” I’m based in Curitiba now.",
+				"Call me Kalke or Henrique. I’ve been building software for about six years — mostly in finance: credit, accounting tech, and now full banking infrastructure.",
+				"I’m based in Curitiba. I lived in England for three years and learned to read and write in English before Portuguese, so English never felt like a “second language.”",
 				"I like systems that can’t casually break: accounts, PIX, boleto, Central Bank rules. I’ve helped automate account onboarding (with compliance), keep high boleto and settlement volume moving, and ship unglamorous but useful stuff — fee engines, LLM document checks.",
-				"Early on I did a lot of ML. Later the work pulled me into APIs, events, Kafka, Python, TypeScript. Still curious about AI — just mixed into everything else.",
+				"I also ship client sites on WordPress/Elementor when the job needs speed and editorial autonomy — and custom apps (like this one) when the problem needs real code. The range is the pitch: page builder to cluster.",
 			],
 		},
 		likes: {
-			eyebrow: "Off the keyboard",
-			title: "What fills the rest",
+			eyebrow: "~/likes",
+			title: "Off the keyboard",
 			items: [
 				{
 					title: "The cats",
@@ -350,58 +458,63 @@ export const copy: Record<Lang, Copy> = {
 			],
 		},
 		stack: {
-			eyebrow: "Stack",
+			eyebrow: "~/stack",
 			title: "What I work with",
-			intro: "Day to day: backend, data, and cloud. Everything else shows up when the project needs it.",
+			intro: "Grouped by the kind of problem — not by buzzword.",
 			groups: [
-				{ area: "Backend", items: ["Go", "Python", "FastAPI", "TypeScript"] },
-				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
-				{ area: "Cloud", items: ["AWS", "Docker", "Cloudflare Workers / Containers"] },
-				{ area: "Auth / APIs", items: ["OIDC", "OpenAPI"] },
-				{ area: "Frontend", items: ["React", "Vite", "Hono"] },
+				{ area: "Custom code", items: ["Go", "Python", "FastAPI", "TypeScript", "React"] },
+				{ area: "Data & events", items: ["PostgreSQL", "Redis", "Kafka"] },
+				{ area: "Infra & hosting", items: ["AWS", "Docker", "Cloudflare Workers"] },
+				{ area: "Auth & APIs", items: ["OIDC", "Keycloak", "OpenAPI"] },
+				{ area: "Client sites", items: ["WordPress", "Elementor"] },
 			],
 		},
 		builds: {
-			eyebrow: "Projects",
-			title: "What I’ve been building",
-			intro:
-				"At work it’s systems that can’t casually break. At home I tinker — Go, LLMs, APIs — at my own pace.",
+			eyebrow: "~/work",
+			title: "Work",
+			intro: "Projects you can click. The extractor is a live demo — real account, token, and document.",
 			items: [
+				{
+					name: "Document extractor",
+					href: "/playground",
+					blurb:
+						"Authenticated app: generate a token, send a PDF or image, get structured data back. Explicit LGPD consent. Live on kalke.dev.",
+					tags: ["Live demo", "Go", "LLM", "OIDC"],
+					featured: true,
+				},
 				{
 					name: "kalke-auth",
 					href: "https://github.com/kalke/kalke-auth",
 					blurb:
-						"Auth for Kalke apps with Keycloak/OIDC. People and machines, no weird proprietary keys.",
-					tags: ["Keycloak", "OIDC", "Docker"],
+						"Auth for Kalke apps with Keycloak/OIDC. Human and machine login, session cookie, PAT, and introspect.",
+					tags: ["Keycloak", "OIDC", "Go"],
 				},
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"Drop in a Brazilian ID, address proof, or invoice — get JSON back. Go + LLM + Postgres + Redis.",
+						"API behind the playground. Extract ID, proof of address, or invoice to JSON — Go, LLM, Postgres, Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"Tiny FastAPI bank API — deposit, withdraw, transfer. Swagger and tests included.",
+						"Simple banking API in FastAPI — deposit, withdraw, transfer. Swagger and tests included.",
 					tags: ["Python", "FastAPI"],
-				},
-				{
-					name: "personal-compose",
-					href: "https://github.com/kalke/personal-compose",
-					blurb:
-						"Docker Compose to spin up local DB and broker without the usual pain.",
-					tags: ["Docker", "DX"],
 				},
 			],
 		},
 		contact: {
-			eyebrow: "Contact",
-			title: "Say hi",
-			text: "A role, an idea, a technical question, or just hello. I’ll reply when I can — for real.",
+			eyebrow: "~/contact",
+			title: "Get in touch",
+			text: "Job, freelance, technical question, or just hello. Email is the fastest path.",
 			links: [
+				{
+					label: "Email",
+					href: "mailto:henriquekalke@icloud.com",
+					note: "henriquekalke@icloud.com",
+				},
 				{
 					label: "GitHub",
 					href: "https://github.com/kalke",
@@ -415,28 +528,18 @@ export const copy: Record<Lang, Copy> = {
 				{
 					label: "WhatsApp",
 					href: "https://wa.me/5541991071908",
-					note: "+55 41 99107-1908",
-				},
-				{
-					label: "Spotify",
-					href: "https://open.spotify.com/user/12149692772?si=09f6c534878040e1",
-					note: "what I listen to",
-				},
-				{
-					label: "Email",
-					href: "mailto:henriquekalke@icloud.com",
-					note: "henriquekalke@icloud.com",
+					note: "(41) 99107-1908",
 				},
 			],
 		},
 		footer: "React · Vite · Cloudflare",
 		playground: {
-			pageTitle: "kalke — playground",
-			navAria: "Playground",
-			backHome: "Home",
-			eyebrow: "Playground",
-			title: "Mess around with documents",
-			intro: "Just a corner to try the extraction API. Nothing fancy — sign in, drop a file, get JSON back.",
+			pageTitle: "Henrique Kalke — dashboard",
+			navAria: "Dashboard",
+			backHome: "~/",
+			eyebrow: "~/dashboard",
+			title: "Dashboard",
+			intro: "API tokens and the document extractor — each in its own place.",
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
@@ -444,8 +547,31 @@ export const copy: Record<Lang, Copy> = {
 			login: "Sign in",
 			signup: "Create account",
 			logout: "Sign out",
-			signedInAs: "Signed in as",
-			loginError: "Couldn’t sign in. Double-check email and password?",
+			signedInAs: "Session",
+			loginError: "Couldn’t sign in. Check email and password.",
+			signupError: "Couldn’t create the account. Check what you typed.",
+			signupOk: "Account created. You’re in.",
+			verifyTitle: "Confirm your email",
+			verifyHint: "I sent a code to {email}. Paste it here.",
+			verifyCode: "Code",
+			verifySubmit: "Confirm",
+			verifyError: "Wrong or expired code. Resend if you need to.",
+			verifyClose: "Close",
+			resend: "Send again",
+			resendIn: "Resend in {seconds}s",
+			resendWait: "Wait a bit before asking for another code.",
+			resendError: "Couldn’t resend the code. Try again.",
+			modeLogin: "Sign in",
+			modeSignup: "Create account",
+			pathOverview: "~/dashboard",
+			pathApi: "~/dashboard/api",
+			pathExtract: "~/dashboard/extract",
+			overviewTitle: "Overview",
+			overviewIntro: "Pick what you want to do. No fake stats — only what’s real.",
+			overviewApiCard: "API tokens",
+			overviewApiHint: "Generate, copy, and revoke tokens to call the API.",
+			overviewExtractCard: "Extractor",
+			overviewExtractHint: "Send a document and see structured results.",
 			passwordTitle: "Change password",
 			passwordHint: "At least 10 characters. You’ll stay signed in.",
 			currentPassword: "Current password",
@@ -454,41 +580,42 @@ export const copy: Record<Lang, Copy> = {
 			changePassword: "Save password",
 			passwordOk: "Password updated.",
 			passwordMismatch: "Confirmation doesn’t match the new password.",
-			passwordSame: "New password must be different from the current one.",
+			passwordSame: "New password must differ from the current one.",
 			passwordShort: "New password needs at least 10 characters.",
-			passwordError: "Couldn’t change the password. Check the current one?",
-			signupError: "Couldn’t create the account. Check what you typed.",
-			signupOk: "You’re in — account created.",
-			verifyTitle: "Confirm your email",
-			verifyHint: "I sent a code to {email}. Paste it here.",
-			verifyCode: "Code",
-			verifySubmit: "Confirm",
-			verifyError: "Wrong code, or it expired.",
-			verifyClose: "Close",
-			resend: "Send again",
-			resendIn: "You can resend in {seconds}s",
-			resendWait: "Give it a second before asking again.",
-			resendError: "Couldn’t resend the code.",
-			modeLogin: "Sign in",
-			modeSignup: "Create account",
+			passwordError: "Couldn’t change the password. Check the current one.",
 			tokensTitle: "API tokens",
-			tokensHint: "The full token shows once. Save it if you’ll need it later.",
+			tokensHint:
+				"The full token shows once. Copy it now if you’ll use it outside this site. The extractor uses your session token automatically.",
 			tokenName: "Token name",
-			createToken: "Create token",
-			tokenOnce: "Copy now — it’s gone after this: ",
+			createToken: "Generate token",
+			copyToken: "Copy token",
+			copied: "Copied.",
+			tokenOnce: "Copy now — it’s gone after this:",
 			revoke: "Revoke",
-			tokenError: "Something went wrong with the token.",
-			needToken: "Make a token before extracting.",
-			pdeTitle: "Extractor",
-			pdeHint: "Send a PDF or image, get JSON. Any signed-in account works.",
+			tokenError: "Something went wrong with the token. Try again.",
+			needToken: "Generate a token in ~/dashboard/api before extracting.",
+			apiHowTitle: "How to call it",
+			apiHowBody:
+				"Authorization: Bearer <token> header. POST multipart to /v1/extract with the file and LGPD consent.",
+			pdeTitle: "Extract document",
+			pdeHint: "Pick a type, send a PDF or image, accept the terms. Results show below.",
 			consentLabel:
-				"Cool: the file itself isn’t stored. Content may go through an LLM, and I may keep a hash, the result, and an audit trail (including IP).",
+				"The file itself isn’t stored. Content may go through an LLM; I may keep a hash, the result, and an audit trail (including IP).",
 			consentRequired: "Tick the consent box to continue.",
-			docType: "Type",
+			docType: "Document type",
+			docTypeIdentity: "Identity document",
+			docTypeAddress: "Proof of address",
+			docTypeInvoice: "Invoice",
 			chooseFile: "File",
 			extract: "Extract",
-			extractError: "Extraction failed.",
-			result: "Response",
+			extracting: "Extracting…",
+			extracted: "Extracted",
+			extractError: "Extraction failed. Check the file and try again.",
+			extractEmpty: "No result yet. Upload a file and click Extract.",
+			resultSummary: "Summary",
+			resultJson: "Show JSON",
+			resultHideJson: "Hide JSON",
+			preparingToken: "Preparing access…",
 		},
 	},
 };

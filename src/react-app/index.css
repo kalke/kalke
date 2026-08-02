@@ -1,16 +1,24 @@
 :root {
-	--bg: #141210;
-	--bg-deep: #0e0c0a;
-	--ink: #ebe6dc;
-	--muted: #9a9288;
-	--accent: #c4a35a;
-	--accent-soft: rgba(196, 163, 90, 0.16);
-	--olive: #7a8f5c;
-	--line: rgba(235, 230, 220, 0.12);
+	--bg: #15120f;
+	--surface: #211c18;
+	--text: #f2ece4;
+	--text-muted: #9c948a;
+	--accent: #e7a339;
+	--accent-cool: #4fb6b0;
+	--accent-soft: rgba(231, 163, 57, 0.16);
+	--cool-soft: rgba(79, 182, 176, 0.14);
+	--line: rgba(242, 236, 228, 0.12);
+	--danger: #e08a7a;
+	--danger-bg: rgba(80, 30, 20, 0.4);
 	--max: 68rem;
-	--font-display: "Fraunces", "Times New Roman", serif;
-	--font-body: "Karla", "Helvetica Neue", sans-serif;
-	color: var(--ink);
+	--font-display: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+	--font-body: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+	/* aliases for gradual migration */
+	--ink: var(--text);
+	--muted: var(--text-muted);
+	--olive: var(--accent-cool);
+	--bg-deep: #100e0c;
+	color: var(--text);
 	background: var(--bg);
 	font-family: var(--font-body);
 	font-synthesis: none;
@@ -31,7 +39,7 @@ html {
 body {
 	margin: 0;
 	min-width: 320px;
-	background: var(--bg-deep);
+	background: var(--bg);
 }
 
 a {
@@ -41,7 +49,8 @@ a {
 
 button,
 input,
-textarea {
+textarea,
+select {
 	font: inherit;
 }
 
@@ -52,4 +61,9 @@ img {
 
 #root {
 	min-height: 100svh;
+}
+
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
 }
