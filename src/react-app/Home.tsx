@@ -214,22 +214,26 @@ export function Home({ lang, onLang }: Props) {
 					<h2>{t.contact.title}</h2>
 					<p className="section-intro">{t.contact.text}</p>
 					<ul className="contact-links">
-						{t.contact.links.map((link) => (
-							<li key={link.label}>
-								<a
-									className="contact-card"
-									href={link.href}
-									{...(link.download
-										? { download: link.download }
-										: link.href.startsWith("mailto:")
-											? {}
-											: { target: "_blank", rel: "noreferrer" })}
-								>
-									<span className="contact-label">{link.label}</span>
-									<span className="contact-note">{link.note}</span>
-								</a>
-							</li>
-						))}
+						{t.contact.links.map((link) => {
+							const isMailto = link.href.startsWith("mailto:");
+							const isDownload = Boolean(link.download);
+							return (
+								<li key={link.label}>
+									<a
+										className="contact-card"
+										href={link.href}
+										{...(isDownload
+											? { download: link.download }
+											: isMailto
+												? undefined
+												: { target: "_blank", rel: "noreferrer" })}
+									>
+										<span className="contact-label">{link.label}</span>
+										<span className="contact-note">{link.note}</span>
+									</a>
+								</li>
+							);
+						})}
 					</ul>
 				</RevealSection>
 			</main>

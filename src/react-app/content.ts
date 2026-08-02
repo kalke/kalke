@@ -323,16 +323,9 @@ export const copy: Record<Lang, Copy> = {
 			text: "Quer bater um papo sobre código, infraestrutura bancária, projetos paralelos ou novas oportunidades? Me manda uma mensagem. Costumo ser mais rápido no WhatsApp. O currículo em PDF também está aqui.",
 			links: [
 				{
-					label: "Currículo (PDF)",
-					href: "/cv/Henrique_Kalke_Engenheiro_de_Software_Senior.pdf",
-					note: "Português · download",
-					download: "Henrique_Kalke_Curriculo_PT.pdf",
-				},
-				{
-					label: "Resume (PDF)",
-					href: "/cv/Henrique_Kalke_Senior_Software_Engineer.pdf",
-					note: "English · download",
-					download: "Henrique_Kalke_Resume_EN.pdf",
+					label: "WhatsApp",
+					href: "https://wa.me/5541991071908",
+					note: "+55 41 99107-1908",
 				},
 				{
 					label: "Email",
@@ -350,9 +343,10 @@ export const copy: Record<Lang, Copy> = {
 					note: "github.com/kalke",
 				},
 				{
-					label: "WhatsApp",
-					href: "https://wa.me/5541991071908",
-					note: "+55 41 99107-1908",
+					label: "Currículo (PDF)",
+					href: "/cv/Henrique_Kalke_Engenheiro_de_Software_Senior.pdf",
+					note: "Download",
+					download: "Henrique_Kalke_Curriculo_PT.pdf",
 				},
 			],
 		},
@@ -628,19 +622,12 @@ export const copy: Record<Lang, Copy> = {
 		contact: {
 			eyebrow: "~/contact",
 			title: "Contact",
-			text: "Want to talk code, banking infrastructure, side projects, or new roles? Send a message. I'm usually fastest on WhatsApp. Résumé PDFs are available below.",
+			text: "Want to talk code, banking infrastructure, side projects, or new roles? Send a message. I'm usually fastest on WhatsApp. The résumé PDF is available below.",
 			links: [
 				{
-					label: "Resume (PDF)",
-					href: "/cv/Henrique_Kalke_Senior_Software_Engineer.pdf",
-					note: "English · download",
-					download: "Henrique_Kalke_Resume_EN.pdf",
-				},
-				{
-					label: "Currículo (PDF)",
-					href: "/cv/Henrique_Kalke_Engenheiro_de_Software_Senior.pdf",
-					note: "Portuguese · download",
-					download: "Henrique_Kalke_Curriculo_PT.pdf",
+					label: "WhatsApp",
+					href: "https://wa.me/5541991071908",
+					note: "+55 41 99107-1908",
 				},
 				{
 					label: "Email",
@@ -658,9 +645,10 @@ export const copy: Record<Lang, Copy> = {
 					note: "github.com/kalke",
 				},
 				{
-					label: "WhatsApp",
-					href: "https://wa.me/5541991071908",
-					note: "+55 41 99107-1908",
+					label: "Resume (PDF)",
+					href: "/cv/Henrique_Kalke_Senior_Software_Engineer.pdf",
+					note: "Download",
+					download: "Henrique_Kalke_Resume_EN.pdf",
 				},
 			],
 		},
