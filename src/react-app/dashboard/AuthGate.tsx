@@ -30,6 +30,7 @@ export function AuthGate({ lang }: Props) {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [otpCode, setOtpCode] = useState("");
 	const [verifyKind, setVerifyKind] = useState<VerifyKind | null>(null);
@@ -42,7 +43,7 @@ export function AuthGate({ lang }: Props) {
 		[password, confirmPassword],
 	);
 	const resetStrong = passwordIsStrong(resetRules, true);
-	const loginWantsPassword = password.trim().length > 0;
+	const loginWantsPassword = showPassword && password.trim().length > 0;
 
 	useEffect(() => {
 		if (resendIn <= 0) return;
@@ -70,6 +71,7 @@ export function AuthGate({ lang }: Props) {
 		setOtpCode("");
 		setPassword("");
 		setConfirmPassword("");
+		setShowPassword(false);
 	}
 
 	async function finishAuth(me: Me) {
@@ -84,6 +86,10 @@ export function AuthGate({ lang }: Props) {
 	async function onLogin(e: FormEvent) {
 		e.preventDefault();
 		setError("");
+		if (showPassword && !password.trim()) {
+			setError(t.loginError);
+			return;
+		}
 		setBusy(true);
 		try {
 			if (loginWantsPassword) {
@@ -277,9 +283,9 @@ export function AuthGate({ lang }: Props) {
 							required
 						/>
 					</label>
-					{mode === "login" ? (
+					{mode === "login" && showPassword ? (
 						<label>
-							{t.passwordOptional}
+							{t.password}
 							<input
 								type="password"
 								autoComplete="current-password"
@@ -287,8 +293,8 @@ export function AuthGate({ lang }: Props) {
 								onChange={(e) => setPassword(e.target.value)}
 								onKeyDown={onKeyEvent}
 								onKeyUp={onKeyEvent}
+								required
 							/>
-							<span className="auth-field-hint">{t.passwordOptionalHint}</span>
 						</label>
 					) : null}
 					{mode === "signup" ? (
@@ -306,7 +312,8 @@ export function AuthGate({ lang }: Props) {
 							/>
 						</label>
 					) : null}
-					{capsOn && (mode === "login" || mode === "signup") ? (
+					{capsOn &&
+					((mode === "login" && showPassword) || mode === "signup") ? (
 						<p className="caps-indicator is-on" role="status" aria-live="polite">
 							{t.capsOn}
 						</p>
@@ -343,6 +350,21 @@ export function AuthGate({ lang }: Props) {
 				{mode === "login" ? (
 					<>
 						<p className="auth-footnotes">
+							<button
+								type="button"
+								onClick={() => {
+									setError("");
+									if (showPassword) {
+										setShowPassword(false);
+										setPassword("");
+									} else {
+										setShowPassword(true);
+									}
+								}}
+							>
+								{showPassword ? t.hidePassword : t.usePassword}
+							</button>
+							<span aria-hidden="true">·</span>
 							<button type="button" onClick={() => switchMode("forgot")}>
 								{t.forgotPassword}
 							</button>
