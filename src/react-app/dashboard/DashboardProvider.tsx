@@ -52,13 +52,32 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	useEffect(() => {
-		me()
-			.then(async (u) => {
-				setUser(u);
-				if (u) await refreshTokens();
-			})
-			.catch(() => setUser(null))
-			.finally(() => setLoading(false));
+		let cancelled = false;
+		(async () => {
+			let next: Me | null = null;
+			try {
+				next = await Promise.race([
+					me(),
+					new Promise<Me | null>((_, reject) => {
+						window.setTimeout(() => reject(new Error("me_timeout")), 10_000);
+					}),
+				]);
+			} catch {
+				next = null;
+			}
+			if (cancelled) return;
+			setUser(next);
+			setLoading(false);
+			if (!next) return;
+			try {
+				await refreshTokens();
+			} catch {
+				/* token list is non-blocking for demo access */
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
 	}, [refreshTokens]);
 
 	const value = useMemo(

@@ -251,7 +251,7 @@ export function Extract({ lang }: Props) {
 						{t.chooseFile}
 						<input
 							type="file"
-							accept=".pdf,image/*"
+							accept="image/*,.pdf,application/pdf"
 							onChange={(e) => setFile(e.target.files?.[0] ?? null)}
 							required
 						/>
