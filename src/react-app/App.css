@@ -1040,6 +1040,10 @@
 	min-width: 0;
 }
 
+.extract-form {
+	max-width: 28rem;
+}
+
 .playground-form.inline {
 	grid-template-columns: 1fr auto;
 	align-items: end;
@@ -1070,6 +1074,196 @@
 	font-size: 16px;
 	line-height: 1.35;
 	touch-action: manipulation;
+}
+
+.file-field {
+	display: grid;
+	gap: 0.45rem;
+}
+
+.file-field-label {
+	color: var(--text-muted);
+	font-family: var(--font-display);
+	font-size: 0.78rem;
+}
+
+.file-input-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.file-dropzone {
+	display: grid;
+	justify-items: center;
+	gap: 0.35rem;
+	padding: 1.35rem 1rem;
+	border: 1px dashed rgba(231, 163, 57, 0.35);
+	border-radius: 0.25rem;
+	background:
+		linear-gradient(180deg, rgba(231, 163, 57, 0.06), transparent 70%),
+		rgba(16, 14, 12, 0.45);
+	color: var(--text-muted);
+	text-align: center;
+	cursor: pointer;
+	transition:
+		border-color 0.2s ease,
+		background 0.2s ease,
+		transform 0.2s ease;
+}
+
+.file-dropzone:hover,
+.file-dropzone.is-dragging {
+	border-color: rgba(231, 163, 57, 0.7);
+	background:
+		linear-gradient(180deg, rgba(231, 163, 57, 0.12), transparent 70%),
+		rgba(33, 28, 24, 0.65);
+	color: var(--text);
+}
+
+.file-dropzone.is-dragging {
+	transform: translateY(-1px);
+}
+
+.file-dropzone-icon {
+	display: grid;
+	place-items: center;
+	width: 2.1rem;
+	height: 2.1rem;
+	margin-bottom: 0.2rem;
+	border: 1px solid rgba(231, 163, 57, 0.35);
+	border-radius: 999px;
+	color: var(--accent);
+	font-family: var(--font-display);
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.file-dropzone-title {
+	font-family: var(--font-body);
+	font-size: 0.92rem;
+	color: var(--text);
+}
+
+.file-dropzone-browse {
+	font-family: var(--font-display);
+	font-size: 0.75rem;
+	color: var(--accent);
+	text-decoration: underline;
+	text-underline-offset: 0.16em;
+}
+
+.file-selected {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	gap: 0.65rem 0.85rem;
+	align-items: center;
+	padding: 0.85rem 0.9rem;
+	border: 1px solid rgba(231, 163, 57, 0.28);
+	border-radius: 0.25rem;
+	background: rgba(16, 14, 12, 0.55);
+}
+
+.file-selected-badge {
+	display: grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: 0.2rem;
+	background: var(--accent-soft);
+	border: 1px solid rgba(231, 163, 57, 0.35);
+	color: var(--accent);
+	font-family: var(--font-display);
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+}
+
+.file-selected-meta {
+	display: grid;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.file-selected-meta strong {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--text);
+	font-family: var(--font-body);
+	font-size: 0.92rem;
+	font-weight: 600;
+}
+
+.file-selected-meta span {
+	color: var(--text-muted);
+	font-family: var(--font-display);
+	font-size: 0.72rem;
+}
+
+.file-selected-actions {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.file-selected-actions .btn {
+	padding: 0.4rem 0.7rem;
+	font-size: 0.72rem;
+}
+
+.extract-progress {
+	display: grid;
+	gap: 0.45rem;
+	padding: 0.75rem 0.85rem;
+	border: 1px solid var(--line);
+	border-radius: 0.2rem;
+	background: rgba(16, 14, 12, 0.5);
+}
+
+.extract-progress-head {
+	display: flex;
+	justify-content: space-between;
+	gap: 0.75rem;
+	font-family: var(--font-display);
+	font-size: 0.75rem;
+	color: var(--text-muted);
+}
+
+.extract-progress-track {
+	height: 0.42rem;
+	overflow: hidden;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.extract-progress-fill {
+	display: block;
+	height: 100%;
+	border-radius: inherit;
+	background: linear-gradient(90deg, #c4872f, var(--accent), #4fb6b0);
+	transition: width 0.25s ease;
+}
+
+.extract-progress.is-extracting .extract-progress-fill {
+	background-size: 200% 100%;
+	animation: extract-shimmer 1.1s linear infinite;
+}
+
+@keyframes extract-shimmer {
+	0% {
+		background-position: 100% 0;
+	}
+	100% {
+		background-position: -100% 0;
+	}
 }
 
 .playground-consent {
@@ -1538,7 +1732,8 @@
 	.hero-copy,
 	.hero-glow,
 	.terminal-caret,
-	.playground-modal-panel {
+	.playground-modal-panel,
+	.extract-progress.is-extracting .extract-progress-fill {
 		animation: none !important;
 		transition: none !important;
 		opacity: 1;

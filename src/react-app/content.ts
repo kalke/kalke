@@ -125,6 +125,12 @@ export type PlaygroundCopy = {
 	docTypeAddress: string;
 	docTypeInvoice: string;
 	chooseFile: string;
+	dropHint: string;
+	dropBrowse: string;
+	dropReplace: string;
+	dropRemove: string;
+	uploadProgress: string;
+	extractProgress: string;
 	extract: string;
 	extracting: string;
 	extracted: string;
@@ -472,6 +478,12 @@ export const copy: Record<Lang, Copy> = {
 			docTypeAddress: "Comprovante de endereço",
 			docTypeInvoice: "Nota fiscal",
 			chooseFile: "Arquivo",
+			dropHint: "Arraste o PDF ou a imagem para cá",
+			dropBrowse: "escolher arquivo",
+			dropReplace: "Trocar arquivo",
+			dropRemove: "Remover",
+			uploadProgress: "Enviando…",
+			extractProgress: "Extraindo campos…",
 			extract: "Extrair",
 			extracting: "Extraindo…",
 			extracted: "Extraído",
@@ -802,6 +814,12 @@ export const copy: Record<Lang, Copy> = {
 			docTypeAddress: "Proof of address",
 			docTypeInvoice: "Invoice",
 			chooseFile: "File",
+			dropHint: "Drop a PDF or image here",
+			dropBrowse: "browse files",
+			dropReplace: "Replace file",
+			dropRemove: "Remove",
+			uploadProgress: "Uploading…",
+			extractProgress: "Extracting fields…",
 			extract: "Extract",
 			extracting: "Extracting…",
 			extracted: "Extracted",

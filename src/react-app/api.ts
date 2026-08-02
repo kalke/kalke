@@ -245,32 +245,70 @@ export async function revokeToken(id: string): Promise<void> {
 
 export const LGPD_POLICY_VERSION = "lgpd-extract-v1";
 
+export type ExtractProgress = {
+	/** 0–100 overall progress shown in the UI */
+	percent: number;
+	stage: "upload" | "extract";
+};
+
 export async function extractDocument(
 	pat: string,
 	file: File,
 	docType: string,
 	consent = true,
+	onProgress?: (progress: ExtractProgress) => void,
 ): Promise<unknown> {
 	const body = new FormData();
 	body.append("file", file);
 	if (consent) {
 		body.append("consent", LGPD_POLICY_VERSION);
 	}
-	const res = await fetch(
-		`${PDE_BASE}/v1/extract?doc_type=${encodeURIComponent(docType)}`,
-		{
-			method: "POST",
-			headers: { Authorization: `Bearer ${pat}` },
-			body,
-		},
-	);
-	const data = await res.json().catch(() => ({}));
-	if (!res.ok) {
-		const msg =
-			typeof data === "object" && data && "error" in data
-				? String((data as { error: string }).error)
-				: "extract_failed";
-		throw new Error(msg);
-	}
-	return data;
+
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open(
+			"POST",
+			`${PDE_BASE}/v1/extract?doc_type=${encodeURIComponent(docType)}`,
+		);
+		xhr.setRequestHeader("Authorization", `Bearer ${pat}`);
+		xhr.responseType = "json";
+
+		xhr.upload.onprogress = (event) => {
+			if (!onProgress || !event.lengthComputable || event.total <= 0) return;
+			const uploadPct = Math.min(90, Math.round((event.loaded / event.total) * 90));
+			onProgress({ percent: uploadPct, stage: "upload" });
+		};
+
+		xhr.upload.onload = () => {
+			onProgress?.({ percent: 92, stage: "extract" });
+		};
+
+		xhr.onload = () => {
+			const data =
+				xhr.response && typeof xhr.response === "object"
+					? xhr.response
+					: (() => {
+							try {
+								return JSON.parse(xhr.responseText || "{}");
+							} catch {
+								return {};
+							}
+						})();
+			if (xhr.status >= 200 && xhr.status < 300) {
+				onProgress?.({ percent: 100, stage: "extract" });
+				resolve(data);
+				return;
+			}
+			const msg =
+				typeof data === "object" && data && "error" in data
+					? String((data as { error: string }).error)
+					: "extract_failed";
+			reject(new Error(msg));
+		};
+
+		xhr.onerror = () => reject(new Error("extract_failed"));
+		xhr.onabort = () => reject(new Error("extract_failed"));
+		onProgress?.({ percent: 4, stage: "upload" });
+		xhr.send(body);
+	});
 }

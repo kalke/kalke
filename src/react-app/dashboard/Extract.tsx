@@ -1,7 +1,17 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+	type ChangeEvent,
+	type DragEvent,
+	type FormEvent,
+} from "react";
 import {
 	clearWorkingPat,
 	extractDocument,
+	type ExtractProgress,
 } from "../api";
 import { copy, type Lang } from "../content";
 import { useDashboard } from "./useDashboard";
@@ -24,6 +34,20 @@ function formatScalar(v: unknown): string | null {
 		return String(v);
 	}
 	return null;
+}
+
+function formatBytes(n: number): string {
+	if (n < 1024) return `${n} B`;
+	if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+	return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function fileKind(file: File): "pdf" | "image" | "other" {
+	if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) return "pdf";
+	if (file.type.startsWith("image/") || /\.(png|jpe?g|webp|gif)$/i.test(file.name)) {
+		return "image";
+	}
+	return "other";
 }
 
 function pushRow(
@@ -103,16 +127,18 @@ function flattenObject(
 
 		if (Array.isArray(value)) {
 			if (value.length === 0) continue;
-			const lines = value.map((item, i) => {
-				if (!isPlainObject(item)) return formatScalar(item) ?? "";
-				const desc = formatScalar(item.descricao) ?? `Item ${i + 1}`;
-				const qty = formatScalar(item.quantidade);
-				const valor = formatScalar(item.valor);
-				const bits = [desc];
-				if (qty) bits.push(`qtd ${qty}`);
-				if (valor) bits.push(`R$ ${valor}`);
-				return bits.join(" · ");
-			}).filter(Boolean);
+			const lines = value
+				.map((item, i) => {
+					if (!isPlainObject(item)) return formatScalar(item) ?? "";
+					const desc = formatScalar(item.descricao) ?? `Item ${i + 1}`;
+					const qty = formatScalar(item.quantidade);
+					const valor = formatScalar(item.valor);
+					const bits = [desc];
+					if (qty) bits.push(`qtd ${qty}`);
+					if (valor) bits.push(`R$ ${valor}`);
+					return bits.join(" · ");
+				})
+				.filter(Boolean);
 			if (lines.length) {
 				seen.add(path);
 				rows.push({
@@ -177,6 +203,10 @@ export function Extract({ lang }: Props) {
 	const [result, setResult] = useState<unknown>(null);
 	const [showJson, setShowJson] = useState(false);
 	const [ready, setReady] = useState(false);
+	const [dragging, setDragging] = useState(false);
+	const [progress, setProgress] = useState<ExtractProgress | null>(null);
+	const inputRef = useRef<HTMLInputElement>(null);
+	const fileInputId = useId();
 
 	useEffect(() => {
 		let cancelled = false;
@@ -198,6 +228,27 @@ export function Extract({ lang }: Props) {
 		[result, docType, t.fieldLabels],
 	);
 
+	function pickFile(next: File | null) {
+		setFile(next);
+		setError("");
+		setResult(null);
+		setShowJson(false);
+		setProgress(null);
+	}
+
+	function onFileChange(e: ChangeEvent<HTMLInputElement>) {
+		pickFile(e.target.files?.[0] ?? null);
+		e.target.value = "";
+	}
+
+	function onDrop(e: DragEvent<HTMLLabelElement>) {
+		e.preventDefault();
+		setDragging(false);
+		if (busy) return;
+		const next = e.dataTransfer.files?.[0] ?? null;
+		if (next) pickFile(next);
+	}
+
 	async function onExtract(e: FormEvent) {
 		e.preventDefault();
 		if (!consent) {
@@ -212,22 +263,29 @@ export function Extract({ lang }: Props) {
 		setError("");
 		setResult(null);
 		setShowJson(false);
+		setProgress({ percent: 2, stage: "upload" });
 		try {
 			let pat = await ensureWorkingPat();
+			const run = (token: string) =>
+				extractDocument(token, file, docType, consent, setProgress);
 			try {
-				setResult(await extractDocument(pat, file, docType, consent));
+				setResult(await run(pat));
 			} catch (err) {
 				if (!isUnauthorized(err)) throw err;
 				clearWorkingPat();
 				pat = await ensureWorkingPat();
-				setResult(await extractDocument(pat, file, docType, consent));
+				setResult(await run(pat));
 			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.extractError);
+			setProgress(null);
 		} finally {
 			setBusy(false);
 		}
 	}
+
+	const progressLabel =
+		progress?.stage === "upload" ? t.uploadProgress : t.extractProgress;
 
 	return (
 		<>
@@ -238,24 +296,112 @@ export function Extract({ lang }: Props) {
 			{!ready ? (
 				<p className="playground-muted">{t.preparingToken}</p>
 			) : (
-				<form className="playground-form" onSubmit={onExtract}>
+				<form className="playground-form extract-form" onSubmit={onExtract}>
 					<label>
 						{t.docType}
-						<select value={docType} onChange={(e) => setDocType(e.target.value)}>
+						<select
+							value={docType}
+							onChange={(e) => setDocType(e.target.value)}
+							disabled={busy}
+						>
 							<option value="identity_document">{t.docTypeIdentity}</option>
 							<option value="address_proof">{t.docTypeAddress}</option>
 							<option value="invoice_nf">{t.docTypeInvoice}</option>
 						</select>
 					</label>
-					<label>
-						{t.chooseFile}
+
+					<div className="file-field">
+						<span className="file-field-label">{t.chooseFile}</span>
 						<input
+							ref={inputRef}
+							id={fileInputId}
+							className="file-input-hidden"
 							type="file"
 							accept="image/*,.pdf,application/pdf"
-							onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-							required
+							onChange={onFileChange}
+							disabled={busy}
 						/>
-					</label>
+						{!file ? (
+							<label
+								htmlFor={fileInputId}
+								className={`file-dropzone${dragging ? " is-dragging" : ""}`}
+								onDragEnter={(e) => {
+									e.preventDefault();
+									if (!busy) setDragging(true);
+								}}
+								onDragOver={(e) => {
+									e.preventDefault();
+									if (!busy) setDragging(true);
+								}}
+								onDragLeave={(e) => {
+									e.preventDefault();
+									if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+									setDragging(false);
+								}}
+								onDrop={onDrop}
+							>
+								<span className="file-dropzone-icon" aria-hidden="true">
+									↑
+								</span>
+								<span className="file-dropzone-title">{t.dropHint}</span>
+								<span className="file-dropzone-browse">{t.dropBrowse}</span>
+							</label>
+						) : (
+							<div className={`file-selected kind-${fileKind(file)}`}>
+								<div className="file-selected-badge" aria-hidden="true">
+									{fileKind(file) === "pdf" ? "PDF" : "IMG"}
+								</div>
+								<div className="file-selected-meta">
+									<strong title={file.name}>{file.name}</strong>
+									<span>{formatBytes(file.size)}</span>
+								</div>
+								<div className="file-selected-actions">
+									<button
+										type="button"
+										className="btn btn-ghost"
+										disabled={busy}
+										onClick={() => inputRef.current?.click()}
+									>
+										{t.dropReplace}
+									</button>
+									<button
+										type="button"
+										className="btn btn-ghost"
+										disabled={busy}
+										onClick={() => pickFile(null)}
+									>
+										{t.dropRemove}
+									</button>
+								</div>
+							</div>
+						)}
+					</div>
+
+					{progress ? (
+						<div
+							className={`extract-progress${progress.stage === "extract" ? " is-extracting" : ""}`}
+							role="status"
+							aria-live="polite"
+						>
+							<div className="extract-progress-head">
+								<span>{progressLabel}</span>
+								<span>{Math.round(progress.percent)}%</span>
+							</div>
+							<div
+								className="extract-progress-track"
+								aria-valuemin={0}
+								aria-valuemax={100}
+								aria-valuenow={Math.round(progress.percent)}
+								role="progressbar"
+							>
+								<span
+									className="extract-progress-fill"
+									style={{ width: `${Math.max(4, progress.percent)}%` }}
+								/>
+							</div>
+						</div>
+					) : null}
+
 					<label
 						className={`playground-consent${consent ? " is-checked" : ""}`}
 					>
@@ -264,6 +410,7 @@ export function Extract({ lang }: Props) {
 							checked={consent}
 							onChange={(e) => setConsent(e.target.checked)}
 							required
+							disabled={busy}
 						/>
 						<span className="playground-consent-copy">
 							<span className="playground-consent-title">{t.consentTitle}</span>
@@ -273,7 +420,7 @@ export function Extract({ lang }: Props) {
 					<button
 						className="btn btn-primary"
 						type="submit"
-						disabled={busy || !consent}
+						disabled={busy || !consent || !file}
 					>
 						{busy ? t.extracting : t.extract}
 					</button>
@@ -307,7 +454,7 @@ export function Extract({ lang }: Props) {
 						</pre>
 					) : null}
 				</div>
-			) : !error && ready ? (
+			) : !error && ready && !busy ? (
 				<p className="playground-muted">{t.extractEmpty}</p>
 			) : null}
 		</>
