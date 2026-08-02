@@ -124,8 +124,14 @@ export function Playground({ lang, onLang }: Props) {
 		}
 	}
 
+	const isAdmin = !!user?.permissions?.includes("admin");
+
 	async function onExtract(e: FormEvent) {
 		e.preventDefault();
+		if (!isAdmin) {
+			setError(t.adminOnly);
+			return;
+		}
 		if (!file || !workingPat) {
 			setError(t.needToken);
 			return;
@@ -305,29 +311,31 @@ export function Playground({ lang, onLang }: Props) {
 
 						<section className="playground-panel" aria-labelledby="pde-title">
 							<h2 id="pde-title">{t.pdeTitle}</h2>
-							<p>{t.pdeHint}</p>
-							<form className="playground-form" onSubmit={onExtract}>
-								<label>
-									{t.docType}
-									<select value={docType} onChange={(e) => setDocType(e.target.value)}>
-										<option value="identity_document">identity_document</option>
-										<option value="address_proof">address_proof</option>
-										<option value="invoice_nf">invoice_nf</option>
-									</select>
-								</label>
-								<label>
-									{t.chooseFile}
-									<input
-										type="file"
-										accept=".pdf,image/*"
-										onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-										required
-									/>
-								</label>
-								<button className="btn btn-primary" type="submit" disabled={busy || !workingPat}>
-									{t.extract}
-								</button>
-							</form>
+							<p>{isAdmin ? t.pdeHint : t.adminOnly}</p>
+							{isAdmin ? (
+								<form className="playground-form" onSubmit={onExtract}>
+									<label>
+										{t.docType}
+										<select value={docType} onChange={(e) => setDocType(e.target.value)}>
+											<option value="identity_document">identity_document</option>
+											<option value="address_proof">address_proof</option>
+											<option value="invoice_nf">invoice_nf</option>
+										</select>
+									</label>
+									<label>
+										{t.chooseFile}
+										<input
+											type="file"
+											accept=".pdf,image/*"
+											onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+											required
+										/>
+									</label>
+									<button className="btn btn-primary" type="submit" disabled={busy || !workingPat}>
+										{t.extract}
+									</button>
+								</form>
+							) : null}
 							{result ? (
 								<div className="playground-result">
 									<h3>{t.result}</h3>

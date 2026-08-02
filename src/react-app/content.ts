@@ -88,6 +88,7 @@ type Copy = {
 		needToken: string;
 		pdeTitle: string;
 		pdeHint: string;
+		adminOnly: string;
 		docType: string;
 		chooseFile: string;
 		extract: string;
@@ -257,6 +258,7 @@ export const copy: Record<Lang, Copy> = {
 			needToken: "Cria um token antes de extrair.",
 			pdeTitle: "Document extractor",
 			pdeHint: "Envia PDF/imagem e recebe JSON.",
+			adminOnly: "Só a conta admin pode chamar as APIs daqui.",
 			docType: "Tipo",
 			chooseFile: "Arquivo",
 			extract: "Extrair",
@@ -424,6 +426,7 @@ export const copy: Record<Lang, Copy> = {
 			needToken: "Create a token before extracting.",
 			pdeTitle: "Document extractor",
 			pdeHint: "Upload a PDF/image and get JSON back.",
+			adminOnly: "Only the admin account can call APIs from here.",
 			docType: "Type",
 			chooseFile: "File",
 			extract: "Extract",
