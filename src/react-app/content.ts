@@ -47,6 +47,7 @@ export type PlaygroundCopy = {
 	modeLogin: string;
 	modeSignup: string;
 	continueWithGoogle: string;
+	continueWithGitHub: string;
 	continueWithEmail: string;
 	authOr: string;
 	authOtherMethods: string;
@@ -378,6 +379,7 @@ export const copy: Record<Lang, Copy> = {
 			modeLogin: "Entrar",
 			modeSignup: "Criar conta",
 			continueWithGoogle: "Continuar com Google",
+			continueWithGitHub: "Continuar com GitHub",
 			continueWithEmail: "Continuar com email",
 			authOr: "ou",
 			authOtherMethods: "Outras opções",
@@ -673,6 +675,7 @@ export const copy: Record<Lang, Copy> = {
 			modeLogin: "Sign in",
 			modeSignup: "Create account",
 			continueWithGoogle: "Continue with Google",
+			continueWithGitHub: "Continue with GitHub",
 			continueWithEmail: "Continue with email",
 			authOr: "or",
 			authOtherMethods: "Other options",
