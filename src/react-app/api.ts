@@ -55,6 +55,29 @@ export type SignupPending = {
 	expires_in_seconds: number;
 };
 
+export type EmailAuthPending = SignupPending;
+
+async function parseResend(
+	res: Response,
+): Promise<{ ok: boolean; resend_after_seconds: number }> {
+	const data = (await res.json().catch(() => ({}))) as {
+		ok?: boolean;
+		resend_after_seconds?: number;
+		error?: string;
+	};
+	if (res.status === 429) {
+		return {
+			ok: false,
+			resend_after_seconds: data.resend_after_seconds ?? 120,
+		};
+	}
+	if (!res.ok) throw new Error("resend_failed");
+	return {
+		ok: true,
+		resend_after_seconds: data.resend_after_seconds ?? 120,
+	};
+}
+
 export async function login(email: string, password: string): Promise<Me> {
 	const res = await authFetch("/v1/auth/login", {
 		method: "POST",
@@ -62,6 +85,70 @@ export async function login(email: string, password: string): Promise<Me> {
 	});
 	if (!res.ok) throw new Error("login_failed");
 	return res.json();
+}
+
+export async function passwordlessStart(email: string): Promise<EmailAuthPending> {
+	const res = await authFetch("/v1/auth/login/email", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	if (!res.ok) throw new Error("passwordless_failed");
+	return res.json();
+}
+
+export async function passwordlessVerify(email: string, code: string): Promise<Me> {
+	const res = await authFetch("/v1/auth/login/email/verify", {
+		method: "POST",
+		body: JSON.stringify({ email, code }),
+	});
+	if (!res.ok) throw new Error("verify_failed");
+	return res.json();
+}
+
+export async function passwordlessResend(
+	email: string,
+): Promise<{ ok: boolean; resend_after_seconds: number }> {
+	const res = await authFetch("/v1/auth/login/email/resend", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	return parseResend(res);
+}
+
+export async function forgotPasswordStart(email: string): Promise<EmailAuthPending> {
+	const res = await authFetch("/v1/auth/password/forgot", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	if (!res.ok) throw new Error("forgot_failed");
+	return res.json();
+}
+
+export async function forgotPasswordVerify(
+	email: string,
+	code: string,
+	newPassword: string,
+): Promise<Me | { ok: true; email: string }> {
+	const res = await authFetch("/v1/auth/password/forgot/verify", {
+		method: "POST",
+		body: JSON.stringify({ email, code, new_password: newPassword }),
+	});
+	if (res.status === 400) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error ?? "bad_request");
+	}
+	if (!res.ok) throw new Error("verify_failed");
+	return res.json();
+}
+
+export async function forgotPasswordResend(
+	email: string,
+): Promise<{ ok: boolean; resend_after_seconds: number }> {
+	const res = await authFetch("/v1/auth/password/forgot/resend", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	return parseResend(res);
 }
 
 export async function signupStart(
@@ -93,22 +180,7 @@ export async function signupResend(
 		method: "POST",
 		body: JSON.stringify({ email }),
 	});
-	const data = (await res.json().catch(() => ({}))) as {
-		ok?: boolean;
-		resend_after_seconds?: number;
-		error?: string;
-	};
-	if (res.status === 429) {
-		return {
-			ok: false,
-			resend_after_seconds: data.resend_after_seconds ?? 120,
-		};
-	}
-	if (!res.ok) throw new Error("resend_failed");
-	return {
-		ok: true,
-		resend_after_seconds: data.resend_after_seconds ?? 120,
-	};
+	return parseResend(res);
 }
 
 export async function changePassword(

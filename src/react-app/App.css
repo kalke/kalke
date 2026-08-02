@@ -896,6 +896,29 @@
 	color: var(--accent);
 }
 
+.playground-auth-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.75rem;
+	margin: 0.85rem 0 0;
+	max-width: 28rem;
+}
+
+.playground-auth-links .btn-ghost,
+.playground-auth-back {
+	padding-inline: 0;
+	justify-self: start;
+}
+
+.playground-auth-back {
+	margin-top: 0.75rem;
+}
+
+.playground-auth-hint {
+	margin: 0;
+	font-size: 0.92rem;
+}
+
 .playground-form {
 	display: grid;
 	gap: 0.85rem;

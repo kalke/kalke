@@ -46,6 +46,23 @@ export type PlaygroundCopy = {
 	resendError: string;
 	modeLogin: string;
 	modeSignup: string;
+	forgotPassword: string;
+	forgotTitle: string;
+	forgotHint: string;
+	forgotSubmit: string;
+	forgotSent: string;
+	forgotError: string;
+	forgotBack: string;
+	passwordless: string;
+	passwordlessTitle: string;
+	passwordlessHint: string;
+	passwordlessSubmit: string;
+	passwordlessError: string;
+	passwordlessBack: string;
+	resetTitle: string;
+	resetHint: string;
+	resetSubmit: string;
+	resetError: string;
 	pathOverview: string;
 	pathApi: string;
 	pathExtract: string;
@@ -351,6 +368,25 @@ export const copy: Record<Lang, Copy> = {
 			resendError: "Falha ao reenviar o código.",
 			modeLogin: "Entrar",
 			modeSignup: "Criar conta",
+			forgotPassword: "Esqueci a senha",
+			forgotTitle: "Redefinir senha",
+			forgotHint:
+				"Informe o email da conta. Se existir, enviaremos um código.",
+			forgotSubmit: "Enviar código",
+			forgotSent: "Se a conta existir, enviamos um código para {email}.",
+			forgotError: "Não foi possível enviar o código. Tente de novo.",
+			forgotBack: "Voltar ao login",
+			passwordless: "Entrar sem senha",
+			passwordlessTitle: "Entrar por email",
+			passwordlessHint:
+				"Enviaremos um código de 6 dígitos para o email da conta.",
+			passwordlessSubmit: "Enviar código",
+			passwordlessError: "Não foi possível enviar o código. Tente de novo.",
+			passwordlessBack: "Voltar ao login",
+			resetTitle: "Nova senha",
+			resetHint: "Digite o código enviado para {email} e a nova senha.",
+			resetSubmit: "Salvar e entrar",
+			resetError: "Não foi possível redefinir a senha. Verifique o código.",
 			pathOverview: "~/demo",
 			pathApi: "~/demo/api",
 			pathExtract: "~/demo/extract",
@@ -618,6 +654,25 @@ export const copy: Record<Lang, Copy> = {
 			resendError: "Could not resend the code.",
 			modeLogin: "Sign in",
 			modeSignup: "Create account",
+			forgotPassword: "Forgot password",
+			forgotTitle: "Reset password",
+			forgotHint:
+				"Enter the account email. If it exists, we will send a code.",
+			forgotSubmit: "Send code",
+			forgotSent: "If the account exists, we sent a code to {email}.",
+			forgotError: "Could not send the code. Try again.",
+			forgotBack: "Back to sign in",
+			passwordless: "Sign in without password",
+			passwordlessTitle: "Email sign-in",
+			passwordlessHint:
+				"We will send a 6-digit code to the account email.",
+			passwordlessSubmit: "Send code",
+			passwordlessError: "Could not send the code. Try again.",
+			passwordlessBack: "Back to sign in",
+			resetTitle: "New password",
+			resetHint: "Enter the code sent to {email} and your new password.",
+			resetSubmit: "Save and sign in",
+			resetError: "Could not reset the password. Check the code.",
 			pathOverview: "~/demo",
 			pathApi: "~/demo/api",
 			pathExtract: "~/demo/extract",

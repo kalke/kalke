@@ -1,9 +1,16 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
+	forgotPasswordResend,
+	forgotPasswordStart,
+	forgotPasswordVerify,
 	login,
+	passwordlessResend,
+	passwordlessStart,
+	passwordlessVerify,
 	signupResend,
 	signupStart,
 	signupVerify,
+	type Me,
 } from "../api";
 import { copy, type Lang } from "../content";
 import { useCapsLock } from "../hooks/useCapsLock";
@@ -11,7 +18,8 @@ import { evaluatePassword, passwordIsStrong } from "./passwordRules";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-type AuthMode = "login" | "signup";
+type AuthMode = "login" | "signup" | "passwordless" | "forgot";
+type VerifyKind = "signup" | "passwordless" | "reset";
 
 export function AuthGate({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -21,12 +29,18 @@ export function AuthGate({ lang }: Props) {
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
 	const [otpCode, setOtpCode] = useState("");
-	const [verifyOpen, setVerifyOpen] = useState(false);
+	const [verifyKind, setVerifyKind] = useState<VerifyKind | null>(null);
 	const [resendIn, setResendIn] = useState(0);
 
 	const signupRules = useMemo(() => evaluatePassword(password), [password]);
 	const signupStrong = passwordIsStrong(signupRules, false);
+	const resetRules = useMemo(
+		() => evaluatePassword(password, confirmPassword),
+		[password, confirmPassword],
+	);
+	const resetStrong = passwordIsStrong(resetRules, true);
 
 	useEffect(() => {
 		if (resendIn <= 0) return;
@@ -36,13 +50,30 @@ export function AuthGate({ lang }: Props) {
 		return () => window.clearInterval(id);
 	}, [resendIn]);
 
+	function switchMode(next: AuthMode) {
+		setMode(next);
+		setError("");
+		setVerifyKind(null);
+		setOtpCode("");
+		setPassword("");
+		setConfirmPassword("");
+	}
+
+	async function finishAuth(me: Me) {
+		await afterAuth(me);
+		setPassword("");
+		setConfirmPassword("");
+		setOtpCode("");
+		setVerifyKind(null);
+		setName("");
+	}
+
 	async function onLogin(e: FormEvent) {
 		e.preventDefault();
 		setError("");
 		setBusy(true);
 		try {
-			await afterAuth(await login(email, password));
-			setPassword("");
+			await finishAuth(await login(email, password));
 		} catch {
 			setError(t.loginError);
 		} finally {
@@ -61,7 +92,7 @@ export function AuthGate({ lang }: Props) {
 		try {
 			const pending = await signupStart(name, email, password);
 			setEmail(pending.email);
-			setVerifyOpen(true);
+			setVerifyKind("signup");
 			setResendIn(pending.resend_after_seconds || 120);
 		} catch {
 			setError(t.signupError);
@@ -70,29 +101,91 @@ export function AuthGate({ lang }: Props) {
 		}
 	}
 
-	async function onVerify(e: FormEvent) {
+	async function onPasswordless(e: FormEvent) {
 		e.preventDefault();
 		setError("");
 		setBusy(true);
 		try {
-			await afterAuth(await signupVerify(email, otpCode));
-			setPassword("");
-			setOtpCode("");
-			setVerifyOpen(false);
-			setName("");
+			const pending = await passwordlessStart(email);
+			setEmail(pending.email);
+			setVerifyKind("passwordless");
+			setResendIn(pending.resend_after_seconds || 120);
 		} catch {
-			setError(t.verifyError);
+			setError(t.passwordlessError);
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function onForgot(e: FormEvent) {
+		e.preventDefault();
+		setError("");
+		setBusy(true);
+		try {
+			const pending = await forgotPasswordStart(email);
+			setEmail(pending.email);
+			setPassword("");
+			setConfirmPassword("");
+			setVerifyKind("reset");
+			setResendIn(pending.resend_after_seconds || 120);
+		} catch {
+			setError(t.forgotError);
+		} finally {
+			setBusy(false);
+		}
+	}
+
+	async function onVerify(e: FormEvent) {
+		e.preventDefault();
+		if (!verifyKind) return;
+		setError("");
+		setBusy(true);
+		try {
+			if (verifyKind === "signup") {
+				await finishAuth(await signupVerify(email, otpCode));
+			} else if (verifyKind === "passwordless") {
+				await finishAuth(await passwordlessVerify(email, otpCode));
+			} else {
+				if (!resetStrong) {
+					setError(t.passwordWeak);
+					return;
+				}
+				const out = await forgotPasswordVerify(email, otpCode, password);
+				if ("permissions" in out) {
+					await finishAuth(out);
+				} else {
+					setVerifyKind(null);
+					setMode("login");
+					setPassword("");
+					setConfirmPassword("");
+					setOtpCode("");
+					setError("");
+				}
+			}
+		} catch (err) {
+			const code = err instanceof Error ? err.message : "";
+			if (verifyKind === "reset") {
+				if (code.includes("password")) setError(t.passwordWeak);
+				else setError(t.resetError);
+			} else {
+				setError(t.verifyError);
+			}
 		} finally {
 			setBusy(false);
 		}
 	}
 
 	async function onResend() {
-		if (resendIn > 0) return;
+		if (resendIn > 0 || !verifyKind) return;
 		setError("");
 		setBusy(true);
 		try {
-			const out = await signupResend(email);
+			const out =
+				verifyKind === "signup"
+					? await signupResend(email)
+					: verifyKind === "passwordless"
+						? await passwordlessResend(email)
+						: await forgotPasswordResend(email);
 			setResendIn(out.resend_after_seconds || 120);
 			if (!out.ok) setError(t.resendWait);
 		} catch {
@@ -102,44 +195,61 @@ export function AuthGate({ lang }: Props) {
 		}
 	}
 
+	const primaryTab = mode === "signup" ? "signup" : "login";
+	const formSubmit =
+		mode === "login"
+			? onLogin
+			: mode === "signup"
+				? onSignup
+				: mode === "passwordless"
+					? onPasswordless
+					: onForgot;
+
+	const verifyTitle =
+		verifyKind === "reset"
+			? t.resetTitle
+			: verifyKind === "passwordless"
+				? t.passwordlessTitle
+				: t.verifyTitle;
+	const verifyHint =
+		verifyKind === "reset"
+			? t.resetHint.replace("{email}", email)
+			: t.verifyHint.replace("{email}", email);
+
 	return (
 		<>
 			<p className="eyebrow">{t.eyebrow}</p>
 			<h1>{t.title}</h1>
 			<p className="section-intro">{t.intro}</p>
 
-			<div className="playground-modes" role="tablist" aria-label="Auth">
-				<button
-					type="button"
-					role="tab"
-					aria-selected={mode === "login"}
-					className={mode === "login" ? "is-active" : undefined}
-					onClick={() => {
-						setMode("login");
-						setError("");
-						setVerifyOpen(false);
-					}}
-				>
-					{t.modeLogin}
-				</button>
-				<button
-					type="button"
-					role="tab"
-					aria-selected={mode === "signup"}
-					className={mode === "signup" ? "is-active" : undefined}
-					onClick={() => {
-						setMode("signup");
-						setError("");
-					}}
-				>
-					{t.modeSignup}
-				</button>
-			</div>
+			{mode === "login" || mode === "signup" ? (
+				<div className="playground-modes" role="tablist" aria-label="Auth">
+					<button
+						type="button"
+						role="tab"
+						aria-selected={primaryTab === "login"}
+						className={primaryTab === "login" ? "is-active" : undefined}
+						onClick={() => switchMode("login")}
+					>
+						{t.modeLogin}
+					</button>
+					<button
+						type="button"
+						role="tab"
+						aria-selected={primaryTab === "signup"}
+						className={primaryTab === "signup" ? "is-active" : undefined}
+						onClick={() => switchMode("signup")}
+					>
+						{t.modeSignup}
+					</button>
+				</div>
+			) : (
+				<p className="eyebrow">
+					{mode === "forgot" ? t.forgotTitle : t.passwordlessTitle}
+				</p>
+			)}
 
-			<form
-				className="playground-form"
-				onSubmit={mode === "login" ? onLogin : onSignup}
-			>
+			<form className="playground-form" onSubmit={formSubmit}>
 				{mode === "signup" ? (
 					<label>
 						{t.name}
@@ -164,20 +274,24 @@ export function AuthGate({ lang }: Props) {
 						required
 					/>
 				</label>
-				<label>
-					{t.password}
-					<input
-						type="password"
-						autoComplete={mode === "login" ? "current-password" : "new-password"}
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						onKeyDown={onKeyEvent}
-						onKeyUp={onKeyEvent}
-						minLength={mode === "signup" ? 10 : undefined}
-						required
-					/>
-				</label>
-				{capsOn ? (
+				{mode === "login" || mode === "signup" ? (
+					<label>
+						{t.password}
+						<input
+							type="password"
+							autoComplete={
+								mode === "login" ? "current-password" : "new-password"
+							}
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							onKeyDown={onKeyEvent}
+							onKeyUp={onKeyEvent}
+							minLength={mode === "signup" ? 10 : undefined}
+							required
+						/>
+					</label>
+				) : null}
+				{capsOn && (mode === "login" || mode === "signup") ? (
 					<p className="caps-indicator is-on" role="status" aria-live="polite">
 						{t.capsOn}
 					</p>
@@ -195,18 +309,59 @@ export function AuthGate({ lang }: Props) {
 						</li>
 					</ul>
 				) : null}
+				{mode === "passwordless" ? (
+					<p className="section-intro playground-auth-hint">{t.passwordlessHint}</p>
+				) : null}
+				{mode === "forgot" ? (
+					<p className="section-intro playground-auth-hint">{t.forgotHint}</p>
+				) : null}
 				<button
 					className="btn btn-primary"
 					type="submit"
 					disabled={busy || (mode === "signup" && !signupStrong)}
 				>
-					{mode === "login" ? t.login : t.signup}
+					{mode === "login"
+						? t.login
+						: mode === "signup"
+							? t.signup
+							: mode === "passwordless"
+								? t.passwordlessSubmit
+								: t.forgotSubmit}
 				</button>
 			</form>
 
+			{mode === "login" ? (
+				<div className="playground-auth-links">
+					<button
+						type="button"
+						className="btn btn-ghost"
+						onClick={() => switchMode("passwordless")}
+					>
+						{t.passwordless}
+					</button>
+					<button
+						type="button"
+						className="btn btn-ghost"
+						onClick={() => switchMode("forgot")}
+					>
+						{t.forgotPassword}
+					</button>
+				</div>
+			) : null}
+
+			{mode === "passwordless" || mode === "forgot" ? (
+				<button
+					type="button"
+					className="btn btn-ghost playground-auth-back"
+					onClick={() => switchMode("login")}
+				>
+					{mode === "forgot" ? t.forgotBack : t.passwordlessBack}
+				</button>
+			) : null}
+
 			{error ? <p className="playground-error">{error}</p> : null}
 
-			{verifyOpen ? (
+			{verifyKind ? (
 				<div
 					className="playground-modal"
 					role="dialog"
@@ -214,8 +369,8 @@ export function AuthGate({ lang }: Props) {
 					aria-labelledby="verify-title"
 				>
 					<div className="playground-modal-panel surface-panel">
-						<h2 id="verify-title">{t.verifyTitle}</h2>
-						<p>{t.verifyHint.replace("{email}", email)}</p>
+						<h2 id="verify-title">{verifyTitle}</h2>
+						<p>{verifyHint}</p>
 						<form className="playground-form" onSubmit={onVerify}>
 							<label>
 								{t.verifyCode}
@@ -232,12 +387,69 @@ export function AuthGate({ lang }: Props) {
 									required
 								/>
 							</label>
+							{verifyKind === "reset" ? (
+								<>
+									<label>
+										{t.newPassword}
+										<input
+											type="password"
+											autoComplete="new-password"
+											value={password}
+											onChange={(e) => setPassword(e.target.value)}
+											onKeyDown={onKeyEvent}
+											onKeyUp={onKeyEvent}
+											minLength={10}
+											required
+										/>
+									</label>
+									<label>
+										{t.confirmPassword}
+										<input
+											type="password"
+											autoComplete="new-password"
+											value={confirmPassword}
+											onChange={(e) => setConfirmPassword(e.target.value)}
+											onKeyDown={onKeyEvent}
+											onKeyUp={onKeyEvent}
+											minLength={10}
+											required
+										/>
+									</label>
+									{capsOn ? (
+										<p
+											className="caps-indicator is-on"
+											role="status"
+											aria-live="polite"
+										>
+											{t.capsOn}
+										</p>
+									) : null}
+									<ul className="password-rules" aria-label={t.newPassword}>
+										<li className={resetRules.minLength ? "is-ok" : undefined}>
+											{t.passwordRuleLen}
+										</li>
+										<li className={resetRules.hasLetter ? "is-ok" : undefined}>
+											{t.passwordRuleLetter}
+										</li>
+										<li className={resetRules.hasNumber ? "is-ok" : undefined}>
+											{t.passwordRuleNumber}
+										</li>
+										<li className={resetRules.matches ? "is-ok" : undefined}>
+											{t.passwordRuleMatch}
+										</li>
+									</ul>
+								</>
+							) : null}
 							<button
 								className="btn btn-primary"
 								type="submit"
-								disabled={busy || otpCode.length !== 6}
+								disabled={
+									busy ||
+									otpCode.length !== 6 ||
+									(verifyKind === "reset" && !resetStrong)
+								}
 							>
-								{t.verifySubmit}
+								{verifyKind === "reset" ? t.resetSubmit : t.verifySubmit}
 							</button>
 						</form>
 						<button
@@ -254,8 +466,12 @@ export function AuthGate({ lang }: Props) {
 							type="button"
 							className="btn btn-ghost"
 							onClick={() => {
-								setVerifyOpen(false);
+								setVerifyKind(null);
 								setOtpCode("");
+								setConfirmPassword("");
+								if (verifyKind === "reset" || verifyKind === "passwordless") {
+									setPassword("");
+								}
 							}}
 						>
 							{t.verifyClose}
