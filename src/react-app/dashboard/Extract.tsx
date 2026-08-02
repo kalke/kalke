@@ -256,14 +256,19 @@ export function Extract({ lang }: Props) {
 							required
 						/>
 					</label>
-					<label className="playground-consent">
+					<label
+						className={`playground-consent${consent ? " is-checked" : ""}`}
+					>
 						<input
 							type="checkbox"
 							checked={consent}
 							onChange={(e) => setConsent(e.target.checked)}
 							required
 						/>
-						<span>{t.consentLabel}</span>
+						<span className="playground-consent-copy">
+							<span className="playground-consent-title">{t.consentTitle}</span>
+							<span className="playground-consent-text">{t.consentLabel}</span>
+						</span>
 					</label>
 					<button
 						className="btn btn-primary"

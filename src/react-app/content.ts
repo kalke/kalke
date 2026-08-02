@@ -116,6 +116,7 @@ export type PlaygroundCopy = {
 	apiHowBody: string;
 	pdeTitle: string;
 	pdeHint: string;
+	consentTitle: string;
 	consentLabel: string;
 	consentRequired: string;
 	docType: string;
@@ -459,10 +460,11 @@ export const copy: Record<Lang, Copy> = {
 				"Header Authorization: Bearer <token>. POST multipart em /v1/extract com arquivo e consentimento LGPD.",
 			pdeTitle: "Extrair documento",
 			pdeHint:
-				"Selecione o tipo, envie o arquivo e aceite o termo. O resultado aparece abaixo. O token de sessão é preparado automaticamente.",
+				"Escolha o tipo, envie o arquivo e confirme o consentimento. O resultado aparece abaixo — o token de sessão é preparado automaticamente.",
+			consentTitle: "Processamento deste documento",
 			consentLabel:
-				"O arquivo não é armazenado. O conteúdo pode ser processado por LLM; hash, resultado e auditoria (incl. IP) podem ser retidos.",
-			consentRequired: "Aceite o termo para continuar.",
+				"O arquivo sobe só para esta extração e não fica armazenado. Um modelo de linguagem pode ler o conteúdo. Para operar e auditar a demo, podemos reter o hash, o resultado e metadados técnicos (como IP).",
+			consentRequired: "Confirme o consentimento para extrair.",
 			docType: "Tipo",
 			docTypeIdentity: "Documento de identidade",
 			docTypeAddress: "Comprovante de endereço",
@@ -787,10 +789,11 @@ export const copy: Record<Lang, Copy> = {
 				"Authorization: Bearer <token> header. POST multipart to /v1/extract with file and LGPD consent.",
 			pdeTitle: "Extract document",
 			pdeHint:
-				"Select a type, upload a file, and accept the terms. Results appear below. The session token is prepared automatically.",
+				"Pick a type, upload a file, and confirm consent. Results show below — the session token is prepared automatically.",
+			consentTitle: "Processing this document",
 			consentLabel:
-				"The file is not stored. Content may be processed by an LLM; hash, result, and audit data (incl. IP) may be retained.",
-			consentRequired: "Accept the terms to continue.",
+				"The file is uploaded only for this extraction and is not stored. A language model may read the content. To run and audit the demo, we may retain the hash, the result, and technical metadata (such as IP).",
+			consentRequired: "Confirm consent to extract.",
 			docType: "Type",
 			docTypeIdentity: "Identity document",
 			docTypeAddress: "Proof of address",

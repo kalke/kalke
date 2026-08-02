@@ -1066,17 +1066,101 @@
 .playground-consent {
 	display: grid !important;
 	grid-template-columns: auto 1fr;
-	gap: 0.75rem !important;
+	gap: 0.85rem !important;
 	align-items: start;
+	margin: 0.15rem 0 0.25rem;
+	padding: 0.9rem 0.95rem;
+	border: 1px solid rgba(231, 163, 57, 0.22);
+	border-radius: 0.2rem;
+	background:
+		linear-gradient(135deg, rgba(231, 163, 57, 0.07), transparent 55%),
+		rgba(16, 14, 12, 0.55);
 	color: var(--text) !important;
 	font-family: var(--font-body) !important;
 	font-size: 0.9rem !important;
 	line-height: 1.45;
+	cursor: pointer;
+	transition:
+		border-color 0.2s ease,
+		background 0.2s ease,
+		box-shadow 0.2s ease;
+}
+
+.playground-consent:hover {
+	border-color: rgba(231, 163, 57, 0.4);
+}
+
+.playground-consent.is-checked {
+	border-color: rgba(231, 163, 57, 0.55);
+	background:
+		linear-gradient(135deg, rgba(231, 163, 57, 0.12), transparent 60%),
+		rgba(33, 28, 24, 0.72);
+	box-shadow: 0 0 0 1px rgba(231, 163, 57, 0.08);
 }
 
 .playground-consent input {
-	margin-top: 0.25rem;
-	width: auto;
+	appearance: none;
+	margin: 0.2rem 0 0;
+	width: 1.15rem;
+	height: 1.15rem;
+	flex-shrink: 0;
+	border: 1.5px solid rgba(231, 163, 57, 0.45);
+	border-radius: 0.2rem;
+	background: rgba(10, 9, 8, 0.65);
+	display: grid;
+	place-items: center;
+	cursor: pointer;
+	transition:
+		border-color 0.2s ease,
+		background 0.2s ease;
+}
+
+.playground-consent input::after {
+	content: "";
+	width: 0.45rem;
+	height: 0.28rem;
+	border-left: 2px solid var(--accent);
+	border-bottom: 2px solid var(--accent);
+	transform: rotate(-45deg) translateY(-1px) scale(0);
+	opacity: 0;
+	transition:
+		transform 0.15s ease,
+		opacity 0.15s ease;
+}
+
+.playground-consent input:checked {
+	border-color: var(--accent);
+	background: var(--accent-soft);
+}
+
+.playground-consent input:checked::after {
+	opacity: 1;
+	transform: rotate(-45deg) translateY(-1px) scale(1);
+}
+
+.playground-consent input:focus-visible {
+	outline: 2px solid rgba(231, 163, 57, 0.55);
+	outline-offset: 2px;
+}
+
+.playground-consent-copy {
+	display: grid;
+	gap: 0.35rem;
+	min-width: 0;
+}
+
+.playground-consent-title {
+	font-family: var(--font-display);
+	font-size: 0.82rem;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	color: var(--accent);
+}
+
+.playground-consent-text {
+	color: var(--text-muted);
+	font-size: 0.88rem;
+	line-height: 1.5;
 }
 
 .surface-panel,
@@ -1375,15 +1459,22 @@
 
 	.playground-consent {
 		align-items: flex-start;
-		gap: 0.75rem;
-		padding: 0.35rem 0;
+		gap: 0.85rem !important;
+		padding: 1rem;
 	}
 
 	.playground-consent input {
 		width: 1.25rem;
 		height: 1.25rem;
 		margin-top: 0.15rem;
-		accent-color: var(--accent);
+	}
+
+	.playground-consent-title {
+		font-size: 0.88rem;
+	}
+
+	.playground-consent-text {
+		font-size: 0.9rem;
 	}
 
 	.profile-panel {
