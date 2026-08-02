@@ -1,7 +1,7 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Billboard, useTexture } from "@react-three/drei";
+import { Billboard, Image } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { SRGBColorSpace, type Group } from "three";
+import type { Group } from "three";
 
 import chico from "../assets/cats/chico.jpg";
 import claire from "../assets/cats/claire.jpg";
@@ -25,8 +25,6 @@ const basePhotos: Photo[] = [
 
 function CatPhoto({ url, position, scale, speed, phase }: Photo) {
 	const group = useRef<Group>(null);
-	const map = useTexture(url);
-	map.colorSpace = SRGBColorSpace;
 
 	useFrame((state) => {
 		if (!group.current) return;
@@ -46,10 +44,7 @@ function CatPhoto({ url, position, scale, speed, phase }: Photo) {
 						<planeGeometry args={[width + 0.08, height + 0.08]} />
 						<meshBasicMaterial color="#100e0c" toneMapped={false} />
 					</mesh>
-					<mesh>
-						<planeGeometry args={[width, height]} />
-						<meshBasicMaterial map={map} toneMapped={false} />
-					</mesh>
+					<Image url={url} scale={[width, height]} toneMapped={false} />
 				</group>
 			</Billboard>
 		</group>
