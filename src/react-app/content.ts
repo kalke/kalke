@@ -51,6 +51,7 @@ export type PlaygroundCopy = {
 	continueWithEmail: string;
 	authOr: string;
 	authOtherMethods: string;
+	authSocialHint: string;
 	passwordOptional: string;
 	passwordOptionalHint: string;
 	usePassword: string;
@@ -390,11 +391,12 @@ export const copy: Record<Lang, Copy> = {
 			continueWithEmail: "Continuar com email",
 			authOr: "ou",
 			authOtherMethods: "Outras opções",
+			authSocialHint: "Se ainda não tiver conta, criamos na hora com o email do provedor.",
 			passwordOptional: "Senha (opcional)",
 			passwordOptionalHint: "Deixe em branco para receber um código por email.",
 			usePassword: "Usar senha",
 			hidePassword: "Entrar com código",
-			oauthError: "Não foi possível entrar com Google. Tente de novo.",
+			oauthError: "Não foi possível entrar com Google ou GitHub. Tente de novo.",
 			forgotPassword: "Esqueci a senha",
 			forgotTitle: "Redefinir senha",
 			forgotHint:
@@ -719,11 +721,12 @@ export const copy: Record<Lang, Copy> = {
 			continueWithEmail: "Continue with email",
 			authOr: "or",
 			authOtherMethods: "Other options",
+			authSocialHint: "If you don't have an account yet, we create one with the provider email.",
 			passwordOptional: "Password (optional)",
 			passwordOptionalHint: "Leave blank to get a code by email.",
 			usePassword: "Use password",
 			hidePassword: "Use email code",
-			oauthError: "Could not sign in with Google. Try again.",
+			oauthError: "Could not sign in with Google or GitHub. Try again.",
 			forgotPassword: "Forgot password",
 			forgotTitle: "Reset password",
 			forgotHint:

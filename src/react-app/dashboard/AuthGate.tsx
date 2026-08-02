@@ -255,6 +255,7 @@ export function AuthGate({ lang }: Props) {
 						<a className="auth-method" href={oauthStartURL("github")}>
 							{t.continueWithGitHub}
 						</a>
+						<p className="auth-social-hint">{t.authSocialHint}</p>
 						<p className="auth-divider">
 							<span>{t.authOr}</span>
 						</p>
@@ -382,6 +383,7 @@ export function AuthGate({ lang }: Props) {
 							<a className="auth-method" href={oauthStartURL("github")}>
 								{t.continueWithGitHub}
 							</a>
+							<p className="auth-social-hint">{t.authSocialHint}</p>
 						</div>
 					</>
 				) : null}
