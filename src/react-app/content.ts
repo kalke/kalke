@@ -68,7 +68,7 @@ type Copy = {
 		loading: string;
 		email: string;
 		password: string;
-		inviteCode: string;
+		name: string;
 		login: string;
 		signup: string;
 		logout: string;
@@ -76,6 +76,16 @@ type Copy = {
 		loginError: string;
 		signupError: string;
 		signupOk: string;
+		verifyTitle: string;
+		verifyHint: string;
+		verifyCode: string;
+		verifySubmit: string;
+		verifyError: string;
+		verifyClose: string;
+		resend: string;
+		resendIn: string;
+		resendWait: string;
+		resendError: string;
 		modeLogin: string;
 		modeSignup: string;
 		tokensTitle: string;
@@ -88,6 +98,7 @@ type Copy = {
 		needToken: string;
 		pdeTitle: string;
 		pdeHint: string;
+		adminOnly: string;
 		docType: string;
 		chooseFile: string;
 		extract: string;
@@ -237,19 +248,29 @@ export const copy: Record<Lang, Copy> = {
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
-			inviteCode: "Código de convite",
+			name: "Nome",
 			login: "Entrar",
 			signup: "Criar conta",
 			logout: "Sair",
 			signedInAs: "Logado como",
 			loginError: "Não deu pra entrar. Confere email e senha.",
-			signupError: "Não deu pra criar a conta. Confere os dados e o código.",
+			signupError: "Não deu pra criar a conta. Confere os dados.",
 			signupOk: "Conta criada. Você já está logado.",
+			verifyTitle: "Confirma teu email",
+			verifyHint: "Enviamos um código para {email}. Digita ele abaixo.",
+			verifyCode: "Código",
+			verifySubmit: "Confirmar",
+			verifyError: "Código inválido ou expirado.",
+			verifyClose: "Fechar",
+			resend: "Reenviar código",
+			resendIn: "Reenviar em {seconds}s",
+			resendWait: "Espera um pouco pra reenviar.",
+			resendError: "Não deu pra reenviar o código.",
 			modeLogin: "Entrar",
 			modeSignup: "Criar conta",
 			tokensTitle: "API tokens",
 			tokensHint: "O valor completo aparece uma vez. Guarda com cuidado.",
-			tokenName: "Nome",
+			tokenName: "Nome do token",
 			createToken: "Criar token",
 			tokenOnce: "Copia agora — não mostra de novo: ",
 			revoke: "Revogar",
@@ -257,6 +278,7 @@ export const copy: Record<Lang, Copy> = {
 			needToken: "Cria um token antes de extrair.",
 			pdeTitle: "Document extractor",
 			pdeHint: "Envia PDF/imagem e recebe JSON.",
+			adminOnly: "Só a conta admin pode chamar as APIs daqui.",
 			docType: "Tipo",
 			chooseFile: "Arquivo",
 			extract: "Extrair",
@@ -404,19 +426,29 @@ export const copy: Record<Lang, Copy> = {
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
-			inviteCode: "Invite code",
+			name: "Name",
 			login: "Sign in",
 			signup: "Create account",
 			logout: "Sign out",
 			signedInAs: "Signed in as",
 			loginError: "Could not sign in. Check email and password.",
-			signupError: "Could not create the account. Check details and invite code.",
+			signupError: "Could not create the account. Check your details.",
 			signupOk: "Account created. You’re signed in.",
+			verifyTitle: "Confirm your email",
+			verifyHint: "We sent a code to {email}. Enter it below.",
+			verifyCode: "Code",
+			verifySubmit: "Confirm",
+			verifyError: "Invalid or expired code.",
+			verifyClose: "Close",
+			resend: "Resend code",
+			resendIn: "Resend in {seconds}s",
+			resendWait: "Wait a bit before resending.",
+			resendError: "Could not resend the code.",
 			modeLogin: "Sign in",
 			modeSignup: "Create account",
 			tokensTitle: "API tokens",
 			tokensHint: "The full value is shown once. Store it carefully.",
-			tokenName: "Name",
+			tokenName: "Token name",
 			createToken: "Create token",
 			tokenOnce: "Copy now — it won’t be shown again: ",
 			revoke: "Revoke",
@@ -424,6 +456,7 @@ export const copy: Record<Lang, Copy> = {
 			needToken: "Create a token before extracting.",
 			pdeTitle: "Document extractor",
 			pdeHint: "Upload a PDF/image and get JSON back.",
+			adminOnly: "Only the admin account can call APIs from here.",
 			docType: "Type",
 			chooseFile: "File",
 			extract: "Extract",

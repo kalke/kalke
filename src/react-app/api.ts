@@ -24,6 +24,14 @@ export type TokenRow = {
 	last_used_at?: string;
 };
 
+export type SignupPending = {
+	ok: boolean;
+	status: "pending_verification";
+	email: string;
+	resend_after_seconds: number;
+	expires_in_seconds: number;
+};
+
 export async function login(email: string, password: string): Promise<Me> {
 	const res = await authFetch("/v1/auth/login", {
 		method: "POST",
@@ -33,21 +41,51 @@ export async function login(email: string, password: string): Promise<Me> {
 	return res.json();
 }
 
-export async function signup(
+export async function signupStart(
+	name: string,
 	email: string,
 	password: string,
-	inviteCode: string,
-): Promise<Me> {
+): Promise<SignupPending> {
 	const res = await authFetch("/v1/auth/signup", {
 		method: "POST",
-		body: JSON.stringify({
-			email,
-			password,
-			invite_code: inviteCode,
-		}),
+		body: JSON.stringify({ name, email, password }),
 	});
 	if (!res.ok) throw new Error("signup_failed");
 	return res.json();
+}
+
+export async function signupVerify(email: string, code: string): Promise<Me> {
+	const res = await authFetch("/v1/auth/signup/verify", {
+		method: "POST",
+		body: JSON.stringify({ email, code }),
+	});
+	if (!res.ok) throw new Error("verify_failed");
+	return res.json();
+}
+
+export async function signupResend(
+	email: string,
+): Promise<{ ok: boolean; resend_after_seconds: number }> {
+	const res = await authFetch("/v1/auth/signup/resend", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	const data = (await res.json().catch(() => ({}))) as {
+		ok?: boolean;
+		resend_after_seconds?: number;
+		error?: string;
+	};
+	if (res.status === 429) {
+		return {
+			ok: false,
+			resend_after_seconds: data.resend_after_seconds ?? 120,
+		};
+	}
+	if (!res.ok) throw new Error("resend_failed");
+	return {
+		ok: true,
+		resend_after_seconds: data.resend_after_seconds ?? 120,
+	};
 }
 
 export async function logout(): Promise<void> {
