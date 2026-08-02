@@ -151,6 +151,15 @@ export async function forgotPasswordResend(
 	return parseResend(res);
 }
 
+export function oauthStartURL(
+	provider: "google" | "github" | "apple",
+	returnTo = typeof window !== "undefined" ? window.location.href : "",
+): string {
+	const u = new URL(`${AUTH_BASE}/v1/auth/oauth/${provider}`);
+	if (returnTo) u.searchParams.set("return_to", returnTo);
+	return u.toString();
+}
+
 export async function signupStart(
 	name: string,
 	email: string,

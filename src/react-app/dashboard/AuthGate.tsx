@@ -4,6 +4,7 @@ import {
 	forgotPasswordStart,
 	forgotPasswordVerify,
 	login,
+	oauthStartURL,
 	passwordlessResend,
 	passwordlessStart,
 	passwordlessVerify,
@@ -49,6 +50,17 @@ export function AuthGate({ lang }: Props) {
 		}, 1000);
 		return () => window.clearInterval(id);
 	}, [resendIn]);
+
+	useEffect(() => {
+		const params = new URLSearchParams(window.location.search);
+		const oauth = params.get("oauth");
+		if (!oauth) return;
+		if (oauth === "error") setError(t.oauthError);
+		params.delete("oauth");
+		const next = params.toString();
+		const url = `${window.location.pathname}${next ? `?${next}` : ""}${window.location.hash}`;
+		window.history.replaceState({}, "", url);
+	}, [setError, t.oauthError]);
 
 	function switchMode(next: AuthMode) {
 		setMode(next);
@@ -248,6 +260,17 @@ export function AuthGate({ lang }: Props) {
 					{mode === "forgot" ? t.forgotTitle : t.passwordlessTitle}
 				</p>
 			)}
+
+			{mode === "login" || mode === "signup" ? (
+				<div className="playground-oauth">
+					<a className="playground-oauth-google" href={oauthStartURL("google")}>
+						{t.continueWithGoogle}
+					</a>
+					<p className="playground-oauth-or" aria-hidden="true">
+						—
+					</p>
+				</div>
+			) : null}
 
 			<form className="playground-form" onSubmit={formSubmit}>
 				{mode === "signup" ? (

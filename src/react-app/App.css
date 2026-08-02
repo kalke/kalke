@@ -904,6 +904,40 @@
 	max-width: 28rem;
 }
 
+.playground-oauth {
+	display: grid;
+	gap: 0.65rem;
+	max-width: 28rem;
+	margin: 0 0 1rem;
+}
+
+.playground-oauth-google {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	border: 1px solid var(--line);
+	background: var(--surface);
+	color: var(--text);
+	font-family: var(--font-display);
+	font-size: 0.85rem;
+	padding: 0.65rem 1rem;
+}
+
+.playground-oauth-google:hover {
+	border-color: rgba(231, 163, 57, 0.45);
+	color: var(--accent);
+}
+
+.playground-oauth-or {
+	margin: 0;
+	text-align: center;
+	color: var(--text-muted);
+	font-family: var(--font-display);
+	font-size: 0.75rem;
+	letter-spacing: 0.08em;
+}
+
 .playground-auth-links .btn-ghost,
 .playground-auth-back {
 	padding-inline: 0;

@@ -46,6 +46,8 @@ export type PlaygroundCopy = {
 	resendError: string;
 	modeLogin: string;
 	modeSignup: string;
+	continueWithGoogle: string;
+	oauthError: string;
 	forgotPassword: string;
 	forgotTitle: string;
 	forgotHint: string;
@@ -368,6 +370,8 @@ export const copy: Record<Lang, Copy> = {
 			resendError: "Falha ao reenviar o código.",
 			modeLogin: "Entrar",
 			modeSignup: "Criar conta",
+			continueWithGoogle: "Continuar com Google",
+			oauthError: "Não foi possível entrar com Google. Tente de novo.",
 			forgotPassword: "Esqueci a senha",
 			forgotTitle: "Redefinir senha",
 			forgotHint:
@@ -654,6 +658,8 @@ export const copy: Record<Lang, Copy> = {
 			resendError: "Could not resend the code.",
 			modeLogin: "Sign in",
 			modeSignup: "Create account",
+			continueWithGoogle: "Continue with Google",
+			oauthError: "Could not sign in with Google. Try again.",
 			forgotPassword: "Forgot password",
 			forgotTitle: "Reset password",
 			forgotHint:
