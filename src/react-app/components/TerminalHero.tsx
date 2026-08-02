@@ -27,9 +27,14 @@ function resolveCommand(
 	return null;
 }
 
+function prefersReducedMotion(): boolean {
+	if (typeof window === "undefined") return false;
+	return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function TerminalHero({ lang }: Props) {
 	const t = copy[lang].hero.terminal;
-	const [reduceMotion, setReduceMotion] = useState(false);
+	const [reduceMotion, setReduceMotion] = useState(prefersReducedMotion);
 	const [typedCount, setTypedCount] = useState(0);
 	const [charIndex, setCharIndex] = useState(0);
 	const [input, setInput] = useState("");
@@ -39,22 +44,12 @@ export function TerminalHero({ lang }: Props) {
 	useEffect(() => {
 		const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
 		const sync = () => setReduceMotion(mq.matches);
-		sync();
 		mq.addEventListener("change", sync);
 		return () => mq.removeEventListener("change", sync);
 	}, []);
 
 	useEffect(() => {
-		setTypedCount(0);
-		setCharIndex(0);
-		setExtra([]);
-	}, [lang]);
-
-	useEffect(() => {
-		if (reduceMotion) {
-			setTypedCount(t.lines.length);
-			return;
-		}
+		if (reduceMotion) return;
 		if (typedCount >= t.lines.length) return;
 		const line = t.lines[typedCount];
 		const fullLen = line.cmd.length;
@@ -98,6 +93,7 @@ export function TerminalHero({ lang }: Props) {
 	const visibleLines = reduceMotion ? t.lines.length : typedCount;
 	const currentLine = !reduceMotion && typedCount < t.lines.length ? t.lines[typedCount] : null;
 	const typedCmd = currentLine ? currentLine.cmd.slice(0, charIndex) : "";
+	const sessionReady = reduceMotion || typedCount >= t.lines.length;
 
 	return (
 		<div className="terminal">
@@ -142,7 +138,7 @@ export function TerminalHero({ lang }: Props) {
 						</button>
 					</div>
 				))}
-				{(reduceMotion || typedCount >= t.lines.length) && (
+				{sessionReady ? (
 					<form className="terminal-input-row" onSubmit={onSubmit}>
 						<span className="terminal-prompt">{t.prompt}</span>
 						<input
@@ -156,7 +152,7 @@ export function TerminalHero({ lang }: Props) {
 							spellCheck={false}
 						/>
 					</form>
-				)}
+				) : null}
 			</div>
 			<p className="terminal-hint">{t.hint}</p>
 		</div>

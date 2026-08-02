@@ -88,7 +88,7 @@ export function Home({ lang, onLang }: Props) {
 						<p className="hero-brand">{siteMeta.brand}</p>
 						<h1 className="hero-title">{t.hero.headline}</h1>
 						<p className="hero-support">{t.hero.support}</p>
-						<TerminalHero lang={lang} />
+						<TerminalHero key={lang} lang={lang} />
 						<div className="hero-actions">
 							<a className="btn btn-primary" href={t.hero.primaryCta.href}>
 								{t.hero.primaryCta.label}
