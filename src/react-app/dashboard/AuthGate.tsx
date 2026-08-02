@@ -19,8 +19,7 @@ import { evaluatePassword, passwordIsStrong } from "./passwordRules";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-type AuthMode = "login" | "signup" | "passwordless" | "forgot";
-type LoginStep = "methods" | "email";
+type AuthMode = "login" | "signup" | "forgot";
 type VerifyKind = "signup" | "passwordless" | "reset";
 
 export function AuthGate({ lang }: Props) {
@@ -28,7 +27,6 @@ export function AuthGate({ lang }: Props) {
 	const { afterAuth, busy, setBusy, error, setError } = useDashboard();
 	const { capsOn, onKeyEvent } = useCapsLock();
 	const [mode, setMode] = useState<AuthMode>("login");
-	const [loginStep, setLoginStep] = useState<LoginStep>("methods");
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -44,6 +42,7 @@ export function AuthGate({ lang }: Props) {
 		[password, confirmPassword],
 	);
 	const resetStrong = passwordIsStrong(resetRules, true);
+	const loginWantsPassword = password.trim().length > 0;
 
 	useEffect(() => {
 		if (resendIn <= 0) return;
@@ -66,7 +65,6 @@ export function AuthGate({ lang }: Props) {
 
 	function switchMode(next: AuthMode) {
 		setMode(next);
-		setLoginStep(next === "login" ? "methods" : "email");
 		setError("");
 		setVerifyKind(null);
 		setOtpCode("");
@@ -88,9 +86,16 @@ export function AuthGate({ lang }: Props) {
 		setError("");
 		setBusy(true);
 		try {
-			await finishAuth(await login(email, password));
+			if (loginWantsPassword) {
+				await finishAuth(await login(email, password));
+			} else {
+				const pending = await passwordlessStart(email);
+				setEmail(pending.email);
+				setVerifyKind("passwordless");
+				setResendIn(pending.resend_after_seconds || 120);
+			}
 		} catch {
-			setError(t.loginError);
+			setError(loginWantsPassword ? t.loginError : t.passwordlessError);
 		} finally {
 			setBusy(false);
 		}
@@ -111,22 +116,6 @@ export function AuthGate({ lang }: Props) {
 			setResendIn(pending.resend_after_seconds || 120);
 		} catch {
 			setError(t.signupError);
-		} finally {
-			setBusy(false);
-		}
-	}
-
-	async function onPasswordless(e: FormEvent) {
-		e.preventDefault();
-		setError("");
-		setBusy(true);
-		try {
-			const pending = await passwordlessStart(email);
-			setEmail(pending.email);
-			setVerifyKind("passwordless");
-			setResendIn(pending.resend_after_seconds || 120);
-		} catch {
-			setError(t.passwordlessError);
 		} finally {
 			setBusy(false);
 		}
@@ -206,31 +195,8 @@ export function AuthGate({ lang }: Props) {
 		}
 	}
 
-	const showTabs = mode === "login" || mode === "signup";
-	const showMethodChooser = mode === "login" && loginStep === "methods";
-	const showEmailForm =
-		mode === "signup" ||
-		(mode === "login" && loginStep === "email") ||
-		mode === "passwordless" ||
-		mode === "forgot";
-
 	const formSubmit =
-		mode === "login"
-			? onLogin
-			: mode === "signup"
-				? onSignup
-				: mode === "passwordless"
-					? onPasswordless
-					: onForgot;
-
-	const panelTitle =
-		mode === "forgot"
-			? t.forgotTitle
-			: mode === "passwordless"
-				? t.passwordlessTitle
-				: mode === "login" && loginStep === "email"
-					? t.continueWithEmail
-					: null;
+		mode === "login" ? onLogin : mode === "signup" ? onSignup : onForgot;
 
 	const verifyTitle =
 		verifyKind === "reset"
@@ -249,7 +215,7 @@ export function AuthGate({ lang }: Props) {
 			<h1>{t.title}</h1>
 			<p className="section-intro">{t.intro}</p>
 
-			{showTabs ? (
+			{mode === "login" || mode === "signup" ? (
 				<div className="playground-modes" role="tablist" aria-label="Auth">
 					<button
 						type="button"
@@ -270,29 +236,11 @@ export function AuthGate({ lang }: Props) {
 						{t.modeSignup}
 					</button>
 				</div>
-			) : null}
+			) : (
+				<p className="auth-panel-title">{t.forgotTitle}</p>
+			)}
 
 			<div className="auth-panel">
-				{panelTitle ? <p className="auth-panel-title">{panelTitle}</p> : null}
-
-				{showMethodChooser ? (
-					<div className="auth-methods" role="group" aria-label={t.modeLogin}>
-						<a className="auth-method" href={oauthStartURL("google")}>
-							{t.continueWithGoogle}
-						</a>
-						<button
-							type="button"
-							className="auth-method"
-							onClick={() => {
-								setError("");
-								setLoginStep("email");
-							}}
-						>
-							{t.continueWithEmail}
-						</button>
-					</div>
-				) : null}
-
 				{mode === "signup" ? (
 					<div className="auth-methods">
 						<a className="auth-method" href={oauthStartURL("google")}>
@@ -304,118 +252,116 @@ export function AuthGate({ lang }: Props) {
 					</div>
 				) : null}
 
-				{showEmailForm ? (
-					<form className="playground-form" onSubmit={formSubmit}>
-						{mode === "signup" ? (
-							<label>
-								{t.name}
-								<input
-									type="text"
-									autoComplete="name"
-									value={name}
-									onChange={(e) => setName(e.target.value)}
-									required
-									minLength={2}
-									maxLength={80}
-								/>
-							</label>
-						) : null}
+				<form className="playground-form" onSubmit={formSubmit}>
+					{mode === "signup" ? (
 						<label>
-							{t.email}
+							{t.name}
 							<input
-								type="email"
-								autoComplete="username"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
+								type="text"
+								autoComplete="name"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
+								required
+								minLength={2}
+								maxLength={80}
+							/>
+						</label>
+					) : null}
+					<label>
+						{t.email}
+						<input
+							type="email"
+							autoComplete="username"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							required
+						/>
+					</label>
+					{mode === "login" ? (
+						<label>
+							{t.passwordOptional}
+							<input
+								type="password"
+								autoComplete="current-password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								onKeyDown={onKeyEvent}
+								onKeyUp={onKeyEvent}
+							/>
+							<span className="auth-field-hint">{t.passwordOptionalHint}</span>
+						</label>
+					) : null}
+					{mode === "signup" ? (
+						<label>
+							{t.password}
+							<input
+								type="password"
+								autoComplete="new-password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								onKeyDown={onKeyEvent}
+								onKeyUp={onKeyEvent}
+								minLength={10}
 								required
 							/>
 						</label>
-						{mode === "login" || mode === "signup" ? (
-							<label>
-								{t.password}
-								<input
-									type="password"
-									autoComplete={
-										mode === "login" ? "current-password" : "new-password"
-									}
-									value={password}
-									onChange={(e) => setPassword(e.target.value)}
-									onKeyDown={onKeyEvent}
-									onKeyUp={onKeyEvent}
-									minLength={mode === "signup" ? 10 : undefined}
-									required
-								/>
-							</label>
-						) : null}
-						{capsOn && (mode === "login" || mode === "signup") ? (
-							<p
-								className="caps-indicator is-on"
-								role="status"
-								aria-live="polite"
-							>
-								{t.capsOn}
-							</p>
-						) : null}
-						{mode === "signup" ? (
-							<ul className="password-rules" aria-label={t.password}>
-								<li className={signupRules.minLength ? "is-ok" : undefined}>
-									{t.passwordRuleLen}
-								</li>
-								<li className={signupRules.hasLetter ? "is-ok" : undefined}>
-									{t.passwordRuleLetter}
-								</li>
-								<li className={signupRules.hasNumber ? "is-ok" : undefined}>
-									{t.passwordRuleNumber}
-								</li>
-							</ul>
-						) : null}
-						{mode === "passwordless" ? (
-							<p className="auth-hint">{t.passwordlessHint}</p>
-						) : null}
-						{mode === "forgot" ? <p className="auth-hint">{t.forgotHint}</p> : null}
-						<button
-							className="btn btn-primary auth-submit"
-							type="submit"
-							disabled={busy || (mode === "signup" && !signupStrong)}
-						>
-							{mode === "login"
+					) : null}
+					{capsOn && (mode === "login" || mode === "signup") ? (
+						<p className="caps-indicator is-on" role="status" aria-live="polite">
+							{t.capsOn}
+						</p>
+					) : null}
+					{mode === "signup" ? (
+						<ul className="password-rules" aria-label={t.password}>
+							<li className={signupRules.minLength ? "is-ok" : undefined}>
+								{t.passwordRuleLen}
+							</li>
+							<li className={signupRules.hasLetter ? "is-ok" : undefined}>
+								{t.passwordRuleLetter}
+							</li>
+							<li className={signupRules.hasNumber ? "is-ok" : undefined}>
+								{t.passwordRuleNumber}
+							</li>
+						</ul>
+					) : null}
+					{mode === "forgot" ? <p className="auth-hint">{t.forgotHint}</p> : null}
+					<button
+						className="btn btn-primary auth-submit"
+						type="submit"
+						disabled={busy || (mode === "signup" && !signupStrong)}
+					>
+						{mode === "login"
+							? loginWantsPassword
 								? t.login
-								: mode === "signup"
-									? t.signup
-									: mode === "passwordless"
-										? t.passwordlessSubmit
-										: t.forgotSubmit}
-						</button>
-					</form>
+								: t.passwordlessSubmit
+							: mode === "signup"
+								? t.signup
+								: t.forgotSubmit}
+					</button>
+				</form>
+
+				{mode === "login" ? (
+					<>
+						<p className="auth-footnotes">
+							<button type="button" onClick={() => switchMode("forgot")}>
+								{t.forgotPassword}
+							</button>
+						</p>
+						<p className="auth-divider">
+							<span>{t.authOr}</span>
+						</p>
+						<div className="auth-methods">
+							<a className="auth-method" href={oauthStartURL("google")}>
+								{t.continueWithGoogle}
+							</a>
+						</div>
+					</>
 				) : null}
 
-				{mode === "login" && loginStep === "email" ? (
-					<p className="auth-footnotes">
-						<button type="button" onClick={() => switchMode("passwordless")}>
-							{t.passwordless}
-						</button>
-						<span aria-hidden="true">·</span>
-						<button type="button" onClick={() => switchMode("forgot")}>
-							{t.forgotPassword}
-						</button>
-						<span aria-hidden="true">·</span>
-						<button
-							type="button"
-							onClick={() => {
-								setError("");
-								setLoginStep("methods");
-								setPassword("");
-							}}
-						>
-							{t.authOtherMethods}
-						</button>
-					</p>
-				) : null}
-
-				{mode === "passwordless" || mode === "forgot" ? (
+				{mode === "forgot" ? (
 					<p className="auth-footnotes">
 						<button type="button" onClick={() => switchMode("login")}>
-							{mode === "forgot" ? t.forgotBack : t.passwordlessBack}
+							{t.forgotBack}
 						</button>
 					</p>
 				) : null}

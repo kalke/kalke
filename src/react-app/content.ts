@@ -50,6 +50,8 @@ export type PlaygroundCopy = {
 	continueWithEmail: string;
 	authOr: string;
 	authOtherMethods: string;
+	passwordOptional: string;
+	passwordOptionalHint: string;
 	oauthError: string;
 	forgotPassword: string;
 	forgotTitle: string;
@@ -377,6 +379,8 @@ export const copy: Record<Lang, Copy> = {
 			continueWithEmail: "Continuar com email",
 			authOr: "ou",
 			authOtherMethods: "Outras opções",
+			passwordOptional: "Senha (opcional)",
+			passwordOptionalHint: "Deixe em branco para receber um código por email.",
 			oauthError: "Não foi possível entrar com Google. Tente de novo.",
 			forgotPassword: "Esqueci a senha",
 			forgotTitle: "Redefinir senha",
@@ -668,6 +672,8 @@ export const copy: Record<Lang, Copy> = {
 			continueWithEmail: "Continue with email",
 			authOr: "or",
 			authOtherMethods: "Other options",
+			passwordOptional: "Password (optional)",
+			passwordOptionalHint: "Leave blank to get a code by email.",
 			oauthError: "Could not sign in with Google. Try again.",
 			forgotPassword: "Forgot password",
 			forgotTitle: "Reset password",
