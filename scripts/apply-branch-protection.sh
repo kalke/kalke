@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Protect `main` — only kalke may push/bypass; everyone else needs a PR.
-# Requires YOUR credentials (repo admin), not the Cursor cloud token:
+# Run as the repo admin:
 #
 #   gh auth login -h github.com   # as kalke, with repo admin
 #   ./scripts/apply-branch-protection.sh
@@ -23,7 +23,6 @@ ACTOR_ID="$(gh api "users/${ACTOR_LOGIN}" --jq .id)"
 ME="$(gh api user --jq .login 2>/dev/null || true)"
 if [[ -z "${ME}" || "${ME}" == *"message"* ]]; then
   echo "Not authenticated with a user PAT/OAuth token." >&2
-  echo "The Cursor cloud GitHub App cannot create rulesets (403)." >&2
   echo "Run: gh auth login -h github.com   # as ${ACTOR_LOGIN}" >&2
   exit 1
 fi
@@ -37,7 +36,7 @@ echo "Authenticated as: ${ME}"
 checks_for_repo() {
   case "$1" in
     kalke)
-      echo '[{"context":"Lint & build"}]'
+      echo '[{"context":"Lint"},{"context":"Test"}]'
       ;;
     kalke-auth)
       echo '[{"context":"Validate realm"},{"context":"Go test"},{"context":"Docker build"}]'
@@ -57,7 +56,7 @@ checks_for_repo() {
 contexts_csv() {
   # Convert [{"context":"A"},{"context":"B"}] → "A","B" for classic API.
   case "$1" in
-    kalke) echo '"Lint & build"' ;;
+    kalke) echo '"Lint","Test"' ;;
     kalke-auth) echo '"Validate realm","Go test","Docker build"' ;;
     e-bank-api) echo '"Lint","Tests","Docker build"' ;;
     personal-document-extractor) echo '"Lint and test","Docker build"' ;;

@@ -38,9 +38,7 @@ npm run build
 npm run deploy   # or push to main → GitHub Actions
 ```
 
-Push to `main` → lint, build, deploy on Cloudflare.
-
-See [DEPLOY.md](DEPLOY.md) and [BRANCH_PROTECTION.md](BRANCH_PROTECTION.md).
+Push to `main` deploys the Worker to Cloudflare (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
 
 ---
 
