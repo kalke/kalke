@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { copy, siteMeta, type Lang } from "../content";
 import { AuthGate } from "./AuthGate";
-import { DashboardProvider, useDashboard } from "./DashboardContext";
+import { DashboardProvider } from "./DashboardProvider";
+import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang; onLang: (l: Lang) => void };
 

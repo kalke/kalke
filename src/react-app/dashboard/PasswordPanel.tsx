@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { changePassword } from "../api";
 import { copy, type Lang } from "../content";
-import { useDashboard } from "./DashboardContext";
+import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 

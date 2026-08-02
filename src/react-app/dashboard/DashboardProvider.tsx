@@ -1,12 +1,4 @@
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
-	type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
 	clearWorkingPat,
 	createToken,
@@ -18,23 +10,7 @@ import {
 	type Me,
 	type TokenRow,
 } from "../api";
-
-type DashboardContextValue = {
-	user: Me | null;
-	loading: boolean;
-	busy: boolean;
-	setBusy: (v: boolean) => void;
-	error: string;
-	setError: (v: string) => void;
-	tokens: TokenRow[];
-	refreshTokens: () => Promise<void>;
-	ensureWorkingPat: () => Promise<string>;
-	afterAuth: (u: Me) => Promise<void>;
-	logout: () => Promise<void>;
-	setUser: (u: Me | null) => void;
-};
-
-const DashboardContext = createContext<DashboardContextValue | null>(null);
+import { DashboardContext } from "./dashboard-context";
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
 	const [user, setUser] = useState<Me | null>(null);
@@ -116,10 +92,4 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 	return (
 		<DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>
 	);
-}
-
-export function useDashboard(): DashboardContextValue {
-	const ctx = useContext(DashboardContext);
-	if (!ctx) throw new Error("useDashboard outside provider");
-	return ctx;
 }

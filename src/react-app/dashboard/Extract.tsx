@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { extractDocument } from "../api";
 import { copy, type Lang } from "../content";
-import { useDashboard } from "./DashboardContext";
+import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
