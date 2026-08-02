@@ -3,13 +3,14 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 import { copy, siteMeta, type Lang } from "../content";
 import { AuthGate } from "./AuthGate";
 import { DashboardProvider } from "./DashboardProvider";
+import { ProfileMenu } from "./ProfileMenu";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang; onLang: (l: Lang) => void };
 
 function ShellInner({ lang, onLang }: Props) {
 	const t = copy[lang].playground;
-	const { user, loading, logout, busy, error } = useDashboard();
+	const { user, loading, error } = useDashboard();
 
 	useEffect(() => {
 		document.title = t.pageTitle;
@@ -53,30 +54,17 @@ function ShellInner({ lang, onLang }: Props) {
 							EN
 						</button>
 					</div>
+					{user ? <ProfileMenu lang={lang} /> : null}
 				</div>
 			</header>
 
-			<main className="playground-main">
+			<main className={`playground-main ${user ? "has-profile" : ""}`}>
 				{loading ? (
 					<p className="playground-muted">{t.loading}</p>
 				) : !user ? (
 					<AuthGate lang={lang} />
 				) : (
 					<>
-						<div className="playground-auth">
-							<p>
-								<span className="path-label">{t.signedInAs}</span>{" "}
-								<strong>{user.email}</strong>
-							</p>
-							<button
-								className="btn btn-ghost"
-								type="button"
-								onClick={() => void logout()}
-								disabled={busy}
-							>
-								{t.logout}
-							</button>
-						</div>
 						<Outlet />
 						{error ? <p className="playground-error">{error}</p> : null}
 					</>

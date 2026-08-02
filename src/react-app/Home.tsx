@@ -174,6 +174,7 @@ export function Home({ lang, onLang }: Props) {
 						{t.contact.links.map((link) => (
 							<li key={link.label}>
 								<a
+									className="contact-card"
 									href={link.href}
 									{...(link.href.startsWith("mailto:")
 										? {}

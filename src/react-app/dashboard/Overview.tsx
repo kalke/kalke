@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { copy, type Lang } from "../content";
-import { PasswordPanel } from "./PasswordPanel";
 
 type Props = { lang: Lang };
 
@@ -29,10 +28,6 @@ export function Overview({ lang }: Props) {
 					</Link>
 				</li>
 			</ul>
-
-			<section className="playground-panel" aria-labelledby="password-title">
-				<PasswordPanel lang={lang} />
-			</section>
 		</>
 	);
 }

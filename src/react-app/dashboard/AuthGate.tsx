@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
 	login,
 	signupResend,
@@ -6,6 +6,8 @@ import {
 	signupVerify,
 } from "../api";
 import { copy, type Lang } from "../content";
+import { useCapsLock } from "../hooks/useCapsLock";
+import { evaluatePassword, passwordIsStrong } from "./passwordRules";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
@@ -14,6 +16,7 @@ type AuthMode = "login" | "signup";
 export function AuthGate({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { afterAuth, busy, setBusy, error, setError } = useDashboard();
+	const { capsOn, onKeyEvent } = useCapsLock();
 	const [mode, setMode] = useState<AuthMode>("login");
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
@@ -21,6 +24,9 @@ export function AuthGate({ lang }: Props) {
 	const [otpCode, setOtpCode] = useState("");
 	const [verifyOpen, setVerifyOpen] = useState(false);
 	const [resendIn, setResendIn] = useState(0);
+
+	const signupRules = useMemo(() => evaluatePassword(password), [password]);
+	const signupStrong = passwordIsStrong(signupRules, false);
 
 	useEffect(() => {
 		if (resendIn <= 0) return;
@@ -47,6 +53,10 @@ export function AuthGate({ lang }: Props) {
 	async function onSignup(e: FormEvent) {
 		e.preventDefault();
 		setError("");
+		if (!signupStrong) {
+			setError(t.passwordWeak);
+			return;
+		}
 		setBusy(true);
 		try {
 			const pending = await signupStart(name, email, password);
@@ -161,11 +171,37 @@ export function AuthGate({ lang }: Props) {
 						autoComplete={mode === "login" ? "current-password" : "new-password"}
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
+						onKeyDown={onKeyEvent}
+						onKeyUp={onKeyEvent}
 						minLength={mode === "signup" ? 10 : undefined}
 						required
 					/>
 				</label>
-				<button className="btn btn-primary" type="submit" disabled={busy}>
+				<p
+					className={`caps-indicator ${capsOn ? "is-on" : "is-off"}`}
+					role="status"
+					aria-live="polite"
+				>
+					{capsOn ? t.capsOn : t.capsOff}
+				</p>
+				{mode === "signup" ? (
+					<ul className="password-rules" aria-label={t.password}>
+						<li className={signupRules.minLength ? "is-ok" : undefined}>
+							{t.passwordRuleLen}
+						</li>
+						<li className={signupRules.hasLetter ? "is-ok" : undefined}>
+							{t.passwordRuleLetter}
+						</li>
+						<li className={signupRules.hasNumber ? "is-ok" : undefined}>
+							{t.passwordRuleNumber}
+						</li>
+					</ul>
+				) : null}
+				<button
+					className="btn btn-primary"
+					type="submit"
+					disabled={busy || (mode === "signup" && !signupStrong)}
+				>
 					{mode === "login" ? t.login : t.signup}
 				</button>
 			</form>

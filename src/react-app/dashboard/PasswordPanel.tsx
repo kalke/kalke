@@ -1,6 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { changePassword } from "../api";
 import { copy, type Lang } from "../content";
+import { useCapsLock } from "../hooks/useCapsLock";
+import { evaluatePassword, passwordIsStrong } from "./passwordRules";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
@@ -8,21 +10,24 @@ type Props = { lang: Lang };
 export function PasswordPanel({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { busy, setBusy, setError } = useDashboard();
+	const { capsOn, onKeyEvent } = useCapsLock();
 	const [currentPassword, setCurrentPassword] = useState("");
 	const [newPassword, setNewPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [passwordMsg, setPasswordMsg] = useState("");
 
+	const rules = useMemo(
+		() => evaluatePassword(newPassword, confirmPassword),
+		[newPassword, confirmPassword],
+	);
+	const strong = passwordIsStrong(rules, true);
+
 	async function onChangePassword(e: FormEvent) {
 		e.preventDefault();
 		setError("");
 		setPasswordMsg("");
-		if (newPassword.length < 10) {
-			setError(t.passwordShort);
-			return;
-		}
-		if (newPassword !== confirmPassword) {
-			setError(t.passwordMismatch);
+		if (!strong) {
+			setError(t.passwordWeak);
 			return;
 		}
 		if (currentPassword === newPassword) {
@@ -39,7 +44,12 @@ export function PasswordPanel({ lang }: Props) {
 		} catch (err) {
 			const code = err instanceof Error ? err.message : "";
 			if (code === "password too short") setError(t.passwordShort);
-			else if (code === "new password must differ") setError(t.passwordSame);
+			else if (
+				code === "password needs a letter" ||
+				code === "password needs a number"
+			) {
+				setError(t.passwordWeak);
+			} else if (code === "new password must differ") setError(t.passwordSame);
 			else setError(t.passwordError);
 		} finally {
 			setBusy(false);
@@ -58,6 +68,8 @@ export function PasswordPanel({ lang }: Props) {
 						autoComplete="current-password"
 						value={currentPassword}
 						onChange={(e) => setCurrentPassword(e.target.value)}
+						onKeyDown={onKeyEvent}
+						onKeyUp={onKeyEvent}
 						required
 					/>
 				</label>
@@ -68,6 +80,8 @@ export function PasswordPanel({ lang }: Props) {
 						autoComplete="new-password"
 						value={newPassword}
 						onChange={(e) => setNewPassword(e.target.value)}
+						onKeyDown={onKeyEvent}
+						onKeyUp={onKeyEvent}
 						minLength={10}
 						required
 					/>
@@ -79,11 +93,26 @@ export function PasswordPanel({ lang }: Props) {
 						autoComplete="new-password"
 						value={confirmPassword}
 						onChange={(e) => setConfirmPassword(e.target.value)}
+						onKeyDown={onKeyEvent}
+						onKeyUp={onKeyEvent}
 						minLength={10}
 						required
 					/>
 				</label>
-				<button className="btn btn-primary" type="submit" disabled={busy}>
+				<p
+					className={`caps-indicator ${capsOn ? "is-on" : "is-off"}`}
+					role="status"
+					aria-live="polite"
+				>
+					{capsOn ? t.capsOn : t.capsOff}
+				</p>
+				<ul className="password-rules" aria-label={t.passwordTitle}>
+					<li className={rules.minLength ? "is-ok" : undefined}>{t.passwordRuleLen}</li>
+					<li className={rules.hasLetter ? "is-ok" : undefined}>{t.passwordRuleLetter}</li>
+					<li className={rules.hasNumber ? "is-ok" : undefined}>{t.passwordRuleNumber}</li>
+					<li className={rules.matches ? "is-ok" : undefined}>{t.passwordRuleMatch}</li>
+				</ul>
+				<button className="btn btn-primary" type="submit" disabled={busy || !strong}>
 					{t.changePassword}
 				</button>
 			</form>
