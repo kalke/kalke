@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# Apply "only kalke can push/bypass on main" rulesets to all Kalke repos.
+# Protect `main` — only kalke may push/bypass; everyone else needs a PR.
 # Requires YOUR credentials (repo admin), not the Cursor cloud token:
 #
 #   gh auth login -h github.com   # as kalke, with repo admin
 #   ./scripts/apply-branch-protection.sh
+#
+# Prefers repository rulesets; falls back to classic branch protection when
+# the account plan blocks rulesets on private repos.
 #
 set -euo pipefail
 
@@ -31,36 +34,46 @@ fi
 echo "Bypass actor: ${ACTOR_LOGIN} (id=${ACTOR_ID})"
 echo "Authenticated as: ${ME}"
 
-apply_repo() {
-  local repo="$1"
-  local full="${OWNER}/${repo}"
-  echo ""
-  echo "==> ${full}"
+checks_for_repo() {
+  case "$1" in
+    kalke)
+      echo '[{"context":"Lint & build"}]'
+      ;;
+    kalke-auth)
+      echo '[{"context":"Validate realm"},{"context":"Go test"},{"context":"Docker build"}]'
+      ;;
+    e-bank-api)
+      echo '[{"context":"Lint"},{"context":"Tests"},{"context":"Docker build"}]'
+      ;;
+    personal-document-extractor)
+      echo '[{"context":"Lint and test"},{"context":"Docker build"}]'
+      ;;
+    *)
+      echo '[]'
+      ;;
+  esac
+}
 
-  # Remove prior ruleset with the same name (idempotent re-run).
+contexts_csv() {
+  # Convert [{"context":"A"},{"context":"B"}] → "A","B" for classic API.
+  case "$1" in
+    kalke) echo '"Lint & build"' ;;
+    kalke-auth) echo '"Validate realm","Go test","Docker build"' ;;
+    e-bank-api) echo '"Lint","Tests","Docker build"' ;;
+    personal-document-extractor) echo '"Lint and test","Docker build"' ;;
+    *) echo '' ;;
+  esac
+}
+
+apply_ruleset() {
+  local full="$1"
+  local checks_json="$2"
   local existing
-  existing="$(gh api "repos/${full}/rulesets" --jq '.[] | select(.name=="protect-main") | .id' || true)"
+  existing="$(gh api "repos/${full}/rulesets" --jq '.[] | select(.name=="protect-main") | .id' 2>/dev/null || true)"
   if [[ -n "${existing}" ]]; then
     echo "Deleting existing ruleset id=${existing}"
     gh api --method DELETE "repos/${full}/rulesets/${existing}" >/dev/null
   fi
-
-  # Required status checks differ per repo (must match Actions job names).
-  local checks_json='[]'
-  case "${repo}" in
-    kalke)
-      checks_json='[{"context":"Lint & build"}]'
-      ;;
-    kalke-auth)
-      checks_json='[{"context":"Validate realm"},{"context":"Docker build"}]'
-      ;;
-    e-bank-api)
-      checks_json='[{"context":"Lint"},{"context":"Tests"},{"context":"Docker build"}]'
-      ;;
-    personal-document-extractor)
-      checks_json='[{"context":"Lint and test"},{"context":"Docker build"}]'
-      ;;
-  esac
 
   gh api --method POST "repos/${full}/rulesets" \
     -H "Accept: application/vnd.github+json" \
@@ -106,15 +119,82 @@ apply_repo() {
   ]
 }
 EOF
-
-  echo "Ruleset protect-main active on ${full}"
 }
 
+apply_classic() {
+  local full="$1"
+  local contexts="$2"
+  # Classic protection: require PR, status checks, no force-push/delete.
+  # Restriction: only ${ACTOR_LOGIN} may push (everyone else blocked from direct push).
+  gh api --method PUT "repos/${full}/branches/main/protection" \
+    -H "Accept: application/vnd.github+json" \
+    --input - >/dev/null <<EOF
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [${contexts}]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": {
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false,
+    "required_approving_review_count": 0
+  },
+  "restrictions": {
+    "users": ["${ACTOR_LOGIN}"],
+    "teams": [],
+    "apps": []
+  },
+  "allow_force_pushes": false,
+  "allow_deletions": false,
+  "block_creations": false,
+  "required_conversation_resolution": false
+}
+EOF
+}
+
+apply_repo() {
+  local repo="$1"
+  local full="${OWNER}/${repo}"
+  local checks_json
+  local contexts
+  echo ""
+  echo "==> ${full}"
+
+  checks_json="$(checks_for_repo "${repo}")"
+  contexts="$(contexts_csv "${repo}")"
+
+  if apply_ruleset "${full}" "${checks_json}" 2>/tmp/kalke-protect-err.$$; then
+    echo "Ruleset protect-main active on ${full}"
+    rm -f /tmp/kalke-protect-err.$$
+    return 0
+  fi
+
+  local err
+  err="$(cat /tmp/kalke-protect-err.$$ 2>/dev/null || true)"
+  rm -f /tmp/kalke-protect-err.$$
+  echo "Rulesets unavailable (${err%%$'\n'*}); trying classic branch protection..."
+
+  if apply_classic "${full}" "${contexts}"; then
+    echo "Classic branch protection active on ${full} (push restricted to ${ACTOR_LOGIN})"
+    return 0
+  fi
+
+  echo "FAILED to protect ${full}" >&2
+  return 1
+}
+
+fail=0
 for repo in "${REPOS[@]}"; do
-  apply_repo "${repo}"
+  apply_repo "${repo}" || fail=1
 done
 
 echo ""
-echo "Done. main requires a PR for everyone except ${ACTOR_LOGIN} (bypass)."
-echo "Verify: Settings → Rules → Rulesets on each repo, or:"
-echo "  gh api repos/${OWNER}/kalke/rulesets --jq '.[].name'"
+if [[ "${fail}" -ne 0 ]]; then
+  echo "Some repos failed. Fix auth/plan, then re-run." >&2
+  exit 1
+fi
+echo "Done. main requires a PR for everyone except ${ACTOR_LOGIN}."
+echo "Verify:"
+echo "  gh api repos/${OWNER}/kalke-auth/rulesets --jq '.[].name' 2>/dev/null || \\"
+echo "  gh api repos/${OWNER}/kalke-auth/branches/main/protection --jq '{checks:.required_status_checks.contexts,users:.restrictions.users}'"

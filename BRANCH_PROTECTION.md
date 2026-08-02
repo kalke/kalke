@@ -48,8 +48,11 @@ Settings → Rules → New branch ruleset → target `main`:
 | Repo | Required checks |
 |---|---|
 | `kalke` | `Lint & build` |
-| `kalke-auth` | `Validate realm`, `Docker build` |
+| `kalke-auth` | `Validate realm`, `Go test`, `Docker build` |
 | `e-bank-api` | `Lint`, `Tests`, `Docker build` |
 | `personal-document-extractor` | `Lint and test`, `Docker build` |
+
+If rulesets return “Upgrade to GitHub Pro”, the script falls back to **classic**
+branch protection (same checks + push restricted to user `kalke`).
 
 Deploys already only run on `push` to `main` after CI (see each repo’s `.github/workflows/ci.yml`).
