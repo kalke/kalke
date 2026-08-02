@@ -5,12 +5,12 @@ export const siteMeta = {
 	pt: {
 		title: "Henrique Kalke — engenheiro de software",
 		description:
-			"Henrique Kalke. Engenharia de software para sistemas financeiros, APIs e produtos digitais. Curitiba.",
+			"Henrique Kalke (kalke). Software para crédito, contabilidade e core banking. Curitiba.",
 	},
 	en: {
 		title: "Henrique Kalke — software engineer",
 		description:
-			"Henrique Kalke. Software engineering for financial systems, APIs, and digital products. Based in Curitiba.",
+			"Henrique Kalke (kalke). Software for credit, accounting, and core banking. Based in Curitiba.",
 	},
 };
 
@@ -180,7 +180,7 @@ export const copy: Record<Lang, Copy> = {
 		hero: {
 			headline: "Henrique Kalke",
 			support:
-				"Engenharia de software para finanças e produtos digitais. APIs, autenticação e demos que já rodam em produção.",
+				"Software para os bastidores do mercado financeiro — crédito, contabilidade e core banking.",
 			primaryCta: { label: "Ver projetos", href: "#work" },
 			secondaryCta: { label: "Contato", href: "#contact" },
 			terminal: {
@@ -188,7 +188,7 @@ export const copy: Record<Lang, Copy> = {
 				lines: [
 					{
 						cmd: "whoami",
-						out: "Backend, auth e infra em ambientes regulados.",
+						out: "Backend, core banking e auth em ambientes regulados.",
 						href: "#about",
 					},
 					{
@@ -198,7 +198,7 @@ export const copy: Record<Lang, Copy> = {
 					},
 					{
 						cmd: "cat contact.md",
-						out: "henriquekalke@icloud.com",
+						out: "henriquekalke@icloud.com · WhatsApp preferido",
 						href: "#contact",
 					},
 				],
@@ -211,10 +211,9 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "~/about",
 			title: "Sobre mim",
 			paragraphs: [
-				"Sou o Henrique Kalke — kalke na rede. Há seis anos construo software em crédito, contábil e infraestrutura bancária, onde erro custa dinheiro e auditoria.",
-				"Moro em Curitiba. Morei três anos no Reino Unido. Inglês fluente na leitura e na escrita desde cedo; isso ajuda em docs, código e times fora do Brasil.",
-				"Já trabalhei com onboarding de contas sob compliance, boleto e liquidação em volume, motores de tarifa e checagem de documentos com LLM. Quero sistemas estáveis em torno de contas, PIX, boleto e regras do Banco Central.",
-				"Também entrego sites comerciais em WordPress/Elementor quando prazo e autonomia editorial pesam. E apps próprios — este portfólio e o extrator — quando o produto precisa de código dedicado.",
+				"E aí, sou o Henrique Kalke — ou só kalke. Moro em Curitiba e, nos últimos oito anos, tenho focado em construir software para os bastidores do mercado financeiro: sistemas de crédito, contabilidade e infraestrutura de core banking. Trabalho em ambientes onde um erro não gera só um log de falha — gera prejuízo e dor de cabeça com auditoria.",
+				"Minha base acadêmica é em Sistemas de Informação (BSI) e Inteligência Artificial Aplicada (IAA). No dia a dia, construo ecossistemas com liquidação em volume, PIX, motores de tarifa, governança e onboarding sob regras rígidas de compliance — inclusive usando LLMs para checagem de documentos. Passei por Kanastra, Exati e QuiteJá, de perto com Go, Python e mensageria.",
+				"Morei três anos no Reino Unido e fui alfabetizado em inglês, então não lido com ele só como segundo idioma. Isso ajuda na hora de levantar requisitos, ler documentação e implementar sistemas.",
 			],
 		},
 		likes: {
@@ -222,49 +221,48 @@ export const copy: Record<Lang, Copy> = {
 			title: "Fora do teclado",
 			items: [
 				{
-					title: "Zaia, Chico, Linhaça, Claire",
-					text: "Quatro gatos em casa. Companhia fixa quando eu saio do código.",
+					title: "Zaia, Chico, Linhaça e Claire",
+					text: "Meus quatro gatos. Sou outra pessoa com eles, e a casa nunca fica quieta.",
 				},
 				{
 					title: "Meg",
-					text: "Cachorra da família. Queria Lurdinha — perdi a discussão e ficou Meg.",
-				},
-				{
-					title: "Música",
-					text: "Amo música no deslocamento, no treino, no trabalho e à noite.",
-				},
-				{
-					title: "Treino",
-					text: "Academia para manter a cabeça (e o corpo) depois de longas sessões.",
+					text: "A integrante mais alegre da família. Eu juro que queria Lurdinha, mas perdi a discussão.",
 				},
 				{
 					title: "Games",
-					text: "Meu jeito preferido de desligar quando o dia no teclado acaba.",
+					text: "O jeito oficial de resetar a cabeça depois do expediente.",
+				},
+				{
+					title: "Música",
+					text: "Uma extensão de mim — trabalhando, jogando ou treinando.",
 				},
 			],
 		},
 		stack: {
 			eyebrow: "~/stack",
 			title: "Stack",
-			intro: "Ferramentas do dia a dia, agrupadas por tipo de problema.",
+			intro: "As ferramentas que resolvem meus problemas hoje, agrupadas pelo papel na arquitetura:",
 			groups: [
-				{ area: "Aplicações", items: ["Go", "Python", "FastAPI", "TypeScript", "React"] },
-				{ area: "Dados", items: ["PostgreSQL", "Redis", "Kafka"] },
+				{
+					area: "Aplicações",
+					items: ["Go", "Python", "FastAPI", "Flask", "TypeScript", "React", "Vue"],
+				},
+				{ area: "Dados", items: ["PostgreSQL", "MySQL", "Redis", "Kafka"] },
 				{ area: "Cloud e runtime", items: ["AWS", "Docker", "Cloudflare Workers"] },
-				{ area: "Identidade e APIs", items: ["OIDC", "Keycloak", "OpenAPI"] },
+				{ area: "Identidade e APIs", items: ["OpenAPI", "OIDC", "Keycloak"] },
 				{ area: "Sites comerciais", items: ["WordPress", "Elementor"] },
 			],
 		},
 		builds: {
 			eyebrow: "~/work",
 			title: "Projetos",
-			intro: "Repos públicos e uma demo ao vivo do extrator, autenticada em kalke.dev.",
+			intro: "Alguns repositórios públicos e coisas que construo quando o produto exige código dedicado.",
 			items: [
 				{
 					name: "Document extractor",
 					href: "/playground",
 					blurb:
-						"Demo em produção: token de API, upload de PDF ou imagem, saída estruturada e consentimento LGPD.",
+						"Demo rodando em produção. Upload de PDF ou imagem, saída estruturada da extração, autenticação e consentimento LGPD.",
 					tags: ["Live demo", "Go", "LLM", "OIDC"],
 					featured: true,
 					cta: "Abrir demo",
@@ -273,21 +271,21 @@ export const copy: Record<Lang, Copy> = {
 					name: "kalke-auth",
 					href: "https://github.com/kalke/kalke-auth",
 					blurb:
-						"Auth com Keycloak/OIDC: sessão por cookie, PATs e introspect para serviços que consomem a API.",
+						"Motor de autenticação com Keycloak/OIDC: sessão por cookie, PATs e introspect para microsserviços que consomem a API.",
 					tags: ["Keycloak", "OIDC", "Go"],
 				},
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"API Go de extração (RG, comprovante, NF) com LLM, Postgres e Redis. Base da demo ao vivo.",
+						"API base da demo ao vivo. Extração de RG, comprovantes e NFs com LLM, PostgreSQL e Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"API bancária de referência em FastAPI (depósito, saque, transferência), com OpenAPI e testes.",
+						"API bancária de referência em FastAPI: depósito, saque e transferência, com OpenAPI e boa cobertura de testes.",
 					tags: ["Python", "FastAPI"],
 				},
 			],
@@ -295,7 +293,7 @@ export const copy: Record<Lang, Copy> = {
 		contact: {
 			eyebrow: "~/contact",
 			title: "Contato",
-			text: "Oportunidades, projetos e dúvidas técnicas. Preferência por email.",
+			text: "Quer bater um papo sobre código, infraestrutura bancária, projetos paralelos ou novas oportunidades? Me manda uma mensagem. Costumo ser mais rápido no WhatsApp.",
 			links: [
 				{
 					label: "Email",
@@ -449,7 +447,7 @@ export const copy: Record<Lang, Copy> = {
 		hero: {
 			headline: "Henrique Kalke",
 			support:
-				"Software engineering for finance and digital products. APIs, authentication, and demos already running in production.",
+				"Software for the back office of financial markets — credit, accounting, and core banking.",
 			primaryCta: { label: "View projects", href: "#work" },
 			secondaryCta: { label: "Contact", href: "#contact" },
 			terminal: {
@@ -457,7 +455,7 @@ export const copy: Record<Lang, Copy> = {
 				lines: [
 					{
 						cmd: "whoami",
-						out: "Backend, auth, and infra in regulated environments.",
+						out: "Backend, core banking, and auth in regulated environments.",
 						href: "#about",
 					},
 					{
@@ -467,7 +465,7 @@ export const copy: Record<Lang, Copy> = {
 					},
 					{
 						cmd: "cat contact.md",
-						out: "henriquekalke@icloud.com",
+						out: "henriquekalke@icloud.com · WhatsApp preferred",
 						href: "#contact",
 					},
 				],
@@ -480,10 +478,9 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "~/about",
 			title: "About me",
 			paragraphs: [
-				"I'm Henrique Kalke — kalke online. For six years I've been building software in credit, accounting, and banking infrastructure, where mistakes cost money and audits.",
-				"I live in Curitiba. I spent three years in the UK. Fluent English in reading and writing from early on; it helps with docs, code, and teams outside Brazil.",
-				"I've worked on compliant account onboarding, high-volume boleto and settlement, fee engines, and LLM document checks. I care about stable systems around accounts, PIX, boleto, and Central Bank rules.",
-				"I also ship commercial sites on WordPress/Elementor when timeline and editorial control matter. And purpose-built apps — this portfolio and the extractor — when the product needs its own codebase.",
+				"Hey — I'm Henrique Kalke, or just kalke. I live in Curitiba, and for the last eight years I've focused on software behind financial markets: credit systems, accounting, and core banking infrastructure. I work in places where a mistake isn't just a failed log line — it's money lost and an audit headache.",
+				"My academic background is Information Systems (BSI) and Applied Artificial Intelligence (IAA). Day to day I build ecosystems around high-volume settlement, PIX, fee engines, governance, and onboarding under strict compliance rules — including LLMs for document checks. I've worked at Kanastra, Exati, and QuiteJá, close to Go, Python, and messaging.",
+				"I lived three years in the UK and was raised literate in English, so it isn't just a second language I cope with. That helps a lot when gathering requirements, reading docs, and shipping systems.",
 			],
 		},
 		likes: {
@@ -491,49 +488,48 @@ export const copy: Record<Lang, Copy> = {
 			title: "Away from the keyboard",
 			items: [
 				{
-					title: "Zaia, Chico, Linhaça, Claire",
-					text: "Four house cats. Fixed company when I step away from the code.",
+					title: "Zaia, Chico, Linhaça, and Claire",
+					text: "My four cats. I'm a different person with them, and the house is never quiet.",
 				},
 				{
 					title: "Meg",
-					text: "Family dog. I wanted Lurdinha — lost the discussion, so she's Meg.",
-				},
-				{
-					title: "Music",
-					text: "I love music on the commute, at the gym, at work, and late at night.",
-				},
-				{
-					title: "Training",
-					text: "Gym time to reset my head (and body) after long sessions.",
+					text: "The happiest member of the family. I swear I wanted Lurdinha — I lost that argument.",
 				},
 				{
 					title: "Games",
-					text: "My favorite way to switch off when the coding day is done.",
+					text: "The official way to reset my head after work.",
+				},
+				{
+					title: "Music",
+					text: "An extension of me — working, gaming, or training.",
 				},
 			],
 		},
 		stack: {
 			eyebrow: "~/stack",
 			title: "Stack",
-			intro: "Day-to-day tools, grouped by problem type.",
+			intro: "The tools that solve my problems today, grouped by their role in the architecture:",
 			groups: [
-				{ area: "Applications", items: ["Go", "Python", "FastAPI", "TypeScript", "React"] },
-				{ area: "Data", items: ["PostgreSQL", "Redis", "Kafka"] },
+				{
+					area: "Applications",
+					items: ["Go", "Python", "FastAPI", "Flask", "TypeScript", "React", "Vue"],
+				},
+				{ area: "Data", items: ["PostgreSQL", "MySQL", "Redis", "Kafka"] },
 				{ area: "Cloud & runtime", items: ["AWS", "Docker", "Cloudflare Workers"] },
-				{ area: "Identity & APIs", items: ["OIDC", "Keycloak", "OpenAPI"] },
+				{ area: "Identity & APIs", items: ["OpenAPI", "OIDC", "Keycloak"] },
 				{ area: "Commercial sites", items: ["WordPress", "Elementor"] },
 			],
 		},
 		builds: {
 			eyebrow: "~/work",
 			title: "Projects",
-			intro: "Public repos and a live extractor demo, authenticated on kalke.dev.",
+			intro: "A few public repos and things I build when the product needs dedicated code.",
 			items: [
 				{
 					name: "Document extractor",
 					href: "/playground",
 					blurb:
-						"Production live demo: API token, PDF or image upload, structured output, and LGPD consent.",
+						"Live demo in production. Upload a PDF or image, get structured extraction output, with auth and LGPD consent.",
 					tags: ["Live demo", "Go", "LLM", "OIDC"],
 					featured: true,
 					cta: "Open live demo",
@@ -542,21 +538,21 @@ export const copy: Record<Lang, Copy> = {
 					name: "kalke-auth",
 					href: "https://github.com/kalke/kalke-auth",
 					blurb:
-						"Auth on Keycloak/OIDC: cookie sessions, PATs, and introspect for services that call the API.",
+						"Auth engine on Keycloak/OIDC: cookie sessions, PATs, and introspect for microservices that call the API.",
 					tags: ["Keycloak", "OIDC", "Go"],
 				},
 				{
 					name: "personal-document-extractor",
 					href: "https://github.com/kalke/personal-document-extractor",
 					blurb:
-						"Go extraction API (ID, proof of address, invoice) with LLM, Postgres, and Redis. Powers the live demo.",
+						"API behind the live demo. Extracts ID docs, proof of address, and invoices with an LLM, PostgreSQL, and Redis.",
 					tags: ["Go", "LLM", "Postgres"],
 				},
 				{
 					name: "e-bank-api",
 					href: "https://github.com/kalke/e-bank-api",
 					blurb:
-						"Reference banking API in FastAPI (deposit, withdraw, transfer) with OpenAPI and tests.",
+						"Reference banking API in FastAPI: deposit, withdraw, and transfer, with OpenAPI and solid test coverage.",
 					tags: ["Python", "FastAPI"],
 				},
 			],
@@ -564,7 +560,7 @@ export const copy: Record<Lang, Copy> = {
 		contact: {
 			eyebrow: "~/contact",
 			title: "Contact",
-			text: "Roles, projects, and technical questions. Email preferred.",
+			text: "Want to talk code, banking infrastructure, side projects, or new roles? Send a message. I'm usually fastest on WhatsApp.",
 			links: [
 				{
 					label: "Email",
