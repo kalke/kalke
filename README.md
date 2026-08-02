@@ -28,18 +28,3 @@ Henrique Kalke — software engineer.
 | [kalke](https://github.com/kalke/kalke) | React · Vite · Workers | Code for [kalke.dev](https://kalke.dev) |
 
 ---
-
-## This repository
-
-```bash
-npm install
-npm run dev
-npm run build
-npm run deploy   # or push to main → GitHub Actions
-```
-
-Push to `main` deploys the Worker to Cloudflare (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
-
----
-
-[kalke.dev](https://kalke.dev) · [LinkedIn](https://www.linkedin.com/in/henriquekalke/) · [henriquekalke@icloud.com](mailto:henriquekalke@icloud.com)
