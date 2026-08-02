@@ -28,9 +28,69 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 	return v != null && typeof v === "object" && !Array.isArray(v);
 }
 
-function formatScalar(v: unknown): string | null {
+const DATE_FIELD_KEYS = new Set([
+	"data",
+	"data_emissao",
+	"data_nascimento",
+	"expiry_date",
+	"issue_date",
+	"validade",
+]);
+
+function fieldBase(key: string): string {
+	const leaf = key.includes(".") ? (key.split(".").pop() ?? key) : key;
+	return leaf.replace(/^(emitente|tomador|destinatario)_/, "");
+}
+
+function isDateField(key: string): boolean {
+	const base = fieldBase(key);
+	if (DATE_FIELD_KEYS.has(base)) return true;
+	return base === "date" || /^data_/.test(base) || /_date$/.test(base);
+}
+
+function parseDateParts(raw: string): { y: number; m: number; d: number } | null {
+	const s = raw.trim();
+	let match = /^(\d{4})-(\d{2})-(\d{2})(?:[T\s].*)?$/.exec(s);
+	if (match) {
+		return { y: Number(match[1]), m: Number(match[2]), d: Number(match[3]) };
+	}
+	match = /^(\d{2})[/.-](\d{2})[/.-](\d{4})$/.exec(s);
+	if (match) {
+		return { y: Number(match[3]), m: Number(match[2]), d: Number(match[1]) };
+	}
+	return null;
+}
+
+function formatHumanDate(raw: string, lang: Lang): string | null {
+	const parts = parseDateParts(raw);
+	if (!parts) return null;
+	const { y, m, d } = parts;
+	if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+	const date = new Date(Date.UTC(y, m - 1, d, 12));
+	if (
+		date.getUTCFullYear() !== y ||
+		date.getUTCMonth() !== m - 1 ||
+		date.getUTCDate() !== d
+	) {
+		return null;
+	}
+	return new Intl.DateTimeFormat(lang === "pt" ? "pt-BR" : "en-US", {
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+		timeZone: "UTC",
+	}).format(date);
+}
+
+function formatScalar(v: unknown, lang?: Lang, key?: string): string | null {
 	if (v == null || v === "") return null;
-	if (typeof v === "string" || typeof v === "number" || typeof v === "boolean") {
+	if (typeof v === "string") {
+		if (lang && key && isDateField(key)) {
+			return formatHumanDate(v, lang) ?? v;
+		}
+		return v;
+	}
+	if (typeof v === "number" || typeof v === "boolean") {
 		return String(v);
 	}
 	return null;
@@ -56,9 +116,10 @@ function pushRow(
 	key: string,
 	value: unknown,
 	labels: Record<string, string>,
+	lang: Lang,
 ) {
 	if (seen.has(key)) return;
-	const formatted = formatScalar(value);
+	const formatted = formatScalar(value, lang, key);
 	if (formatted == null) return;
 	seen.add(key);
 	rows.push({ k: key, label: labelFor(key, labels), v: formatted });
@@ -67,6 +128,7 @@ function pushRow(
 function flattenObject(
 	obj: Record<string, unknown>,
 	labels: Record<string, string>,
+	lang: Lang,
 	prefix = "",
 ): SummaryRow[] {
 	const rows: SummaryRow[] = [];
@@ -105,7 +167,7 @@ function flattenObject(
 	];
 
 	for (const key of preferred) {
-		pushRow(rows, seen, prefix ? `${prefix}.${key}` : key, obj[key], labels);
+		pushRow(rows, seen, prefix ? `${prefix}.${key}` : key, obj[key], labels, lang);
 	}
 
 	for (const [key, value] of Object.entries(obj)) {
@@ -116,11 +178,11 @@ function flattenObject(
 			const nestedPreferred = ["nome", "cpf", "cnpj"];
 			for (const nk of nestedPreferred) {
 				const nestedKey = `${key}_${nk}`;
-				pushRow(rows, seen, nestedKey, value[nk], labels);
+				pushRow(rows, seen, nestedKey, value[nk], labels, lang);
 			}
 			for (const [nk, nv] of Object.entries(value)) {
 				const nestedKey = `${key}_${nk}`;
-				pushRow(rows, seen, nestedKey, nv, labels);
+				pushRow(rows, seen, nestedKey, nv, labels, lang);
 			}
 			continue;
 		}
@@ -150,7 +212,7 @@ function flattenObject(
 			continue;
 		}
 
-		pushRow(rows, seen, key, value, labels);
+		pushRow(rows, seen, key, value, labels, lang);
 	}
 
 	return rows;
@@ -160,6 +222,7 @@ function summarize(
 	data: unknown,
 	docType: string,
 	labels: Record<string, string>,
+	lang: Lang,
 ): { title: string; rows: SummaryRow[] } {
 	const rows: SummaryRow[] = [
 		{
@@ -184,7 +247,7 @@ function summarize(
 			? labelFor(resolvedType, labels)
 			: resolvedType;
 
-	rows.push(...flattenObject(payload, labels));
+	rows.push(...flattenObject(payload, labels, lang));
 	return { title: resolvedType, rows };
 }
 
@@ -224,8 +287,8 @@ export function Extract({ lang }: Props) {
 	}, [ensureWorkingPat, setError, t.needToken]);
 
 	const summary = useMemo(
-		() => (result != null ? summarize(result, docType, t.fieldLabels) : null),
-		[result, docType, t.fieldLabels],
+		() => (result != null ? summarize(result, docType, t.fieldLabels, lang) : null),
+		[result, docType, t.fieldLabels, lang],
 	);
 
 	function pickFile(next: File | null) {
