@@ -88,6 +88,25 @@ export async function signupResend(
 	};
 }
 
+export async function changePassword(
+	currentPassword: string,
+	newPassword: string,
+): Promise<void> {
+	const res = await authFetch("/v1/auth/password", {
+		method: "POST",
+		body: JSON.stringify({
+			current_password: currentPassword,
+			new_password: newPassword,
+		}),
+	});
+	if (res.status === 401) throw new Error("invalid_credentials");
+	if (res.status === 400) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error ?? "bad_request");
+	}
+	if (!res.ok) throw new Error("password_change_failed");
+}
+
 export async function logout(): Promise<void> {
 	await authFetch("/v1/auth/logout", { method: "POST" });
 }
