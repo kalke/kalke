@@ -1,7 +1,9 @@
-import { type ReactNode } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { copy, siteMeta, type Lang } from "./content";
 import { useReveal } from "./hooks/useReveal";
+
+const CatScene = lazy(() => import("./components/CatScene"));
 
 function RevealSection({
 	id,
@@ -74,21 +76,32 @@ export function Home({ lang, onLang }: Props) {
 
 			<main>
 				<section id="top" className="hero">
+					<div className="hero-visual" aria-hidden="true">
+						<Suspense fallback={<div className="cat-scene cat-scene-fallback" />}>
+							<CatScene />
+						</Suspense>
+						<div className="hero-glow" />
+						<div className="hero-grain" />
+					</div>
 					<div className="hero-copy">
+						<p className="hero-brand">{siteMeta.brand}</p>
 						<h1 className="hero-title">{t.hero.headline}</h1>
 						<p className="hero-support">{t.hero.support}</p>
+						<p className="hero-scene-caption">{t.hero.sceneCaption}</p>
 						<div className="hero-actions">
-							<a className="btn btn-primary" href={t.hero.primaryCta.href}>
-								{t.hero.primaryCta.label}
-							</a>
+							{t.hero.primaryCta.href.startsWith("/") ? (
+								<Link className="btn btn-primary" to={t.hero.primaryCta.href}>
+									{t.hero.primaryCta.label}
+								</Link>
+							) : (
+								<a className="btn btn-primary" href={t.hero.primaryCta.href}>
+									{t.hero.primaryCta.label}
+								</a>
+							)}
 							<a className="btn btn-ghost" href={t.hero.secondaryCta.href}>
 								{t.hero.secondaryCta.label}
 							</a>
 						</div>
-					</div>
-					<div className="hero-visual" aria-hidden="true">
-						<div className="hero-glow" />
-						<div className="hero-grain" />
 					</div>
 				</section>
 

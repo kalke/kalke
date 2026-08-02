@@ -21,6 +21,7 @@ type Copy = {
 	hero: {
 		headline: string;
 		support: string;
+		sceneCaption: string;
 		primaryCta: { label: string; href: string };
 		secondaryCta: { label: string; href: string };
 	};
@@ -98,7 +99,8 @@ type Copy = {
 		needToken: string;
 		pdeTitle: string;
 		pdeHint: string;
-		adminOnly: string;
+		consentLabel: string;
+		consentRequired: string;
 		docType: string;
 		chooseFile: string;
 		extract: string;
@@ -122,8 +124,10 @@ export const copy: Record<Lang, Copy> = {
 		hero: {
 			headline: "Henrique Kalke",
 			support: "Ou só kalke. Software engineer em Curitiba.",
-			primaryCta: { label: "Sobre mim", href: "#about" },
-			secondaryCta: { label: "Contato", href: "#contact" },
+			sceneCaption:
+				"Zaia, Chico, Linhaça e Claire — o mesmo cuidado que vai pro produto.",
+			primaryCta: { label: "Playground", href: "/playground" },
+			secondaryCta: { label: "Sobre mim", href: "#about" },
 		},
 		about: {
 			eyebrow: "Sobre",
@@ -243,8 +247,9 @@ export const copy: Record<Lang, Copy> = {
 			navAria: "Playground",
 			backHome: "Início",
 			eyebrow: "Playground",
-			title: "Área logada",
-			intro: "Login privado pra gerar API tokens e testar o personal-document-extractor.",
+			title: "Document playground",
+			intro:
+				"Entre com qualquer conta kalke, gere um token e teste o extrator. Arquivo não é guardado; hash/resultado/auditoria podem ser.",
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
@@ -277,8 +282,10 @@ export const copy: Record<Lang, Copy> = {
 			tokenError: "Falha ao gerenciar token.",
 			needToken: "Cria um token antes de extrair.",
 			pdeTitle: "Document extractor",
-			pdeHint: "Envia PDF/imagem e recebe JSON.",
-			adminOnly: "Só a conta admin pode chamar as APIs daqui.",
+			pdeHint: "Envia PDF/imagem e recebe JSON. Qualquer usuário autenticado pode extrair.",
+			consentLabel:
+				"Li e aceito: o arquivo não é armazenado; o conteúdo pode ser processado por LLM; hash, resultado estruturado e metadados de auditoria (incluindo IP) podem ser mantidos (política lgpd-extract-v1).",
+			consentRequired: "Aceite o termo LGPD para extrair.",
 			docType: "Tipo",
 			chooseFile: "Arquivo",
 			extract: "Extrair",
@@ -300,8 +307,10 @@ export const copy: Record<Lang, Copy> = {
 		hero: {
 			headline: "Henrique Kalke",
 			support: "Or just kalke. Software engineer in Curitiba.",
-			primaryCta: { label: "About me", href: "#about" },
-			secondaryCta: { label: "Contact", href: "#contact" },
+			sceneCaption:
+				"Zaia, Chico, Linhaça, and Claire — the same care that goes into the product.",
+			primaryCta: { label: "Playground", href: "/playground" },
+			secondaryCta: { label: "About me", href: "#about" },
 		},
 		about: {
 			eyebrow: "About",
@@ -421,8 +430,9 @@ export const copy: Record<Lang, Copy> = {
 			navAria: "Playground",
 			backHome: "Home",
 			eyebrow: "Playground",
-			title: "Signed-in area",
-			intro: "Private login to mint API tokens and try personal-document-extractor.",
+			title: "Document playground",
+			intro:
+				"Sign in with any kalke account, mint a token, and try the extractor. Files are not stored; hash/result/audit metadata may be.",
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
@@ -455,8 +465,10 @@ export const copy: Record<Lang, Copy> = {
 			tokenError: "Could not manage token.",
 			needToken: "Create a token before extracting.",
 			pdeTitle: "Document extractor",
-			pdeHint: "Upload a PDF/image and get JSON back.",
-			adminOnly: "Only the admin account can call APIs from here.",
+			pdeHint: "Upload a PDF/image and get JSON back. Any authenticated user can extract.",
+			consentLabel:
+				"I understand: the file is not stored; content may be processed by an LLM; hash, structured result, and audit metadata (including IP) may be retained (policy lgpd-extract-v1).",
+			consentRequired: "Accept the LGPD notice to extract.",
 			docType: "Type",
 			chooseFile: "File",
 			extract: "Extract",

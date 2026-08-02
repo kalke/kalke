@@ -120,13 +120,19 @@ export async function revokeToken(id: string): Promise<void> {
 	if (!res.ok) throw new Error("revoke_failed");
 }
 
+export const LGPD_POLICY_VERSION = "lgpd-extract-v1";
+
 export async function extractDocument(
 	pat: string,
 	file: File,
 	docType: string,
+	consent = true,
 ): Promise<unknown> {
 	const body = new FormData();
 	body.append("file", file);
+	if (consent) {
+		body.append("consent", LGPD_POLICY_VERSION);
+	}
 	const res = await fetch(
 		`${PDE_BASE}/v1/extract?doc_type=${encodeURIComponent(docType)}`,
 		{

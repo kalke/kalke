@@ -37,6 +37,7 @@ export function Playground({ lang, onLang }: Props) {
 	const [workingPat, setWorkingPat] = useState("");
 	const [docType, setDocType] = useState("identity_document");
 	const [file, setFile] = useState<File | null>(null);
+	const [consent, setConsent] = useState(false);
 	const [result, setResult] = useState("");
 	const [busy, setBusy] = useState(false);
 
@@ -170,12 +171,10 @@ export function Playground({ lang, onLang }: Props) {
 		}
 	}
 
-	const isAdmin = !!user?.permissions?.includes("admin");
-
 	async function onExtract(e: FormEvent) {
 		e.preventDefault();
-		if (!isAdmin) {
-			setError(t.adminOnly);
+		if (!consent) {
+			setError(t.consentRequired);
 			return;
 		}
 		if (!file || !workingPat) {
@@ -186,7 +185,7 @@ export function Playground({ lang, onLang }: Props) {
 		setError("");
 		setResult("");
 		try {
-			const data = await extractDocument(workingPat, file, docType);
+			const data = await extractDocument(workingPat, file, docType, consent);
 			setResult(JSON.stringify(data, null, 2));
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.extractError);
@@ -360,31 +359,42 @@ export function Playground({ lang, onLang }: Props) {
 
 						<section className="playground-panel" aria-labelledby="pde-title">
 							<h2 id="pde-title">{t.pdeTitle}</h2>
-							<p>{isAdmin ? t.pdeHint : t.adminOnly}</p>
-							{isAdmin ? (
-								<form className="playground-form" onSubmit={onExtract}>
-									<label>
-										{t.docType}
-										<select value={docType} onChange={(e) => setDocType(e.target.value)}>
-											<option value="identity_document">identity_document</option>
-											<option value="address_proof">address_proof</option>
-											<option value="invoice_nf">invoice_nf</option>
-										</select>
-									</label>
-									<label>
-										{t.chooseFile}
-										<input
-											type="file"
-											accept=".pdf,image/*"
-											onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-											required
-										/>
-									</label>
-									<button className="btn btn-primary" type="submit" disabled={busy || !workingPat}>
-										{t.extract}
-									</button>
-								</form>
-							) : null}
+							<p>{t.pdeHint}</p>
+							<form className="playground-form" onSubmit={onExtract}>
+								<label>
+									{t.docType}
+									<select value={docType} onChange={(e) => setDocType(e.target.value)}>
+										<option value="identity_document">identity_document</option>
+										<option value="address_proof">address_proof</option>
+										<option value="invoice_nf">invoice_nf</option>
+									</select>
+								</label>
+								<label>
+									{t.chooseFile}
+									<input
+										type="file"
+										accept=".pdf,image/*"
+										onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+										required
+									/>
+								</label>
+								<label className="playground-consent">
+									<input
+										type="checkbox"
+										checked={consent}
+										onChange={(e) => setConsent(e.target.checked)}
+										required
+									/>
+									<span>{t.consentLabel}</span>
+								</label>
+								<button
+									className="btn btn-primary"
+									type="submit"
+									disabled={busy || !workingPat || !consent}
+								>
+									{t.extract}
+								</button>
+							</form>
 							{result ? (
 								<div className="playground-result">
 									<h3>{t.result}</h3>

@@ -115,7 +115,8 @@
 	transition: color 0.25s ease;
 }
 
-.nav a:hover {
+.nav a:hover,
+.nav a.is-active {
 	color: var(--ink);
 }
 
@@ -135,22 +136,41 @@
 	animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.hero-brand {
+	margin: 0 0 0.65rem;
+	font-family: var(--font-display);
+	font-size: clamp(2.8rem, 10vw, 5rem);
+	font-weight: 600;
+	letter-spacing: -0.04em;
+	line-height: 0.95;
+	color: var(--accent);
+}
+
 .hero-title {
 	margin: 0 0 1rem;
 	font-family: var(--font-display);
-	font-size: clamp(2.4rem, 8vw, 4.25rem);
-	font-weight: 600;
-	line-height: 1.05;
-	letter-spacing: -0.03em;
-	max-width: 12ch;
+	font-size: clamp(1.5rem, 4vw, 2.1rem);
+	font-weight: 500;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	max-width: 18ch;
+	color: var(--ink);
 }
 
 .hero-support {
-	margin: 0 0 1.75rem;
+	margin: 0 0 0.75rem;
 	color: var(--muted);
 	font-size: clamp(1rem, 2.2vw, 1.125rem);
 	line-height: 1.55;
 	max-width: 34ch;
+}
+
+.hero-scene-caption {
+	margin: 0 0 1.75rem;
+	color: rgba(235, 230, 220, 0.62);
+	font-size: 0.92rem;
+	line-height: 1.5;
+	max-width: 40ch;
 }
 
 .hero-actions {
@@ -205,6 +225,23 @@
 	pointer-events: none;
 }
 
+.cat-scene,
+.cat-scene-fallback {
+	position: absolute;
+	inset: 0;
+}
+
+.cat-scene canvas {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+.cat-scene-fallback {
+	background:
+		radial-gradient(ellipse 55% 50% at 70% 40%, rgba(196, 163, 90, 0.22), transparent 60%),
+		radial-gradient(ellipse 40% 45% at 85% 65%, rgba(122, 143, 92, 0.16), transparent 55%);
+}
+
 .hero-glow {
 	position: absolute;
 	right: -8%;
@@ -213,8 +250,8 @@
 	height: min(58vw, 34rem);
 	border-radius: 50%;
 	background:
-		radial-gradient(circle at 35% 35%, rgba(196, 163, 90, 0.28), transparent 55%),
-		radial-gradient(circle at 70% 70%, rgba(122, 143, 92, 0.22), transparent 50%);
+		radial-gradient(circle at 35% 35%, rgba(196, 163, 90, 0.16), transparent 55%),
+		radial-gradient(circle at 70% 70%, rgba(122, 143, 92, 0.12), transparent 50%);
 	filter: blur(8px);
 	animation: drift 12s ease-in-out infinite alternate;
 }
@@ -663,6 +700,137 @@
 	to {
 		transform: translate3d(-3%, 4%, 0) scale(1.06);
 	}
+}
+
+.playground {
+	width: min(var(--max), 100%);
+	margin: 0 auto;
+	padding: clamp(2rem, 6vw, 4rem) clamp(1.25rem, 4vw, 2.5rem) 4rem;
+}
+
+.playground-hero h1 {
+	margin: 0.35rem 0 0.75rem;
+	font-family: var(--font-display);
+	font-size: clamp(2rem, 5vw, 2.8rem);
+	letter-spacing: -0.03em;
+}
+
+.playground-panel {
+	margin-top: 2rem;
+	padding: 1.5rem 0;
+	border-top: 1px solid var(--line);
+}
+
+.playground-session {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.playground-form {
+	display: grid;
+	gap: 1rem;
+	max-width: 36rem;
+}
+
+.playground-form h2 {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: 1.45rem;
+}
+
+.playground-form label {
+	display: grid;
+	gap: 0.4rem;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.playground-form input[type="email"],
+.playground-form input[type="password"],
+.playground-form input[type="text"],
+.playground-form input[type="file"],
+.playground-form select {
+	width: 100%;
+	padding: 0.7rem 0.85rem;
+	border: 1px solid var(--line);
+	border-radius: 0.65rem;
+	background: rgba(20, 18, 16, 0.65);
+	color: var(--ink);
+	font: inherit;
+}
+
+.playground-consent {
+	display: grid !important;
+	grid-template-columns: auto 1fr;
+	gap: 0.75rem !important;
+	align-items: start;
+	color: var(--ink) !important;
+	line-height: 1.45;
+}
+
+.playground-consent input {
+	margin-top: 0.25rem;
+}
+
+.playground-hint,
+.playground-muted {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.playground-error {
+	margin: 1rem 0 0;
+	padding: 0.85rem 1rem;
+	border: 1px solid rgba(196, 100, 80, 0.45);
+	border-radius: 0.65rem;
+	background: rgba(80, 30, 20, 0.35);
+	color: #f0d2c8;
+}
+
+.playground-tabs {
+	display: inline-flex;
+	gap: 0.35rem;
+	margin: 1rem 0;
+	padding: 0.2rem;
+	border: 1px solid var(--line);
+	border-radius: 999px;
+}
+
+.playground-tabs button {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: var(--muted);
+	cursor: pointer;
+	padding: 0.45rem 0.9rem;
+	border-radius: 999px;
+	font: inherit;
+}
+
+.playground-tabs button.is-active {
+	background: var(--accent-soft);
+	color: var(--accent);
+}
+
+.playground-result {
+	margin-top: 2rem;
+}
+
+.playground-result pre {
+	margin: 0.75rem 0 0;
+	padding: 1rem;
+	overflow: auto;
+	border: 1px solid var(--line);
+	border-radius: 0.75rem;
+	background: rgba(10, 9, 8, 0.72);
+	color: var(--ink);
+	font-size: 0.85rem;
+	line-height: 1.45;
 }
 
 @media (max-width: 640px) {
