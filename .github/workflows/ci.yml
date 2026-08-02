@@ -11,53 +11,62 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Lint & build
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
       - run: npm run lint
       - name: npm audit (production)
         # Fail on critical. High findings in react-router currently conflict across
         # versions (RSC CSRF vs older XSS advisories); this SPA does not use RSC.
         run: npm audit --omit=dev --audit-level=critical
-      - run: npm run build
-        env:
-          VITE_AUTH_API_URL: https://auth.kalke.dev
-          VITE_PDE_API_URL: https://pde.kalke.dev
       - name: gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck + production build
+        run: npm run build
+        env:
+          VITE_AUTH_API_URL: https://auth.kalke.dev
+          VITE_PDE_API_URL: https://pde.kalke.dev
+
   deploy:
-    name: Deploy to Cloudflare Workers
-    needs: check
+    name: Deploy
+    needs: [lint, test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci
-      - run: npm run build
+      - name: Build
+        run: npm run build
         env:
           VITE_AUTH_API_URL: https://auth.kalke.dev
           VITE_PDE_API_URL: https://pde.kalke.dev
-
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v4
         with:
