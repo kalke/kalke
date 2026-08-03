@@ -6,6 +6,21 @@ Henrique Kalke — software engineer.
 
 ---
 
+## Local stack
+
+Needs sibling repos `../kalke-auth` and `../personal-document-extractor`, Docker, and a `GROQ_API_KEY` in the PDE `.env`.
+
+```bash
+make setup   # env files + npm install
+make up      # auth (:8090) + PDE (:8080) + Vite (:5173)
+```
+
+Open **http://localhost:5173** — demo login `demo@kalke.local` / `DemoPass123!`.
+
+`make down` stops the Docker backends. Vite stops with Ctrl+C.
+
+---
+
 ## Stack
 
 | Area | Tech |
