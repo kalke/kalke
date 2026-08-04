@@ -1,11 +1,5 @@
 import { useState, type FormEvent } from "react";
-import {
-	clearWorkingPat,
-	createToken,
-	PDE_BASE,
-	revokeToken,
-	setWorkingPat,
-} from "../api";
+import { createToken, PDE_BASE, revokeToken } from "../api";
 import { copy, type Lang } from "../content";
 import { useDashboard } from "./useDashboard";
 
@@ -14,7 +8,7 @@ type Props = { lang: Lang };
 export function ApiTokens({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { tokens, refreshTokens, busy, setBusy, setError } = useDashboard();
-	const [newTokenName, setNewTokenName] = useState("api");
+	const [newTokenName, setNewTokenName] = useState("m2m");
 	const [createdToken, setCreatedToken] = useState("");
 	const [copied, setCopied] = useState(false);
 
@@ -24,9 +18,8 @@ export function ApiTokens({ lang }: Props) {
 		setError("");
 		setCopied(false);
 		try {
-			const created = await createToken(newTokenName.trim() || "token");
+			const created = await createToken(newTokenName.trim() || "m2m");
 			setCreatedToken(created.token);
-			setWorkingPat(created.token);
 			await refreshTokens();
 		} catch {
 			setError(t.tokenError);
@@ -40,7 +33,6 @@ export function ApiTokens({ lang }: Props) {
 		setError("");
 		try {
 			await revokeToken(id);
-			clearWorkingPat();
 			await refreshTokens();
 		} catch {
 			setError(t.tokenError);

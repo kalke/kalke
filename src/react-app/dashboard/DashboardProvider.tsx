@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-	clearWorkingPat,
-	createToken,
-	getWorkingPat,
 	listTokens,
 	logout as apiLogout,
 	me,
-	setWorkingPat,
 	type Me,
 	type TokenRow,
 } from "../api";
@@ -23,22 +19,15 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 		setTokens(await listTokens());
 	}, []);
 
-	const ensureWorkingPat = useCallback(async () => {
-		const existing = getWorkingPat();
-		if (existing) return existing;
-		const created = await createToken("session");
-		setWorkingPat(created.token);
-		await refreshTokens();
-		return created.token;
-	}, [refreshTokens]);
-
 	const afterAuth = useCallback(
 		async (u: Me) => {
 			setUser(u);
 			setError("");
-			const created = await createToken("session");
-			setWorkingPat(created.token);
-			await refreshTokens();
+			try {
+				await refreshTokens();
+			} catch {
+				/* token list is non-blocking */
+			}
 		},
 		[refreshTokens],
 	);
@@ -47,7 +36,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 		await apiLogout();
 		setUser(null);
 		setTokens([]);
-		clearWorkingPat();
 		setError("");
 	}, []);
 
@@ -90,22 +78,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 			setError,
 			tokens,
 			refreshTokens,
-			ensureWorkingPat,
 			afterAuth,
 			logout,
 			setUser,
 		}),
-		[
-			user,
-			loading,
-			busy,
-			error,
-			tokens,
-			refreshTokens,
-			ensureWorkingPat,
-			afterAuth,
-			logout,
-		],
+		[user, loading, busy, error, tokens, refreshTokens, afterAuth, logout],
 	);
 
 	return (

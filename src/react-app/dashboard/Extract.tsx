@@ -1,5 +1,4 @@
 import {
-	useEffect,
 	useId,
 	useMemo,
 	useRef,
@@ -8,11 +7,7 @@ import {
 	type DragEvent,
 	type FormEvent,
 } from "react";
-import {
-	clearWorkingPat,
-	extractDocument,
-	type ExtractProgress,
-} from "../api";
+import { extractDocument, type ExtractProgress } from "../api";
 import { copy, type Lang } from "../content";
 import { useDashboard } from "./useDashboard";
 
@@ -259,32 +254,16 @@ function isUnauthorized(err: unknown): boolean {
 
 export function Extract({ lang }: Props) {
 	const t = copy[lang].playground;
-	const { ensureWorkingPat, busy, setBusy, error, setError } = useDashboard();
+	const { busy, setBusy, error, setError } = useDashboard();
 	const [docType, setDocType] = useState("identity_document");
 	const [file, setFile] = useState<File | null>(null);
 	const [consent, setConsent] = useState(false);
 	const [result, setResult] = useState<unknown>(null);
 	const [showJson, setShowJson] = useState(false);
-	const [ready, setReady] = useState(false);
 	const [dragging, setDragging] = useState(false);
 	const [progress, setProgress] = useState<ExtractProgress | null>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const fileInputId = useId();
-
-	useEffect(() => {
-		let cancelled = false;
-		(async () => {
-			try {
-				await ensureWorkingPat();
-				if (!cancelled) setReady(true);
-			} catch {
-				if (!cancelled) setError(t.needToken);
-			}
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [ensureWorkingPat, setError, t.needToken]);
 
 	const summary = useMemo(
 		() => (result != null ? summarize(result, docType, t.fieldLabels, lang) : null),
@@ -328,19 +307,13 @@ export function Extract({ lang }: Props) {
 		setShowJson(false);
 		setProgress({ percent: 2, stage: "upload" });
 		try {
-			let pat = await ensureWorkingPat();
-			const run = (token: string) =>
-				extractDocument(token, file, docType, consent, setProgress);
-			try {
-				setResult(await run(pat));
-			} catch (err) {
-				if (!isUnauthorized(err)) throw err;
-				clearWorkingPat();
-				pat = await ensureWorkingPat();
-				setResult(await run(pat));
-			}
+			setResult(await extractDocument(file, docType, consent, setProgress));
 		} catch (err) {
-			setError(err instanceof Error ? err.message : t.extractError);
+			if (isUnauthorized(err)) {
+				setError(t.needToken);
+			} else {
+				setError(err instanceof Error ? err.message : t.extractError);
+			}
 			setProgress(null);
 		} finally {
 			setBusy(false);
@@ -356,10 +329,7 @@ export function Extract({ lang }: Props) {
 			<h1>{t.pdeTitle}</h1>
 			<p className="section-intro">{t.pdeHint}</p>
 
-			{!ready ? (
-				<p className="playground-muted">{t.preparingToken}</p>
-			) : (
-				<form className="playground-form extract-form" onSubmit={onExtract}>
+			<form className="playground-form extract-form" onSubmit={onExtract}>
 					<label>
 						{t.docType}
 						<select
@@ -488,7 +458,6 @@ export function Extract({ lang }: Props) {
 						{busy ? t.extracting : t.extract}
 					</button>
 				</form>
-			)}
 
 			{summary ? (
 				<div className="extract-result surface-panel">
@@ -517,7 +486,7 @@ export function Extract({ lang }: Props) {
 						</pre>
 					) : null}
 				</div>
-			) : !error && ready && !busy ? (
+			) : !error && !busy ? (
 				<p className="playground-muted">{t.extractEmpty}</p>
 			) : null}
 		</>

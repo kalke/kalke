@@ -10,7 +10,6 @@ export type DashboardContextValue = {
 	setError: (v: string) => void;
 	tokens: TokenRow[];
 	refreshTokens: () => Promise<void>;
-	ensureWorkingPat: () => Promise<string>;
 	afterAuth: (u: Me) => Promise<void>;
 	logout: () => Promise<void>;
 	setUser: (u: Me | null) => void;

@@ -139,7 +139,6 @@ export type PlaygroundCopy = {
 	resultSummary: string;
 	resultJson: string;
 	resultHideJson: string;
-	preparingToken: string;
 	fieldLabels: Record<string, string>;
 };
 
@@ -366,7 +365,7 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "~/demo",
 			title: "Acesso",
 			intro:
-				"Entre para gerenciar tokens de API e executar extrações. A demo usa um token de sessão automaticamente.",
+				"Entre para gerenciar tokens de API e executar extrações.",
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
@@ -454,7 +453,7 @@ export const copy: Record<Lang, Copy> = {
 			capsOn: "Caps Lock ligado",
 			tokensTitle: "Tokens de API",
 			tokensHint:
-				"O valor completo aparece uma vez. Guarde-o para uso fora deste site. O extrator da demo usa o token da sessão automaticamente.",
+				"Tokens M2M para integrar via HTTP. O valor completo aparece uma vez — guarde-o. A extração no playground usa só a sessão (cookie), sem expor PAT.",
 			tokenName: "Nome",
 			createToken: "Gerar token",
 			copyToken: "Copiar",
@@ -462,13 +461,13 @@ export const copy: Record<Lang, Copy> = {
 			tokenOnce: "Copie agora — não será exibido de novo:",
 			revoke: "Revogar",
 			tokenError: "Falha na operação do token.",
-			needToken: "Gere um token em ~/demo/api antes de extrair.",
+			needToken: "Sessão expirada. Entre de novo para extrair.",
 			apiHowTitle: "Uso via HTTP",
 			apiHowBody:
 				"Header Authorization: Bearer <token>. POST multipart em /v1/extract com arquivo e consentimento LGPD.",
 			pdeTitle: "Extrair documento",
 			pdeHint:
-				"Escolha o tipo, envie o arquivo e confirme o consentimento. O resultado aparece abaixo — o token de sessão é preparado automaticamente.",
+				"Escolha o tipo, envie o arquivo e confirme o consentimento. A autenticação é a sessão do site — nenhum token de API é criado ou mostrado aqui.",
 			consentTitle: "Processamento deste documento",
 			consentLabel:
 				"O arquivo sobe só para esta extração e não fica armazenado. Um modelo de linguagem pode ler o conteúdo. Para operar e auditar a demo, podemos reter o hash, o resultado e metadados técnicos (como IP).",
@@ -492,7 +491,6 @@ export const copy: Record<Lang, Copy> = {
 			resultSummary: "Resumo",
 			resultJson: "JSON",
 			resultHideJson: "Ocultar JSON",
-			preparingToken: "Preparando acesso…",
 			fieldLabels: {
 				doc_type: "Tipo de documento",
 				identity_document: "Documento de identidade",
@@ -702,7 +700,7 @@ export const copy: Record<Lang, Copy> = {
 			eyebrow: "~/demo",
 			title: "Sign in",
 			intro:
-				"Sign in to manage API tokens and run extractions. The demo uses a session token automatically.",
+				"Sign in to manage API tokens and run extractions.",
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
@@ -790,7 +788,7 @@ export const copy: Record<Lang, Copy> = {
 			capsOn: "Caps Lock on",
 			tokensTitle: "API tokens",
 			tokensHint:
-				"The full value is shown once. Store it for use outside this site. The demo extractor uses the session token automatically.",
+				"M2M tokens for HTTP integration. The full value is shown once — store it. Playground extract uses the site session cookie only; no PAT is exposed.",
 			tokenName: "Name",
 			createToken: "Generate token",
 			copyToken: "Copy",
@@ -798,13 +796,13 @@ export const copy: Record<Lang, Copy> = {
 			tokenOnce: "Copy now — it will not be shown again:",
 			revoke: "Revoke",
 			tokenError: "Token operation failed.",
-			needToken: "Generate a token in ~/demo/api before extracting.",
+			needToken: "Session expired. Sign in again to extract.",
 			apiHowTitle: "HTTP usage",
 			apiHowBody:
 				"Authorization: Bearer <token> header. POST multipart to /v1/extract with file and LGPD consent.",
 			pdeTitle: "Extract document",
 			pdeHint:
-				"Pick a type, upload a file, and confirm consent. Results show below — the session token is prepared automatically.",
+				"Pick a type, upload a file, and confirm consent. Auth is your site session — no API token is created or shown here.",
 			consentTitle: "Processing this document",
 			consentLabel:
 				"The file is uploaded only for this extraction and is not stored. A language model may read the content. To run and audit the demo, we may retain the hash, the result, and technical metadata (such as IP).",
@@ -828,7 +826,6 @@ export const copy: Record<Lang, Copy> = {
 			resultSummary: "Summary",
 			resultJson: "JSON",
 			resultHideJson: "Hide JSON",
-			preparingToken: "Preparing access…",
 			fieldLabels: {
 				doc_type: "Document type",
 				identity_document: "Identity document",
