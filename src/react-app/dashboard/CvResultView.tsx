@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { copy, type Lang } from "../content";
 import {
 	extractCvPayload,
-	flatCvSkills,
 	formatCvDate,
+	organizeCvSkills,
 	type CvData,
 } from "./cvShared";
 
@@ -18,7 +18,7 @@ export function CvResultView({ lang, result, title }: Props) {
 	const t = copy[lang].playground;
 	const [showJson, setShowJson] = useState(false);
 	const cv: CvData = extractCvPayload(result);
-	const skills = useMemo(() => flatCvSkills(cv.skills), [cv.skills]);
+	const skillGroups = useMemo(() => organizeCvSkills(cv.skills), [cv.skills]);
 
 	const contactBits = [
 		cv.email,
@@ -28,6 +28,10 @@ export function CvResultView({ lang, result, title }: Props) {
 		cv.github,
 		cv.website,
 	].filter((v): v is string => Boolean(v && String(v).trim()));
+
+	function skillCategoryLabel(cat: string): string {
+		return t.cvSkillCategories[cat] ?? cat;
+	}
 
 	return (
 		<div className="extract-result surface-panel cv-result">
@@ -47,14 +51,34 @@ export function CvResultView({ lang, result, title }: Props) {
 				</section>
 			) : null}
 
-			{skills.length ? (
-				<section className="cv-section">
+			{skillGroups.length ? (
+				<section className="cv-section cv-skills-section">
 					<h3>{t.cvSectionSkills}</h3>
-					<ul className="cv-skills">
-						{skills.map((skill) => (
-							<li key={skill}>{skill}</li>
+					{skillGroups.length > 1 ? (
+						<nav className="cv-skill-nav" aria-label={t.cvSectionSkills}>
+							{skillGroups.map((g) => (
+								<a key={g.category} href={`#cv-skill-${g.category}`}>
+									{skillCategoryLabel(g.category)}
+								</a>
+							))}
+						</nav>
+					) : null}
+					<div className="cv-skill-groups">
+						{skillGroups.map((g) => (
+							<div
+								key={g.category}
+								id={`cv-skill-${g.category}`}
+								className="cv-skill-group"
+							>
+								<h4>{skillCategoryLabel(g.category)}</h4>
+								<ul className="cv-skills">
+									{g.items.map((skill) => (
+										<li key={skill}>{skill}</li>
+									))}
+								</ul>
+							</div>
 						))}
-					</ul>
+					</div>
 				</section>
 			) : null}
 
