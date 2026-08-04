@@ -6,8 +6,10 @@ import {
 	type DragEvent,
 	type FormEvent,
 } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
 	extractDocument,
+	listExtractions,
 	type ExtractProgress,
 } from "../api";
 import { copy, type Lang } from "../content";
@@ -43,6 +45,7 @@ function friendlyExtractError(err: unknown, fallback: string): string {
 
 export function ExtractCV({ lang }: Props) {
 	const t = copy[lang].playground;
+	const navigate = useNavigate();
 	const { busy, setBusy, setError } = useDashboard();
 	const [file, setFile] = useState<File | null>(null);
 	const [consent, setConsent] = useState(false);
@@ -85,7 +88,13 @@ export function ExtractCV({ lang }: Props) {
 		setProgress({ percent: 2, stage: "upload" });
 		try {
 			await extractDocument(file, CV_DOC_TYPE, consent, setProgress);
-			setProgress({ percent: 100, stage: "extract" });
+			const items = await listExtractions(CV_DOC_TYPE);
+			const newest = items[0];
+			if (newest?.id) {
+				navigate(`/playground/cv/saved/${newest.id}`);
+				return;
+			}
+			navigate("/playground/cv/saved");
 		} catch (err) {
 			if (isUnauthorized(err)) {
 				setError(t.needToken);
@@ -106,6 +115,12 @@ export function ExtractCV({ lang }: Props) {
 			<p className="eyebrow">{t.pathCv}</p>
 			<h1>{t.cvTitle}</h1>
 			<p className="section-intro">{t.cvHint}</p>
+
+			<p className="cv-page-actions">
+				<Link className="btn btn-ghost" to="/playground/cv/saved">
+					{t.cvViewSaved}
+				</Link>
+			</p>
 
 			<form className="playground-form extract-form" onSubmit={onExtract}>
 				<div className="file-field">

@@ -6,6 +6,8 @@ import { Extract } from "./dashboard/Extract";
 import { ExtractCV } from "./dashboard/ExtractCV";
 import { Overview } from "./dashboard/Overview";
 import { PlaygroundShell } from "./dashboard/PlaygroundShell";
+import { SavedCV } from "./dashboard/SavedCV";
+import { SavedCVs } from "./dashboard/SavedCVs";
 import { Home } from "./Home";
 import "./App.css";
 
@@ -53,6 +55,8 @@ export default function App() {
 					<Route path="api" element={<ApiTokens lang={lang} />} />
 					<Route path="extract" element={<Extract lang={lang} />} />
 					<Route path="cv" element={<ExtractCV lang={lang} />} />
+					<Route path="cv/saved" element={<SavedCVs lang={lang} />} />
+					<Route path="cv/saved/:id" element={<SavedCV lang={lang} />} />
 				</Route>
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Routes>
