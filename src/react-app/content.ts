@@ -77,15 +77,23 @@ export type PlaygroundCopy = {
 	pathOverview: string;
 	pathApi: string;
 	pathExtract: string;
+	pathCv: string;
+	pathCvSaved: string;
 	pathOverviewShort: string;
 	pathApiShort: string;
 	pathExtractShort: string;
+	pathCvShort: string;
+	pathCvSavedShort: string;
 	overviewTitle: string;
 	overviewIntro: string;
 	overviewApiCard: string;
 	overviewApiHint: string;
 	overviewExtractCard: string;
 	overviewExtractHint: string;
+	overviewCvCard: string;
+	overviewCvHint: string;
+	overviewCvSavedCard: string;
+	overviewCvSavedHint: string;
 	passwordTitle: string;
 	passwordHint: string;
 	currentPassword: string;
@@ -117,6 +125,28 @@ export type PlaygroundCopy = {
 	apiHowBody: string;
 	pdeTitle: string;
 	pdeHint: string;
+	cvTitle: string;
+	cvHint: string;
+	cvPresent: string;
+	cvSectionContact: string;
+	cvSectionExperience: string;
+	cvSectionEducation: string;
+	cvSectionSkills: string;
+	cvSkillCategories: Record<string, string>;
+	cvSectionLanguages: string;
+	cvSectionCertifications: string;
+	cvConsentTitle: string;
+	cvConsentLabel: string;
+	cvHistoryTitle: string;
+	cvHistoryHint: string;
+	cvHistoryEmpty: string;
+	cvHistoryOpen: string;
+	cvHistoryLoadError: string;
+	cvSavedAt: string;
+	cvViewSaved: string;
+	cvBackToSaved: string;
+	cvBackToExtract: string;
+	cvNotFound: string;
 	consentTitle: string;
 	consentLabel: string;
 	consentRequired: string;
@@ -424,16 +454,25 @@ export const copy: Record<Lang, Copy> = {
 			pathOverview: "~/demo",
 			pathApi: "~/demo/api",
 			pathExtract: "~/demo/extract",
+			pathCv: "~/demo/cv",
+			pathCvSaved: "~/demo/cv/saved",
 			pathOverviewShort: "Demo",
 			pathApiShort: "API",
 			pathExtractShort: "Extract",
+			pathCvShort: "CV",
+			pathCvSavedShort: "Salvos",
 			overviewTitle: "Demo ao vivo",
 			overviewIntro:
-				"Dois fluxos: credenciais Bearer para integração HTTP, ou upload de documento com resultado estruturado.",
+				"Tokens Bearer para integração HTTP, extração de documentos BR, ou curriculum vitae estruturado.",
 			overviewApiCard: "Tokens de API",
 			overviewApiHint: "Gerar, copiar e revogar credenciais Bearer.",
 			overviewExtractCard: "Extração",
-			overviewExtractHint: "Enviar documento e revisar o resultado.",
+			overviewExtractHint: "RG, CNH, comprovante e nota fiscal.",
+			overviewCvCard: "Currículo",
+			overviewCvHint:
+				"Extrair e guardar CVs estruturados — abra os salvos em página própria.",
+			overviewCvSavedCard: "Currículos salvos",
+			overviewCvSavedHint: "Reabrir resultados já extraídos da sua conta.",
 			passwordTitle: "Alterar senha",
 			passwordHint: "A sessão permanece ativa após a alteração.",
 			currentPassword: "Senha atual",
@@ -468,6 +507,41 @@ export const copy: Record<Lang, Copy> = {
 			pdeTitle: "Extrair documento",
 			pdeHint:
 				"Escolha o tipo, envie o arquivo e confirme o consentimento. A autenticação é a sessão do site — nenhum token de API é criado ou mostrado aqui.",
+			cvTitle: "Extrair currículo",
+			cvHint:
+				"Envie um CV em PDF ou imagem. O resultado estruturado fica salvo na sua conta para você consultar depois — autenticação só pela sessão.",
+			cvPresent: "Atual",
+			cvSectionContact: "Contato",
+			cvSectionExperience: "Experiência",
+			cvSectionEducation: "Formação",
+			cvSectionSkills: "Skills",
+			cvSkillCategories: {
+				frontend: "Frontend",
+				backend: "Backend",
+				mobile: "Mobile",
+				devops: "DevOps",
+				cloud: "Cloud",
+				data: "Data",
+				tools: "Ferramentas",
+				soft: "Soft skills",
+				other: "Outros",
+			},
+			cvSectionLanguages: "Idiomas",
+			cvSectionCertifications: "Certificações",
+			cvConsentTitle: "Armazenar este currículo",
+			cvConsentLabel:
+				"O arquivo sobe para esta extração e o PDF/imagem não fica guardado. Um modelo de linguagem pode ler o conteúdo. O resultado estruturado (contato, experiência, formação, skills), o hash do arquivo e metadados técnicos (como IP) ficam salvos na sua conta para histórico e auditoria da demo.",
+			cvHistoryTitle: "Currículos salvos",
+			cvHistoryHint:
+				"Resultados estruturados guardados na sua conta. Abra um item para ver o detalhe.",
+			cvHistoryEmpty: "Nenhum currículo salvo ainda.",
+			cvHistoryOpen: "Abrir",
+			cvHistoryLoadError: "Não foi possível carregar os currículos salvos.",
+			cvSavedAt: "Salvo em",
+			cvViewSaved: "Ver currículos salvos",
+			cvBackToSaved: "Voltar aos salvos",
+			cvBackToExtract: "Extrair outro",
+			cvNotFound: "Currículo não encontrado.",
 			consentTitle: "Processamento deste documento",
 			consentLabel:
 				"O arquivo sobe só para esta extração e não fica armazenado. Um modelo de linguagem pode ler o conteúdo. Para operar e auditar a demo, podemos reter o hash, o resultado e metadados técnicos (como IP).",
@@ -528,6 +602,30 @@ export const copy: Record<Lang, Copy> = {
 				itens: "Itens",
 				emitente_nome: "Emitente",
 				emitente_cnpj: "CNPJ do emitente",
+				curriculum_vitae: "Currículo",
+				headline: "Título",
+				email: "Email",
+				phone: "Telefone",
+				location: "Local",
+				linkedin: "LinkedIn",
+				github: "GitHub",
+				website: "Site",
+				summary: "Resumo",
+				skills: "Skills",
+				languages: "Idiomas",
+				experience: "Experiência",
+				education: "Formação",
+				certifications: "Certificações",
+				company: "Empresa",
+				title: "Cargo",
+				start_date: "Início",
+				end_date: "Fim",
+				institution: "Instituição",
+				degree: "Curso",
+				field: "Área",
+				details: "Detalhes",
+				issuer: "Emissor",
+				level: "Nível",
 				emitente_cpf: "CPF do emitente",
 				destinatario_nome: "Destinatário",
 				destinatario_cnpj: "CNPJ do destinatário",
@@ -759,16 +857,25 @@ export const copy: Record<Lang, Copy> = {
 			pathOverview: "~/demo",
 			pathApi: "~/demo/api",
 			pathExtract: "~/demo/extract",
+			pathCv: "~/demo/cv",
+			pathCvSaved: "~/demo/cv/saved",
 			pathOverviewShort: "Demo",
 			pathApiShort: "API",
 			pathExtractShort: "Extract",
+			pathCvShort: "CV",
+			pathCvSavedShort: "Saved",
 			overviewTitle: "Live demo",
 			overviewIntro:
-				"Two flows: Bearer credentials for HTTP integration, or document upload with structured output.",
+				"Bearer tokens for HTTP integration, Brazilian document extraction, or structured curriculum vitae output.",
 			overviewApiCard: "API tokens",
 			overviewApiHint: "Generate, copy, and revoke Bearer credentials.",
 			overviewExtractCard: "Extraction",
-			overviewExtractHint: "Upload a document and review the result.",
+			overviewExtractHint: "ID docs, proof of address, and invoices.",
+			overviewCvCard: "Resume / CV",
+			overviewCvHint:
+				"Extract and store structured CVs — open saved ones on their own page.",
+			overviewCvSavedCard: "Saved resumes",
+			overviewCvSavedHint: "Reopen structured results already saved to your account.",
 			passwordTitle: "Change password",
 			passwordHint: "Your session stays active after the change.",
 			currentPassword: "Current password",
@@ -803,6 +910,41 @@ export const copy: Record<Lang, Copy> = {
 			pdeTitle: "Extract document",
 			pdeHint:
 				"Pick a type, upload a file, and confirm consent. Auth is your site session — no API token is created or shown here.",
+			cvTitle: "Extract resume",
+			cvHint:
+				"Upload a CV as PDF or image. The structured result is saved to your account so you can reopen it later — authenticated by site session only.",
+			cvPresent: "Present",
+			cvSectionContact: "Contact",
+			cvSectionExperience: "Experience",
+			cvSectionEducation: "Education",
+			cvSectionSkills: "Skills",
+			cvSkillCategories: {
+				frontend: "Frontend",
+				backend: "Backend",
+				mobile: "Mobile",
+				devops: "DevOps",
+				cloud: "Cloud",
+				data: "Data",
+				tools: "Tools",
+				soft: "Soft skills",
+				other: "Other",
+			},
+			cvSectionLanguages: "Languages",
+			cvSectionCertifications: "Certifications",
+			cvConsentTitle: "Store this resume",
+			cvConsentLabel:
+				"The file is uploaded for this extraction and the PDF/image is not kept. A language model may read the content. The structured result (contact, experience, education, skills), file hash, and technical metadata (such as IP) are saved to your account for history and demo audit.",
+			cvHistoryTitle: "Saved resumes",
+			cvHistoryHint:
+				"Structured results stored on your account. Open an item to see the full detail.",
+			cvHistoryEmpty: "No saved resumes yet.",
+			cvHistoryOpen: "Open",
+			cvHistoryLoadError: "Could not load saved resumes.",
+			cvSavedAt: "Saved",
+			cvViewSaved: "View saved resumes",
+			cvBackToSaved: "Back to saved",
+			cvBackToExtract: "Extract another",
+			cvNotFound: "Resume not found.",
 			consentTitle: "Processing this document",
 			consentLabel:
 				"The file is uploaded only for this extraction and is not stored. A language model may read the content. To run and audit the demo, we may retain the hash, the result, and technical metadata (such as IP).",
@@ -867,6 +1009,30 @@ export const copy: Record<Lang, Copy> = {
 				destinatario_nome: "Recipient",
 				destinatario_cnpj: "Recipient CNPJ",
 				destinatario_cpf: "Recipient CPF",
+				curriculum_vitae: "Resume / CV",
+				headline: "Headline",
+				email: "Email",
+				phone: "Phone",
+				location: "Location",
+				linkedin: "LinkedIn",
+				github: "GitHub",
+				website: "Website",
+				summary: "Summary",
+				skills: "Skills",
+				languages: "Languages",
+				experience: "Experience",
+				education: "Education",
+				certifications: "Certifications",
+				company: "Company",
+				title: "Title",
+				start_date: "Start",
+				end_date: "End",
+				institution: "Institution",
+				degree: "Degree",
+				field: "Field",
+				details: "Details",
+				issuer: "Issuer",
+				level: "Level",
 			},
 		},
 	},

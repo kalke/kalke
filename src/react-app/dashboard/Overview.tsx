@@ -27,6 +27,13 @@ export function Overview({ lang }: Props) {
 						<span>{t.overviewExtractHint}</span>
 					</Link>
 				</li>
+				<li>
+					<Link className="dash-card" to="/playground/cv">
+						<span className="path-label">{t.pathCv}</span>
+						<strong>{t.overviewCvCard}</strong>
+						<span>{t.overviewCvHint}</span>
+					</Link>
+				</li>
 			</ul>
 		</>
 	);

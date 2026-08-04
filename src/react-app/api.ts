@@ -221,6 +221,47 @@ export async function revokeToken(id: string): Promise<void> {
 }
 
 export const LGPD_POLICY_VERSION = "lgpd-extract-v1";
+export const LGPD_CV_STORE_POLICY = "lgpd-cv-store-v1";
+
+export function consentPolicyForDocType(docType: string): string {
+	return docType === "curriculum_vitae"
+		? LGPD_CV_STORE_POLICY
+		: LGPD_POLICY_VERSION;
+}
+
+export type ExtractionSummary = {
+	id: string;
+	created_at: string;
+	doc_type: string;
+	filename?: string;
+	content_sha256: string;
+	status: string;
+	result: unknown;
+};
+
+export async function listExtractions(
+	docType?: string,
+): Promise<ExtractionSummary[]> {
+	const q = docType
+		? `?doc_type=${encodeURIComponent(docType)}`
+		: "";
+	const res = await authFetch(`/v1/extractions${q}`);
+	if (!res.ok) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error || "list_failed");
+	}
+	const data = (await res.json()) as { extractions?: ExtractionSummary[] };
+	return data.extractions ?? [];
+}
+
+export async function getExtraction(id: string): Promise<ExtractionSummary> {
+	const res = await authFetch(`/v1/extractions/${encodeURIComponent(id)}`);
+	if (!res.ok) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error || "get_failed");
+	}
+	return res.json();
+}
 
 export type ExtractProgress = {
 	/** 0–100 overall progress shown in the UI */
@@ -237,7 +278,7 @@ export async function extractDocument(
 	const body = new FormData();
 	body.append("file", file);
 	if (consent) {
-		body.append("consent", LGPD_POLICY_VERSION);
+		body.append("consent", consentPolicyForDocType(docType));
 	}
 
 	return new Promise((resolve, reject) => {

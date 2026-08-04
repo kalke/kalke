@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { detectLang, siteMeta, type Lang } from "./content";
 import { ApiTokens } from "./dashboard/ApiTokens";
 import { Extract } from "./dashboard/Extract";
+import { ExtractCV } from "./dashboard/ExtractCV";
 import { Overview } from "./dashboard/Overview";
 import { PlaygroundShell } from "./dashboard/PlaygroundShell";
 import { Home } from "./Home";
@@ -51,6 +52,7 @@ export default function App() {
 					<Route index element={<Overview lang={lang} />} />
 					<Route path="api" element={<ApiTokens lang={lang} />} />
 					<Route path="extract" element={<Extract lang={lang} />} />
+					<Route path="cv" element={<ExtractCV lang={lang} />} />
 				</Route>
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Routes>
