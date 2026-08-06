@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { getExtraction, type ExtractionSummary } from "../api";
 import { copy, type Lang } from "../content";
 import { CvResultView } from "./CvResultView";

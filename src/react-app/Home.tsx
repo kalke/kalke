@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { TerminalHero } from "./components/TerminalHero";
 import { copy, siteMeta, type Lang } from "./content";
 import { useReveal } from "./hooks/useReveal";

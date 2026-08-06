@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router";
 import { copy, siteMeta, type Lang } from "../content";
 import { AuthGate } from "./AuthGate";
 import { DashboardProvider } from "./DashboardProvider";

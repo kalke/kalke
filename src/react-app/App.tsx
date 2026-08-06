@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { detectLang, siteMeta, type Lang } from "./content";
 import { ApiTokens } from "./dashboard/ApiTokens";
 import { Extract } from "./dashboard/Extract";
