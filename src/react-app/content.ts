@@ -360,8 +360,8 @@ export const copy: Record<Lang, Copy> = {
 			headline: "Henrique Kalke",
 			support:
 				"Software para os bastidores do mercado financeiro — crédito, contabilidade e core banking.",
-			primaryCta: { label: "Ver projetos", href: "#work" },
-			secondaryCta: { label: "Contato", href: "#contact" },
+			primaryCta: { label: "Abrir demos", href: "/playground" },
+			secondaryCta: { label: "Ver projetos", href: "#work" },
 			terminal: {
 				prompt: "kalke@dev:~$",
 				lines: [
@@ -372,7 +372,7 @@ export const copy: Record<Lang, Copy> = {
 					},
 					{
 						cmd: "ls ~/work",
-						out: "document-extractor/  kalke-auth/  e-bank-api/",
+						out: "e-bank-api/  document-extractor/  kalke-auth/  playground/",
 						href: "#work",
 					},
 					{
@@ -435,16 +435,25 @@ export const copy: Record<Lang, Copy> = {
 		builds: {
 			eyebrow: "~/work",
 			title: "Projetos",
-			intro: "Alguns repositórios públicos e coisas que construo quando o produto exige código dedicado.",
+			intro:
+				"Demos ao vivo no playground — banco, extração de documentos e CV — e os repositórios por trás.",
 			items: [
 				{
-					name: "Document extractor",
+					name: "Playground",
 					href: "/playground",
 					blurb:
-						"Demo rodando em produção. Upload de PDF ou imagem, saída estruturada da extração, autenticação e consentimento LGPD.",
-					tags: ["Live demo", "Go", "LLM", "OIDC"],
+						"Hub ao vivo: banco demo com onboarding e transferências, extração de RG/CNH/NF e currículos estruturados — tudo com auth OIDC.",
+					tags: ["Live demo", "Bank", "LLM", "OIDC"],
 					featured: true,
-					cta: "Abrir demo",
+					cta: "Abrir demos",
+				},
+				{
+					name: "e-bank-api",
+					href: "/playground/bank",
+					blurb:
+						"Banco demo em produção: conta vinculada ao usuário, ledger de partidas dobradas, onboarding e PIX fictício. Código em FastAPI.",
+					tags: ["Live demo", "Python", "FastAPI"],
+					cta: "Abrir banco demo",
 				},
 				{
 					name: "kalke-auth",
@@ -455,17 +464,11 @@ export const copy: Record<Lang, Copy> = {
 				},
 				{
 					name: "personal-document-extractor",
-					href: "https://github.com/kalke/personal-document-extractor",
+					href: "/playground/extract",
 					blurb:
-						"API base da demo ao vivo. Extração de RG, comprovantes e NFs com LLM, PostgreSQL e Redis.",
-					tags: ["Go", "LLM", "Postgres"],
-				},
-				{
-					name: "e-bank-api",
-					href: "https://github.com/kalke/e-bank-api",
-					blurb:
-						"API bancária de referência em FastAPI: depósito, saque e transferência, com OpenAPI e boa cobertura de testes.",
-					tags: ["Python", "FastAPI"],
+						"API de extração (RG, comprovantes, NFs) com LLM — uma das demos do playground, também no GitHub.",
+					tags: ["Live demo", "Go", "LLM"],
+					cta: "Abrir extração",
 				},
 			],
 		},
@@ -504,13 +507,13 @@ export const copy: Record<Lang, Copy> = {
 		},
 		footer: "React · Vite · Cloudflare",
 		playground: {
-			pageTitle: "Live demo — kalke.dev",
+			pageTitle: "Demos — kalke.dev",
 			navAria: "Demo",
 			backHome: "~/",
 			eyebrow: "~/demo",
 			title: "Acesso",
 			intro:
-				"Entre para gerenciar tokens de API e executar extrações.",
+				"Entre para o playground: banco demo, extração de documentos, currículos e tokens de API.",
 			loading: "Carregando…",
 			email: "Email",
 			password: "Senha",
@@ -889,8 +892,8 @@ export const copy: Record<Lang, Copy> = {
 			headline: "Henrique Kalke",
 			support:
 				"Software for the back office of financial markets — credit, accounting, and core banking.",
-			primaryCta: { label: "View projects", href: "#work" },
-			secondaryCta: { label: "Contact", href: "#contact" },
+			primaryCta: { label: "Open demos", href: "/playground" },
+			secondaryCta: { label: "View projects", href: "#work" },
 			terminal: {
 				prompt: "kalke@dev:~$",
 				lines: [
@@ -901,7 +904,7 @@ export const copy: Record<Lang, Copy> = {
 					},
 					{
 						cmd: "ls ~/work",
-						out: "document-extractor/  kalke-auth/  e-bank-api/",
+						out: "e-bank-api/  document-extractor/  kalke-auth/  playground/",
 						href: "#work",
 					},
 					{
@@ -964,16 +967,25 @@ export const copy: Record<Lang, Copy> = {
 		builds: {
 			eyebrow: "~/work",
 			title: "Projects",
-			intro: "A few public repos and things I build when the product needs dedicated code.",
+			intro:
+				"Live demos in the playground — bank, document extraction, and CVs — plus the repos behind them.",
 			items: [
 				{
-					name: "Document extractor",
+					name: "Playground",
 					href: "/playground",
 					blurb:
-						"Live demo in production. Upload a PDF or image, get structured extraction output, with auth and LGPD consent.",
-					tags: ["Live demo", "Go", "LLM", "OIDC"],
+						"Live hub: demo bank with onboarding and transfers, BR ID/invoice extraction, and structured CVs — all behind OIDC auth.",
+					tags: ["Live demo", "Bank", "LLM", "OIDC"],
 					featured: true,
-					cta: "Open live demo",
+					cta: "Open demos",
+				},
+				{
+					name: "e-bank-api",
+					href: "/playground/bank",
+					blurb:
+						"Demo bank in production: user-owned account, double-entry ledger, onboarding, and fictional transfers. FastAPI codebase.",
+					tags: ["Live demo", "Python", "FastAPI"],
+					cta: "Open demo bank",
 				},
 				{
 					name: "kalke-auth",
@@ -984,17 +996,11 @@ export const copy: Record<Lang, Copy> = {
 				},
 				{
 					name: "personal-document-extractor",
-					href: "https://github.com/kalke/personal-document-extractor",
+					href: "/playground/extract",
 					blurb:
-						"API behind the live demo. Extracts ID docs, proof of address, and invoices with an LLM, PostgreSQL, and Redis.",
-					tags: ["Go", "LLM", "Postgres"],
-				},
-				{
-					name: "e-bank-api",
-					href: "https://github.com/kalke/e-bank-api",
-					blurb:
-						"Reference banking API in FastAPI: deposit, withdraw, and transfer, with OpenAPI and solid test coverage.",
-					tags: ["Python", "FastAPI"],
+						"Extraction API (IDs, address proofs, invoices) with an LLM — one of the playground demos, also on GitHub.",
+					tags: ["Live demo", "Go", "LLM"],
+					cta: "Open extraction",
 				},
 			],
 		},
@@ -1033,13 +1039,13 @@ export const copy: Record<Lang, Copy> = {
 		},
 		footer: "React · Vite · Cloudflare",
 		playground: {
-			pageTitle: "Live demo — kalke.dev",
+			pageTitle: "Demos — kalke.dev",
 			navAria: "Demo",
 			backHome: "~/",
 			eyebrow: "~/demo",
 			title: "Sign in",
 			intro:
-				"Sign in to manage API tokens and run extractions.",
+				"Sign in to the playground: demo bank, document extraction, CVs, and API tokens.",
 			loading: "Loading…",
 			email: "Email",
 			password: "Password",
