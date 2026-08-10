@@ -2,7 +2,7 @@
 	"name": "kalke",
 	"description": "kalke.dev — portfolio pessoal (React + Cloudflare Workers)",
 	"dependencies": {
-		"@react-three/drei": "10.7.7",
+		"@react-three/drei": "10.7.8",
 		"@react-three/fiber": "9.7.0",
 		"hono": "4.12.34",
 		"react": "19.2.8",
