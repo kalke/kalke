@@ -41,6 +41,13 @@ export function Overview({ lang }: Props) {
 						<span>{t.overviewCvSavedHint}</span>
 					</Link>
 				</li>
+				<li>
+					<Link className="dash-card" to="/playground/bank">
+						<span className="path-label">{t.pathBank}</span>
+						<strong>{t.overviewBankCard}</strong>
+						<span>{t.overviewBankHint}</span>
+					</Link>
+				</li>
 			</ul>
 		</>
 	);

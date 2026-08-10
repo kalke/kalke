@@ -330,3 +330,173 @@ export async function extractDocument(
 		xhr.send(body);
 	});
 }
+
+/* ── Demo bank (AUTH_BASE /v1/bank/*) ─────────────────────────────── */
+
+export const BANK_TOS_POLICY = "demo-bank-tos-v1";
+export const BANK_DD_POLICY = "demo-dd-v1";
+export const BANK_DD_SKIP_POLICY = "demo-dd-skip-v1";
+
+export type BankMeta = {
+	demo: boolean;
+	welcome_amount: string;
+	currency: string;
+	disclaimer: string;
+	features: string[];
+};
+
+export type BankAccount = {
+	id: string;
+	balance: string;
+	currency: string;
+	kind: string;
+	status: string;
+	onboarding_status: string;
+	demo_credited: boolean;
+	demo: boolean;
+};
+
+export type BankTransaction = {
+	id: number;
+	account_id: string;
+	amount: string;
+	type: string;
+	counterparty_account_id?: string | null;
+	memo?: string | null;
+	created_at: string;
+};
+
+export type BankTransactionsPage = {
+	transactions: BankTransaction[];
+	next_cursor: number | null;
+	demo: boolean;
+};
+
+export type BankOnboardingDoc = {
+	id: string;
+	doc_type: string;
+	status: string;
+	pde_extraction_id?: string | null;
+};
+
+export type BankOnboardingStatus = {
+	onboarding_status: string;
+	session_id?: string | null;
+	session_status?: string | null;
+	documents: BankOnboardingDoc[];
+	skippable: boolean;
+	demo: boolean;
+};
+
+export type BankTransferResult = {
+	origin: { id: string; balance: string };
+	destination: { id: string; balance: string };
+	demo?: boolean;
+};
+
+export type BankWithdrawResult = {
+	id: string;
+	balance: string;
+	currency: string;
+	demo?: boolean;
+};
+
+async function bankJson<T>(path: string, init: RequestInit = {}): Promise<T> {
+	const res = await authFetch(path, init);
+	const data = (await res.json().catch(() => ({}))) as T & {
+		error?: string;
+		message?: string;
+	};
+	if (!res.ok) {
+		const detail =
+			typeof data === "object" && data
+				? data.error || data.message
+				: undefined;
+		throw new Error(detail ? String(detail) : `bank_${res.status}`);
+	}
+	return data;
+}
+
+export async function bankMeta(): Promise<BankMeta> {
+	return bankJson<BankMeta>("/v1/bank/meta");
+}
+
+export async function bankBootstrap(): Promise<BankAccount> {
+	return bankJson<BankAccount>("/v1/bank/bootstrap", { method: "POST" });
+}
+
+export async function bankAccount(): Promise<BankAccount> {
+	return bankJson<BankAccount>("/v1/bank/account");
+}
+
+export async function bankTransactions(
+	limit = 20,
+	cursor?: number | null,
+): Promise<BankTransactionsPage> {
+	const params = new URLSearchParams();
+	params.set("limit", String(limit));
+	if (cursor != null) params.set("cursor", String(cursor));
+	return bankJson<BankTransactionsPage>(
+		`/v1/bank/transactions?${params.toString()}`,
+	);
+}
+
+export async function bankTransfer(input: {
+	destination_account_id: string;
+	amount: string;
+	memo?: string;
+}): Promise<BankTransferResult> {
+	return bankJson<BankTransferResult>("/v1/bank/transfer", {
+		method: "POST",
+		body: JSON.stringify(input),
+	});
+}
+
+export async function bankWithdraw(amount: string): Promise<BankWithdrawResult> {
+	return bankJson<BankWithdrawResult>("/v1/bank/withdraw", {
+		method: "POST",
+		body: JSON.stringify({ amount }),
+	});
+}
+
+export async function bankOnboarding(): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding");
+}
+
+export async function bankOnboardingStart(): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/start", {
+		method: "POST",
+	});
+}
+
+export async function bankOnboardingConsent(
+	policyVersion: string,
+): Promise<{ ok: boolean; policy_version: string }> {
+	return bankJson("/v1/bank/onboarding/consent", {
+		method: "POST",
+		body: JSON.stringify({ policy_version: policyVersion }),
+	});
+}
+
+export async function bankOnboardingSkip(): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/skip", {
+		method: "POST",
+	});
+}
+
+export async function bankOnboardingDocuments(input: {
+	doc_type: "identity_document" | "address_proof";
+	pde_extraction_id?: string | null;
+	summary?: Record<string, unknown> | null;
+}): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/documents", {
+		method: "POST",
+		body: JSON.stringify(input),
+	});
+}
+
+export async function bankOnboardingComplete(): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/complete", {
+		method: "POST",
+	});
+}

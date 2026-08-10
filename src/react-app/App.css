@@ -1526,6 +1526,122 @@
 	margin: 0 0 1.25rem;
 }
 
+.bank-title-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.65rem 0.85rem;
+	margin: 0 0 0.35rem;
+}
+
+.bank-title-row h1 {
+	margin: 0;
+}
+
+.bank-demo-badge {
+	display: inline-block;
+	font-family: var(--font-mono, ui-monospace, monospace);
+	font-size: 0.68rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent);
+	border: 1px solid rgba(231, 163, 57, 0.45);
+	padding: 0.2rem 0.45rem;
+	border-radius: 0.15rem;
+	background: rgba(231, 163, 57, 0.08);
+}
+
+.bank-balance-panel {
+	margin: 0 0 1.25rem;
+	padding: 1.15rem 1.2rem;
+}
+
+.bank-balance {
+	margin: 0.15rem 0 0.55rem;
+	font-family: var(--font-display);
+	font-size: clamp(1.75rem, 4vw, 2.35rem);
+	font-weight: 600;
+	letter-spacing: -0.02em;
+	color: var(--text);
+}
+
+.bank-panel {
+	margin: 0 0 1.25rem;
+}
+
+.bank-docs h2 {
+	margin: 0 0 0.45rem;
+	font-family: var(--font-display);
+	font-size: 1.05rem;
+	font-weight: 600;
+}
+
+.bank-doc-status {
+	display: inline-block;
+	margin-top: 0.35rem;
+	color: var(--accent);
+	font-size: 0.88rem;
+}
+
+.bank-onboarding-actions {
+	display: grid;
+	gap: 0.55rem;
+	margin-top: 0.75rem;
+}
+
+.bank-skip-cta {
+	justify-self: start;
+	border-color: rgba(231, 163, 57, 0.35);
+}
+
+.bank-skip-hint {
+	margin: 0;
+	font-size: 0.85rem;
+}
+
+.bank-tx-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+}
+
+.bank-tx-item {
+	padding: 0.75rem 0.1rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.bank-tx-main {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 0.75rem;
+	margin-bottom: 0.25rem;
+}
+
+.bank-tx-main strong {
+	font-family: var(--font-display);
+	font-weight: 600;
+	font-size: 0.95rem;
+}
+
+.bank-tx-amount {
+	font-variant-numeric: tabular-nums;
+	font-family: var(--font-mono, ui-monospace, monospace);
+	font-size: 0.92rem;
+}
+
+.bank-tx-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+
 .cv-history-item:hover,
 .cv-history-item:focus-visible {
 	color: var(--accent);

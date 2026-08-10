@@ -69,6 +69,10 @@ function ShellInner({ lang, onLang }: Props) {
 								<span className="nav-label-full">{t.pathCvSaved}</span>
 								<span className="nav-label-short">{t.pathCvSavedShort}</span>
 							</NavLink>
+							<NavLink to="/playground/bank">
+								<span className="nav-label-full">{t.pathBank}</span>
+								<span className="nav-label-short">{t.pathBankShort}</span>
+							</NavLink>
 						</>
 					) : null}
 					<Link to="/">{t.backHome}</Link>

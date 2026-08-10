@@ -8,16 +8,17 @@ Henrique Kalke — software engineer.
 
 ## Local stack
 
-Needs sibling repos `../kalke-auth` and `../personal-document-extractor`, Docker, and a `GROQ_API_KEY` in the PDE `.env`.
+Needs sibling repos `../kalke-auth` and `../personal-document-extractor` (and optionally `../e-bank-api` for the demo bank), Docker, and a `GROQ_API_KEY` in the PDE `.env`.
 
 ```bash
 make setup   # env files + npm install
-make up      # auth (:8090) + PDE (:8080) + Vite (:5173)
+make up      # auth (:8090) + PDE (:8080) + e-bank if present (:8000) + Vite (:5173)
 ```
 
 Open **http://localhost:5173** — demo login `demo@kalke.local` / `DemoPass123!`.
 
 `make down` stops the Docker backends. Vite stops with Ctrl+C.
+`EBANK_DIR` defaults to `../e-bank-api`; `make up` starts it when that directory exists (`make ebank-up`).
 
 ---
 

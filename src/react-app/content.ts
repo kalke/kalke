@@ -79,11 +79,13 @@ export type PlaygroundCopy = {
 	pathExtract: string;
 	pathCv: string;
 	pathCvSaved: string;
+	pathBank: string;
 	pathOverviewShort: string;
 	pathApiShort: string;
 	pathExtractShort: string;
 	pathCvShort: string;
 	pathCvSavedShort: string;
+	pathBankShort: string;
 	overviewTitle: string;
 	overviewIntro: string;
 	overviewApiCard: string;
@@ -94,6 +96,58 @@ export type PlaygroundCopy = {
 	overviewCvHint: string;
 	overviewCvSavedCard: string;
 	overviewCvSavedHint: string;
+	overviewBankCard: string;
+	overviewBankHint: string;
+	bankDemoBadge: string;
+	bankTitle: string;
+	bankIntro: string;
+	bankBalance: string;
+	bankAccountId: string;
+	bankLoading: string;
+	bankLoadError: string;
+	bankNoAccount: string;
+	bankOpenAccount: string;
+	bankGoTransfer: string;
+	bankGoActivity: string;
+	bankGoOnboarding: string;
+	bankOnboardingTitle: string;
+	bankOnboardingIntro: string;
+	bankDisclaimerTitle: string;
+	bankTosTitle: string;
+	bankTosLabel: string;
+	bankTosRequired: string;
+	bankContinue: string;
+	bankDocsTitle: string;
+	bankDocsHint: string;
+	bankDocIdentity: string;
+	bankDocAddress: string;
+	bankDocUpload: string;
+	bankDocUploaded: string;
+	bankDocSkip: string;
+	bankDocSkipHint: string;
+	bankFinish: string;
+	bankBootstrapping: string;
+	bankOnboardingError: string;
+	bankTransferTitle: string;
+	bankTransferIntro: string;
+	bankTransferDest: string;
+	bankTransferAmount: string;
+	bankTransferMemo: string;
+	bankTransferSubmit: string;
+	bankTransferOk: string;
+	bankTransferError: string;
+	bankTransferBack: string;
+	bankActivityTitle: string;
+	bankActivityIntro: string;
+	bankActivityEmpty: string;
+	bankActivityLoadError: string;
+	bankActivityMore: string;
+	bankActivityBack: string;
+	bankTxType: string;
+	bankTxAmount: string;
+	bankTxMemo: string;
+	bankTxCounterparty: string;
+	bankTxWhen: string;
 	passwordTitle: string;
 	passwordHint: string;
 	currentPassword: string;
@@ -456,14 +510,16 @@ export const copy: Record<Lang, Copy> = {
 			pathExtract: "~/demo/extract",
 			pathCv: "~/demo/cv",
 			pathCvSaved: "~/demo/cv/saved",
+			pathBank: "~/demo/bank",
 			pathOverviewShort: "Demo",
 			pathApiShort: "API",
 			pathExtractShort: "Extract",
 			pathCvShort: "CV",
 			pathCvSavedShort: "Salvos",
+			pathBankShort: "Bank",
 			overviewTitle: "Demo ao vivo",
 			overviewIntro:
-				"Tokens Bearer para integração HTTP, extração de documentos BR, ou curriculum vitae estruturado.",
+				"Tokens Bearer para integração HTTP, extração de documentos BR, curriculum vitae, ou banco demo.",
 			overviewApiCard: "Tokens de API",
 			overviewApiHint: "Gerar, copiar e revogar credenciais Bearer.",
 			overviewExtractCard: "Extração",
@@ -473,6 +529,65 @@ export const copy: Record<Lang, Copy> = {
 				"Extrair e guardar CVs estruturados — abra os salvos em página própria.",
 			overviewCvSavedCard: "Currículos salvos",
 			overviewCvSavedHint: "Reabrir resultados já extraídos da sua conta.",
+			overviewBankCard: "Banco demo",
+			overviewBankHint:
+				"DEMO ONLY — conta com US$ 10.000 de boas-vindas; due diligence opcional.",
+			bankDemoBadge: "DEMO ONLY",
+			bankTitle: "Banco demo",
+			bankIntro:
+				"Playground fictício. Saldo de boas-vindas US$ 10.000 — sem dinheiro real.",
+			bankBalance: "Saldo",
+			bankAccountId: "Conta",
+			bankLoading: "Carregando conta…",
+			bankLoadError: "Não foi possível carregar a conta demo.",
+			bankNoAccount: "Ainda não há conta demo nesta sessão.",
+			bankOpenAccount: "Abrir conta demo",
+			bankGoTransfer: "Transferir",
+			bankGoActivity: "Extrato",
+			bankGoOnboarding: "Onboarding",
+			bankOnboardingTitle: "Onboarding demo",
+			bankOnboardingIntro:
+				"DEMO ONLY. Aceite os termos, envie documentos se quiser (DD pode ser pulada) e receba US$ 10.000 fictícios.",
+			bankDisclaimerTitle: "Aviso",
+			bankTosTitle: "Termos da demo",
+			bankTosLabel:
+				"Entendo que isto é só uma demo de portfólio (policy demo-bank-tos-v1): sem dinheiro real, sem crédito e sem obrigação bancária.",
+			bankTosRequired: "Aceite os termos para continuar.",
+			bankContinue: "Continuar",
+			bankDocsTitle: "Due diligence (opcional)",
+			bankDocsHint:
+				"Envie identidade e comprovante via PDE, ou pule — a DD é skippable nesta demo.",
+			bankDocIdentity: "Documento de identidade",
+			bankDocAddress: "Comprovante de endereço",
+			bankDocUpload: "Enviar e extrair",
+			bankDocUploaded: "Anexado",
+			bankDocSkip: "Pular due diligence",
+			bankDocSkipHint:
+				"Pular registra consentimento demo-dd-skip-v1 e segue para a conta.",
+			bankFinish: "Concluir e abrir conta",
+			bankBootstrapping: "Creditando fundos demo…",
+			bankOnboardingError: "Falha no onboarding demo. Tente de novo.",
+			bankTransferTitle: "Transferência demo",
+			bankTransferIntro:
+				"Envie saldo fictício para outro account id. DEMO ONLY — nada é liquidado de verdade.",
+			bankTransferDest: "Conta destino",
+			bankTransferAmount: "Valor",
+			bankTransferMemo: "Memo (opcional)",
+			bankTransferSubmit: "Transferir",
+			bankTransferOk: "Transferência registrada na demo.",
+			bankTransferError: "Não foi possível transferir.",
+			bankTransferBack: "Voltar ao banco",
+			bankActivityTitle: "Extrato demo",
+			bankActivityIntro: "Movimentações desta conta playground.",
+			bankActivityEmpty: "Nenhuma movimentação ainda.",
+			bankActivityLoadError: "Não foi possível carregar o extrato.",
+			bankActivityMore: "Carregar mais",
+			bankActivityBack: "Voltar ao banco",
+			bankTxType: "Tipo",
+			bankTxAmount: "Valor",
+			bankTxMemo: "Memo",
+			bankTxCounterparty: "Contraparte",
+			bankTxWhen: "Quando",
 			passwordTitle: "Alterar senha",
 			passwordHint: "A sessão permanece ativa após a alteração.",
 			currentPassword: "Senha atual",
@@ -859,14 +974,16 @@ export const copy: Record<Lang, Copy> = {
 			pathExtract: "~/demo/extract",
 			pathCv: "~/demo/cv",
 			pathCvSaved: "~/demo/cv/saved",
+			pathBank: "~/demo/bank",
 			pathOverviewShort: "Demo",
 			pathApiShort: "API",
 			pathExtractShort: "Extract",
 			pathCvShort: "CV",
 			pathCvSavedShort: "Saved",
+			pathBankShort: "Bank",
 			overviewTitle: "Live demo",
 			overviewIntro:
-				"Bearer tokens for HTTP integration, Brazilian document extraction, or structured curriculum vitae output.",
+				"Bearer tokens for HTTP integration, Brazilian document extraction, structured CVs, or a demo bank.",
 			overviewApiCard: "API tokens",
 			overviewApiHint: "Generate, copy, and revoke Bearer credentials.",
 			overviewExtractCard: "Extraction",
@@ -876,6 +993,65 @@ export const copy: Record<Lang, Copy> = {
 				"Extract and store structured CVs — open saved ones on their own page.",
 			overviewCvSavedCard: "Saved resumes",
 			overviewCvSavedHint: "Reopen structured results already saved to your account.",
+			overviewBankCard: "Demo bank",
+			overviewBankHint:
+				"DEMO ONLY — welcome US$ 10,000; due diligence is skippable.",
+			bankDemoBadge: "DEMO ONLY",
+			bankTitle: "Demo bank",
+			bankIntro:
+				"Fictional playground. Welcome balance US$ 10,000 — no real money.",
+			bankBalance: "Balance",
+			bankAccountId: "Account",
+			bankLoading: "Loading account…",
+			bankLoadError: "Could not load the demo account.",
+			bankNoAccount: "No demo account for this session yet.",
+			bankOpenAccount: "Open demo account",
+			bankGoTransfer: "Transfer",
+			bankGoActivity: "Activity",
+			bankGoOnboarding: "Onboarding",
+			bankOnboardingTitle: "Demo onboarding",
+			bankOnboardingIntro:
+				"DEMO ONLY. Accept the terms, optionally upload documents (DD is skippable), then receive fictional US$ 10,000.",
+			bankDisclaimerTitle: "Disclaimer",
+			bankTosTitle: "Demo terms",
+			bankTosLabel:
+				"I understand this is a portfolio demo only (policy demo-bank-tos-v1): no real money, no credit, no banking obligation.",
+			bankTosRequired: "Accept the terms to continue.",
+			bankContinue: "Continue",
+			bankDocsTitle: "Due diligence (optional)",
+			bankDocsHint:
+				"Upload identity and proof of address via PDE, or skip — DD is skippable in this demo.",
+			bankDocIdentity: "Identity document",
+			bankDocAddress: "Proof of address",
+			bankDocUpload: "Upload and extract",
+			bankDocUploaded: "Attached",
+			bankDocSkip: "Skip due diligence",
+			bankDocSkipHint:
+				"Skipping records demo-dd-skip-v1 consent and continues to the account.",
+			bankFinish: "Finish and open account",
+			bankBootstrapping: "Crediting demo funds…",
+			bankOnboardingError: "Demo onboarding failed. Try again.",
+			bankTransferTitle: "Demo transfer",
+			bankTransferIntro:
+				"Send fictional balance to another account id. DEMO ONLY — nothing settles for real.",
+			bankTransferDest: "Destination account",
+			bankTransferAmount: "Amount",
+			bankTransferMemo: "Memo (optional)",
+			bankTransferSubmit: "Transfer",
+			bankTransferOk: "Transfer recorded in the demo.",
+			bankTransferError: "Could not transfer.",
+			bankTransferBack: "Back to bank",
+			bankActivityTitle: "Demo activity",
+			bankActivityIntro: "Movements on this playground account.",
+			bankActivityEmpty: "No movements yet.",
+			bankActivityLoadError: "Could not load activity.",
+			bankActivityMore: "Load more",
+			bankActivityBack: "Back to bank",
+			bankTxType: "Type",
+			bankTxAmount: "Amount",
+			bankTxMemo: "Memo",
+			bankTxCounterparty: "Counterparty",
+			bankTxWhen: "When",
 			passwordTitle: "Change password",
 			passwordHint: "Your session stays active after the change.",
 			currentPassword: "Current password",

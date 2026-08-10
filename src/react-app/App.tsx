@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { detectLang, siteMeta, type Lang } from "./content";
 import { ApiTokens } from "./dashboard/ApiTokens";
+import { BankActivity } from "./dashboard/BankActivity";
+import { BankDashboard } from "./dashboard/BankDashboard";
+import { BankOnboarding } from "./dashboard/BankOnboarding";
+import { BankTransfer } from "./dashboard/BankTransfer";
 import { Extract } from "./dashboard/Extract";
 import { ExtractCV } from "./dashboard/ExtractCV";
 import { Overview } from "./dashboard/Overview";
@@ -57,6 +61,13 @@ export default function App() {
 					<Route path="cv" element={<ExtractCV lang={lang} />} />
 					<Route path="cv/saved" element={<SavedCVs lang={lang} />} />
 					<Route path="cv/saved/:id" element={<SavedCV lang={lang} />} />
+					<Route path="bank" element={<BankDashboard lang={lang} />} />
+					<Route
+						path="bank/onboarding"
+						element={<BankOnboarding lang={lang} />}
+					/>
+					<Route path="bank/transfer" element={<BankTransfer lang={lang} />} />
+					<Route path="bank/activity" element={<BankActivity lang={lang} />} />
 				</Route>
 				<Route path="*" element={<Navigate to="/" replace />} />
 			</Routes>
