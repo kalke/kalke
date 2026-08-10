@@ -407,7 +407,7 @@ export type BankAccount = {
 };
 
 export type BankTransaction = {
-	id: number;
+	id: string;
 	account_id: string;
 	amount: string;
 	type: string;
@@ -418,7 +418,7 @@ export type BankTransaction = {
 
 export type BankTransactionsPage = {
 	transactions: BankTransaction[];
-	next_cursor: number | null;
+	next_cursor: string | null;
 	demo: boolean;
 };
 
@@ -528,11 +528,11 @@ export async function bankAccountDetail(display: string): Promise<BankAccount> {
 
 export async function bankTransactions(
 	limit = 20,
-	cursor?: number | null,
+	cursor?: string | null,
 ): Promise<BankTransactionsPage> {
 	const params = new URLSearchParams();
 	params.set("limit", String(limit));
-	if (cursor != null) params.set("cursor", String(cursor));
+	if (cursor) params.set("cursor", cursor);
 	return bankJson<BankTransactionsPage>(
 		`/v1/bank/transactions?${params.toString()}`,
 	);

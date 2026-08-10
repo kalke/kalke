@@ -19,12 +19,12 @@ export function BankActivity({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { setError } = useDashboard();
 	const [items, setItems] = useState<BankTransaction[]>([]);
-	const [cursor, setCursor] = useState<number | null>(null);
+	const [cursor, setCursor] = useState<string | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [loadingMore, setLoadingMore] = useState(false);
 
 	const load = useCallback(
-		async (nextCursor?: number | null, append = false) => {
+		async (nextCursor?: string | null, append = false) => {
 			if (append) setLoadingMore(true);
 			else setLoading(true);
 			setError("");
