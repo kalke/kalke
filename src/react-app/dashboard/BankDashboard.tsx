@@ -35,8 +35,9 @@ export function BankDashboard({ lang }: Props) {
 				if (cancelled) return;
 				const msg = err instanceof Error ? err.message : "";
 				if (
-					/not found/i.test(msg) ||
+					/not found|onboarding|complete onboarding/i.test(msg) ||
 					msg.includes("bank_404") ||
+					msg.includes("bank_400") ||
 					msg.includes("404")
 				) {
 					setMissing(true);
@@ -81,7 +82,9 @@ export function BankDashboard({ lang }: Props) {
 							{formatMoney(account.balance, account.currency, lang)}
 						</p>
 						<p className="playground-muted">
-							{t.bankAccountId}: <code>{account.id}</code>
+							{t.bankAccountId}:{" "}
+							<code>{account.display_number || account.id}</code>
+							{account.holder_name ? ` · ${account.holder_name}` : null}
 						</p>
 					</section>
 
@@ -91,6 +94,9 @@ export function BankDashboard({ lang }: Props) {
 						</Link>
 						<Link className="btn btn-ghost" to="/playground/bank/activity">
 							{t.bankGoActivity}
+						</Link>
+						<Link className="btn btn-ghost" to="/playground/bank/accounts">
+							{t.bankAccountsTitle}
 						</Link>
 						<Link className="btn btn-ghost" to="/playground/bank/onboarding">
 							{t.bankGoOnboarding}

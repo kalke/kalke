@@ -2099,3 +2099,118 @@
 		transform: none;
 	}
 }
+
+/* Bank onboarding wizard + accounts list */
+.bank-stepper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	list-style: none;
+	padding: 0;
+	margin: 0 0 1.25rem;
+}
+.bank-step {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.35rem 0.65rem;
+	border: 1px solid color-mix(in srgb, var(--text, #f2ebe3) 18%, transparent);
+	opacity: 0.55;
+}
+.bank-step-current {
+	opacity: 1;
+	border-color: var(--accent, #e7a339);
+}
+.bank-step-done {
+	opacity: 0.85;
+}
+.bank-step-index {
+	font-family: var(--font-mono, ui-monospace, monospace);
+	font-size: 0.75rem;
+}
+.bank-terms-toggle {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-start;
+	margin-top: 1rem;
+	padding: 0.85rem;
+	border: 1px solid color-mix(in srgb, var(--text, #f2ebe3) 20%, transparent);
+}
+.bank-terms-toggle.is-error {
+	border-color: #c45c4a;
+}
+.bank-terms-toggle input {
+	width: auto;
+	margin-top: 0.2rem;
+}
+.bank-review {
+	display: grid;
+	gap: 0.75rem;
+	margin: 0 0 1rem;
+}
+.bank-review div {
+	display: grid;
+	gap: 0.2rem;
+}
+.bank-review dt {
+	font-size: 0.75rem;
+	opacity: 0.7;
+}
+.bank-review dd {
+	margin: 0;
+}
+.linkish {
+	background: none;
+	border: 0;
+	color: var(--accent, #e7a339);
+	cursor: pointer;
+	padding: 0;
+	font: inherit;
+	text-decoration: underline;
+}
+.bank-modal {
+	position: fixed;
+	inset: 0;
+	background: color-mix(in srgb, #000 55%, transparent);
+	display: grid;
+	place-items: center;
+	z-index: 40;
+	padding: 1rem;
+}
+.bank-modal-card {
+	background: var(--surface, #211c18);
+	border: 1px solid color-mix(in srgb, var(--text, #f2ebe3) 18%, transparent);
+	padding: 1.25rem;
+	max-width: 28rem;
+	width: 100%;
+}
+.bank-accounts-table-wrap {
+	overflow-x: auto;
+}
+.bank-accounts-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.bank-accounts-table th,
+.bank-accounts-table td {
+	text-align: left;
+	padding: 0.65rem 0.5rem;
+	border-bottom: 1px solid color-mix(in srgb, var(--text, #f2ebe3) 12%, transparent);
+}
+.bank-eye {
+	display: inline-flex;
+	font-size: 1.1rem;
+	text-decoration: none;
+	color: var(--accent, #e7a339);
+}
+.bank-search {
+	display: grid;
+	gap: 0.35rem;
+	margin-bottom: 1rem;
+	max-width: 22rem;
+}
+.bank-mode-toggle {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+}

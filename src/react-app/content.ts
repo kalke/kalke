@@ -128,6 +128,43 @@ export type PlaygroundCopy = {
 	bankFinish: string;
 	bankBootstrapping: string;
 	bankOnboardingError: string;
+	bankSkipDueDiligence: string;
+	bankWizardIdHint: string;
+	bankWizardExtract: string;
+	bankWizardSkipId: string;
+	bankWizardFullName: string;
+	bankWizardDob: string;
+	bankWizardAge: string;
+	bankWizardDocument: string;
+	bankWizardNameRequired: string;
+	bankWizardDobRequired: string;
+	bankWizardUnderage: string;
+	bankWizardDocRequired: string;
+	bankWizardCepRequired: string;
+	bankWizardAddressRequired: string;
+	bankWizardEmailRequired: string;
+	bankWizardPhoneRequired: string;
+	bankWizardCepLoading: string;
+	bankWizardStreet: string;
+	bankWizardNumber: string;
+	bankWizardComplement: string;
+	bankWizardNeighborhood: string;
+	bankWizardCity: string;
+	bankWizardPhone: string;
+	bankWizardTermsSummary: string;
+	bankWizardViewTerms: string;
+	bankWizardEdit: string;
+	bankWizardConfirm: string;
+	bankWizardBack: string;
+	bankWizardNext: string;
+	bankAccountsTitle: string;
+	bankAccountsIntro: string;
+	bankAccountsEmpty: string;
+	bankAccountsSearch: string;
+	bankAccountsOpen: string;
+	bankTransferResolve: string;
+	bankTransferConfirm: string;
+	bankTransferHolder: string;
 	bankTransferTitle: string;
 	bankTransferIntro: string;
 	bankTransferDest: string;
@@ -567,6 +604,45 @@ export const copy: Record<Lang, Copy> = {
 			bankFinish: "Concluir e abrir conta",
 			bankBootstrapping: "Creditando fundos demo…",
 			bankOnboardingError: "Falha no onboarding demo. Tente de novo.",
+			bankSkipDueDiligence: "Pular e abrir conta demo",
+			bankWizardIdHint:
+				"Opcional: envie um documento de identidade para pré-preencher. Você pode editar tudo depois.",
+			bankWizardExtract: "Extrair e continuar",
+			bankWizardSkipId: "Pular upload",
+			bankWizardFullName: "Nome completo",
+			bankWizardDob: "Data de nascimento",
+			bankWizardAge: "Idade",
+			bankWizardDocument: "CPF",
+			bankWizardNameRequired: "Informe o nome completo.",
+			bankWizardDobRequired: "Informe a data de nascimento.",
+			bankWizardUnderage: "É preciso ter 18 anos ou mais.",
+			bankWizardDocRequired: "Informe um CPF válido.",
+			bankWizardCepRequired: "Informe um CEP com 8 dígitos.",
+			bankWizardAddressRequired: "Informe rua e número.",
+			bankWizardEmailRequired: "Informe um e-mail válido.",
+			bankWizardPhoneRequired: "Informe um telefone válido.",
+			bankWizardCepLoading: "Consultando CEP…",
+			bankWizardStreet: "Rua",
+			bankWizardNumber: "Número",
+			bankWizardComplement: "Complemento",
+			bankWizardNeighborhood: "Bairro",
+			bankWizardCity: "Cidade",
+			bankWizardPhone: "Telefone",
+			bankWizardTermsSummary:
+				"Resumo: conta demo fictícia, sem dinheiro real. Aceite para abrir a conta.",
+			bankWizardViewTerms: "Ver termos completos",
+			bankWizardEdit: "Editar",
+			bankWizardConfirm: "Confirmar e abrir conta",
+			bankWizardBack: "Voltar",
+			bankWizardNext: "Continuar",
+			bankAccountsTitle: "Contas",
+			bankAccountsIntro: "Sua conta demo com número, titular e saldo do ledger.",
+			bankAccountsEmpty: "Nenhuma conta ainda — conclua o onboarding.",
+			bankAccountsSearch: "Buscar por nome ou número",
+			bankAccountsOpen: "Abrir",
+			bankTransferResolve: "Resolver destinatário",
+			bankTransferConfirm: "Confirmar transferência",
+			bankTransferHolder: "Titular",
 			bankTransferTitle: "Transferência demo",
 			bankTransferIntro:
 				"Envie saldo fictício para outro account id. DEMO ONLY — nada é liquidado de verdade.",
@@ -1031,6 +1107,45 @@ export const copy: Record<Lang, Copy> = {
 			bankFinish: "Finish and open account",
 			bankBootstrapping: "Crediting demo funds…",
 			bankOnboardingError: "Demo onboarding failed. Try again.",
+			bankSkipDueDiligence: "Skip and open demo account",
+			bankWizardIdHint:
+				"Optional: upload an ID to pre-fill fields. Everything stays editable.",
+			bankWizardExtract: "Extract and continue",
+			bankWizardSkipId: "Skip upload",
+			bankWizardFullName: "Full name",
+			bankWizardDob: "Date of birth",
+			bankWizardAge: "Age",
+			bankWizardDocument: "CPF",
+			bankWizardNameRequired: "Enter your full name.",
+			bankWizardDobRequired: "Enter your date of birth.",
+			bankWizardUnderage: "You must be at least 18.",
+			bankWizardDocRequired: "Enter a valid CPF.",
+			bankWizardCepRequired: "Enter an 8-digit CEP.",
+			bankWizardAddressRequired: "Enter street and number.",
+			bankWizardEmailRequired: "Enter a valid email.",
+			bankWizardPhoneRequired: "Enter a valid phone number.",
+			bankWizardCepLoading: "Looking up CEP…",
+			bankWizardStreet: "Street",
+			bankWizardNumber: "Number",
+			bankWizardComplement: "Complement",
+			bankWizardNeighborhood: "Neighborhood",
+			bankWizardCity: "City",
+			bankWizardPhone: "Phone",
+			bankWizardTermsSummary:
+				"Summary: fictional demo account, no real money. Accept to open the account.",
+			bankWizardViewTerms: "View full terms",
+			bankWizardEdit: "Edit",
+			bankWizardConfirm: "Confirm and open account",
+			bankWizardBack: "Back",
+			bankWizardNext: "Continue",
+			bankAccountsTitle: "Accounts",
+			bankAccountsIntro: "Your demo account with number, holder, and ledger balance.",
+			bankAccountsEmpty: "No account yet — finish onboarding.",
+			bankAccountsSearch: "Search by name or number",
+			bankAccountsOpen: "Open",
+			bankTransferResolve: "Resolve recipient",
+			bankTransferConfirm: "Confirm transfer",
+			bankTransferHolder: "Holder",
 			bankTransferTitle: "Demo transfer",
 			bankTransferIntro:
 				"Send fictional balance to another account id. DEMO ONLY — nothing settles for real.",

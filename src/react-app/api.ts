@@ -353,6 +353,10 @@ export type BankAccount = {
 	onboarding_status: string;
 	demo_credited: boolean;
 	demo: boolean;
+	account_number?: number | null;
+	digit?: number | null;
+	display_number?: string | null;
+	holder_name?: string | null;
 };
 
 export type BankTransaction = {
@@ -388,9 +392,51 @@ export type BankOnboardingStatus = {
 };
 
 export type BankTransferResult = {
-	origin: { id: string; balance: string };
-	destination: { id: string; balance: string };
+	origin: {
+		id: string;
+		balance: string;
+		display_number?: string | null;
+	};
+	destination: {
+		id: string;
+		balance: string;
+		display_number?: string | null;
+	};
 	demo?: boolean;
+};
+
+export type BankResolveResult = {
+	account_id: string;
+	account_display: string;
+	holder_name: string;
+	document_masked?: string | null;
+	demo?: boolean;
+};
+
+export type BankCepResult = {
+	cep: string;
+	street: string;
+	neighborhood: string;
+	city: string;
+	state: string;
+	demo?: boolean;
+};
+
+export type BankOnboardingCompleteInput = {
+	full_name: string;
+	birth_date: string;
+	document_number: string;
+	cep: string;
+	street: string;
+	number: string;
+	complement?: string;
+	neighborhood?: string;
+	city?: string;
+	state?: string;
+	email: string;
+	phone: string;
+	terms_accepted: boolean;
+	accepted_at?: string;
 };
 
 async function bankJson<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -398,11 +444,12 @@ async function bankJson<T>(path: string, init: RequestInit = {}): Promise<T> {
 	const data = (await res.json().catch(() => ({}))) as T & {
 		error?: string;
 		message?: string;
+		detail?: string;
 	};
 	if (!res.ok) {
 		const detail =
 			typeof data === "object" && data
-				? data.error || data.message
+				? data.error || data.message || data.detail
 				: undefined;
 		throw new Error(detail ? String(detail) : `bank_${res.status}`);
 	}
@@ -421,6 +468,17 @@ export async function bankAccount(): Promise<BankAccount> {
 	return bankJson<BankAccount>("/v1/bank/account");
 }
 
+export async function bankAccounts(): Promise<{
+	accounts: BankAccount[];
+	demo: boolean;
+}> {
+	return bankJson("/v1/bank/accounts");
+}
+
+export async function bankAccountDetail(display: string): Promise<BankAccount> {
+	return bankJson(`/v1/bank/accounts/${encodeURIComponent(display)}`);
+}
+
 export async function bankTransactions(
 	limit = 20,
 	cursor?: number | null,
@@ -433,15 +491,36 @@ export async function bankTransactions(
 	);
 }
 
-export async function bankTransfer(input: {
-	destination_account_id: string;
-	amount: string;
-	memo?: string;
-}): Promise<BankTransferResult> {
-	return bankJson<BankTransferResult>("/v1/bank/transfer", {
+export async function bankTransferResolve(input: {
+	account?: string;
+	document?: string;
+}): Promise<BankResolveResult> {
+	return bankJson<BankResolveResult>("/v1/bank/transfers/resolve", {
 		method: "POST",
 		body: JSON.stringify(input),
 	});
+}
+
+export async function bankTransfer(input: {
+	destination_account_id?: string;
+	destination_account?: string;
+	destination_document?: string;
+	amount: string;
+	memo?: string;
+	idempotencyKey?: string;
+}): Promise<BankTransferResult> {
+	const { idempotencyKey, ...body } = input;
+	return bankJson<BankTransferResult>("/v1/bank/transfer", {
+		method: "POST",
+		headers: idempotencyKey
+			? { "Idempotency-Key": idempotencyKey }
+			: undefined,
+		body: JSON.stringify(body),
+	});
+}
+
+export async function bankCepLookup(cep: string): Promise<BankCepResult> {
+	return bankJson(`/v1/bank/cep/${encodeURIComponent(cep)}`);
 }
 
 export async function bankOnboarding(): Promise<BankOnboardingStatus> {
@@ -463,9 +542,14 @@ export async function bankOnboardingConsent(
 	});
 }
 
-export async function bankOnboardingSkip(): Promise<BankOnboardingStatus> {
-	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/skip", {
+export async function bankOnboardingSkip(
+	idempotencyKey?: string,
+): Promise<BankAccount> {
+	return bankJson<BankAccount>("/v1/bank/onboarding/skip", {
 		method: "POST",
+		headers: idempotencyKey
+			? { "Idempotency-Key": idempotencyKey }
+			: undefined,
 	});
 }
 
@@ -480,8 +564,15 @@ export async function bankOnboardingDocuments(input: {
 	});
 }
 
-export async function bankOnboardingComplete(): Promise<BankOnboardingStatus> {
-	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/complete", {
+export async function bankOnboardingComplete(
+	input: BankOnboardingCompleteInput,
+	idempotencyKey?: string,
+): Promise<BankAccount> {
+	return bankJson<BankAccount>("/v1/bank/onboarding/complete", {
 		method: "POST",
+		headers: idempotencyKey
+			? { "Idempotency-Key": idempotencyKey }
+			: undefined,
+		body: JSON.stringify(input),
 	});
 }
