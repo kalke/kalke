@@ -201,3 +201,5 @@ dist
 # local production env (never commit)
 prod.env
 img/
+*:Zone.Identifier
+.cursor/

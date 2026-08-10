@@ -28,7 +28,7 @@ Open **http://localhost:5173** — demo login `demo@kalke.local` / `DemoPass123!
 |------|------|
 | Backend | Go, Python, FastAPI, TypeScript |
 | Data | PostgreSQL, Redis, Kafka |
-| Cloud | AWS, Docker, Cloudflare Workers / Containers |
+| Cloud | AWS, Docker, Cloudflare Workers |
 | Auth / APIs | OIDC, OpenAPI |
 | Frontend (this repo) | React 19, Vite, Hono |
 
