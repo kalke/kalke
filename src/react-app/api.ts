@@ -335,7 +335,6 @@ export async function extractDocument(
 
 export const BANK_TOS_POLICY = "demo-bank-tos-v1";
 export const BANK_DD_POLICY = "demo-dd-v1";
-export const BANK_DD_SKIP_POLICY = "demo-dd-skip-v1";
 
 export type BankMeta = {
 	demo: boolean;
@@ -394,13 +393,6 @@ export type BankTransferResult = {
 	demo?: boolean;
 };
 
-export type BankWithdrawResult = {
-	id: string;
-	balance: string;
-	currency: string;
-	demo?: boolean;
-};
-
 async function bankJson<T>(path: string, init: RequestInit = {}): Promise<T> {
 	const res = await authFetch(path, init);
 	const data = (await res.json().catch(() => ({}))) as T & {
@@ -449,13 +441,6 @@ export async function bankTransfer(input: {
 	return bankJson<BankTransferResult>("/v1/bank/transfer", {
 		method: "POST",
 		body: JSON.stringify(input),
-	});
-}
-
-export async function bankWithdraw(amount: string): Promise<BankWithdrawResult> {
-	return bankJson<BankWithdrawResult>("/v1/bank/withdraw", {
-		method: "POST",
-		body: JSON.stringify({ amount }),
 	});
 }
 
