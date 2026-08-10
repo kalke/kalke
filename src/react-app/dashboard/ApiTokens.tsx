@@ -3,9 +3,9 @@ import { createToken, PDE_BASE, revokeToken } from "../api";
 import { copy, type Lang } from "../content";
 import { useDashboard } from "./useDashboard";
 
-type Props = { lang: Lang };
+type Props = { lang: Lang; embedded?: boolean };
 
-export function ApiTokens({ lang }: Props) {
+export function ApiTokens({ lang, embedded = false }: Props) {
 	const t = copy[lang].playground;
 	const { tokens, refreshTokens, busy, setBusy, setError } = useDashboard();
 	const [newTokenName, setNewTokenName] = useState("m2m");
@@ -53,9 +53,18 @@ export function ApiTokens({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathApi}</p>
-			<h1>{t.tokensTitle}</h1>
-			<p className="section-intro">{t.tokensHint}</p>
+			{embedded ? (
+				<>
+					<h2>{t.tokensTitle}</h2>
+					<p className="playground-muted">{t.tokensHint}</p>
+				</>
+			) : (
+				<>
+					<p className="eyebrow">{t.pathApi}</p>
+					<h1>{t.tokensTitle}</h1>
+					<p className="section-intro">{t.tokensHint}</p>
+				</>
+			)}
 
 			<form className="playground-form inline" onSubmit={onCreateToken}>
 				<label>

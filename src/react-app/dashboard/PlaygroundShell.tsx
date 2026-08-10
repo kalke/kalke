@@ -53,9 +53,9 @@ function ShellInner({ lang, onLang }: Props) {
 					</NavLink>
 					{user ? (
 						<>
-							<NavLink to="/playground/api">
-								<span className="nav-label-full">{t.pathApi}</span>
-								<span className="nav-label-short">{t.pathApiShort}</span>
+							<NavLink to="/playground/bank">
+								<span className="nav-label-full">{t.pathBank}</span>
+								<span className="nav-label-short">{t.pathBankShort}</span>
 							</NavLink>
 							<NavLink to="/playground/extract">
 								<span className="nav-label-full">{t.pathExtract}</span>
@@ -68,10 +68,6 @@ function ShellInner({ lang, onLang }: Props) {
 							<NavLink to="/playground/cv/saved">
 								<span className="nav-label-full">{t.pathCvSaved}</span>
 								<span className="nav-label-short">{t.pathCvSavedShort}</span>
-							</NavLink>
-							<NavLink to="/playground/bank">
-								<span className="nav-label-full">{t.pathBank}</span>
-								<span className="nav-label-short">{t.pathBankShort}</span>
 							</NavLink>
 						</>
 					) : null}

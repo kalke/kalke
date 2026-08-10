@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { detectLang, siteMeta, type Lang } from "./content";
-import { ApiTokens } from "./dashboard/ApiTokens";
 import { BankAccounts } from "./dashboard/BankAccounts";
 import { BankActivity } from "./dashboard/BankActivity";
 import { BankDashboard } from "./dashboard/BankDashboard";
@@ -11,6 +10,7 @@ import { Extract } from "./dashboard/Extract";
 import { ExtractCV } from "./dashboard/ExtractCV";
 import { Overview } from "./dashboard/Overview";
 import { PlaygroundShell } from "./dashboard/PlaygroundShell";
+import { Profile } from "./dashboard/Profile";
 import { SavedCV } from "./dashboard/SavedCV";
 import { SavedCVs } from "./dashboard/SavedCVs";
 import { Home } from "./Home";
@@ -57,7 +57,8 @@ export default function App() {
 					element={<PlaygroundShell lang={lang} onLang={setLang} />}
 				>
 					<Route index element={<Overview lang={lang} />} />
-					<Route path="api" element={<ApiTokens lang={lang} />} />
+					<Route path="profile" element={<Profile lang={lang} />} />
+					<Route path="api" element={<Navigate to="/playground/profile" replace />} />
 					<Route path="extract" element={<Extract lang={lang} />} />
 					<Route path="cv" element={<ExtractCV lang={lang} />} />
 					<Route path="cv/saved" element={<SavedCVs lang={lang} />} />

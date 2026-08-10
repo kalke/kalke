@@ -14,10 +14,10 @@ export function Overview({ lang }: Props) {
 
 			<ul className="dash-cards">
 				<li>
-					<Link className="dash-card" to="/playground/api">
-						<span className="path-label">{t.pathApi}</span>
-						<strong>{t.overviewApiCard}</strong>
-						<span>{t.overviewApiHint}</span>
+					<Link className="dash-card" to="/playground/bank">
+						<span className="path-label">{t.pathBank}</span>
+						<strong>{t.overviewBankCard}</strong>
+						<span>{t.overviewBankHint}</span>
 					</Link>
 				</li>
 				<li>
@@ -42,10 +42,10 @@ export function Overview({ lang }: Props) {
 					</Link>
 				</li>
 				<li>
-					<Link className="dash-card" to="/playground/bank">
-						<span className="path-label">{t.pathBank}</span>
-						<strong>{t.overviewBankCard}</strong>
-						<span>{t.overviewBankHint}</span>
+					<Link className="dash-card" to="/playground/profile">
+						<span className="path-label">{t.pathProfile}</span>
+						<strong>{t.overviewProfileCard}</strong>
+						<span>{t.overviewProfileHint}</span>
 					</Link>
 				</li>
 			</ul>

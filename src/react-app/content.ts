@@ -76,12 +76,14 @@ export type PlaygroundCopy = {
 	resetError: string;
 	pathOverview: string;
 	pathApi: string;
+	pathProfile: string;
 	pathExtract: string;
 	pathCv: string;
 	pathCvSaved: string;
 	pathBank: string;
 	pathOverviewShort: string;
 	pathApiShort: string;
+	pathProfileShort: string;
 	pathExtractShort: string;
 	pathCvShort: string;
 	pathCvSavedShort: string;
@@ -90,6 +92,8 @@ export type PlaygroundCopy = {
 	overviewIntro: string;
 	overviewApiCard: string;
 	overviewApiHint: string;
+	overviewProfileCard: string;
+	overviewProfileHint: string;
 	overviewExtractCard: string;
 	overviewExtractHint: string;
 	overviewCvCard: string;
@@ -202,6 +206,26 @@ export type PlaygroundCopy = {
 	passwordRuleNumber: string;
 	passwordRuleMatch: string;
 	capsOn: string;
+	profileMenuLink: string;
+	profileTitle: string;
+	profileIntro: string;
+	profileIdentityTitle: string;
+	profileIdentityHint: string;
+	profileSaveName: string;
+	profileNameOk: string;
+	profileNameRequired: string;
+	profileNameError: string;
+	profileEmailTitle: string;
+	profileEmailHint: string;
+	profileNewEmail: string;
+	profileEmailSendCode: string;
+	profileEmailSent: string;
+	profileEmailOk: string;
+	profileEmailCancel: string;
+	profileEmailInvalid: string;
+	profileEmailTaken: string;
+	profileEmailSame: string;
+	profileEmailError: string;
 	tokensTitle: string;
 	tokensHint: string;
 	tokenName: string;
@@ -544,21 +568,25 @@ export const copy: Record<Lang, Copy> = {
 			resetError: "Não foi possível redefinir a senha. Verifique o código.",
 			pathOverview: "~/demo",
 			pathApi: "~/demo/api",
+			pathProfile: "~/demo/profile",
 			pathExtract: "~/demo/extract",
 			pathCv: "~/demo/cv",
 			pathCvSaved: "~/demo/cv/saved",
 			pathBank: "~/demo/bank",
 			pathOverviewShort: "Demo",
 			pathApiShort: "API",
+			pathProfileShort: "Perfil",
 			pathExtractShort: "Extract",
 			pathCvShort: "CV",
 			pathCvSavedShort: "Salvos",
 			pathBankShort: "Bank",
 			overviewTitle: "Demo ao vivo",
 			overviewIntro:
-				"Tokens Bearer para integração HTTP, extração de documentos BR, curriculum vitae, ou banco demo.",
+				"Banco demo, extração de documentos BR, curriculum vitae, e ajustes de conta.",
 			overviewApiCard: "Tokens de API",
 			overviewApiHint: "Gerar, copiar e revogar credenciais Bearer.",
+			overviewProfileCard: "Perfil e API",
+			overviewProfileHint: "Nome, email, senha e tokens de integração.",
 			overviewExtractCard: "Extração",
 			overviewExtractHint: "RG, CNH, comprovante e nota fiscal.",
 			overviewCvCard: "Currículo",
@@ -681,6 +709,28 @@ export const copy: Record<Lang, Copy> = {
 			passwordRuleNumber: "Pelo menos um número",
 			passwordRuleMatch: "Confirmação igual à nova senha",
 			capsOn: "Caps Lock ligado",
+			profileMenuLink: "Perfil e API",
+			profileTitle: "Perfil",
+			profileIntro:
+				"Atualize nome e email, troque a senha e gerencie tokens de API.",
+			profileIdentityTitle: "Identidade",
+			profileIdentityHint: "Nome exibido na conta. O email atual aparece abaixo.",
+			profileSaveName: "Salvar nome",
+			profileNameOk: "Nome atualizado.",
+			profileNameRequired: "Informe um nome.",
+			profileNameError: "Não foi possível salvar o nome.",
+			profileEmailTitle: "Alterar email",
+			profileEmailHint:
+				"Enviamos um código de confirmação para o novo endereço antes de trocar.",
+			profileNewEmail: "Novo email",
+			profileEmailSendCode: "Enviar código",
+			profileEmailSent: "Código enviado para {email}.",
+			profileEmailOk: "Email atualizado.",
+			profileEmailCancel: "Cancelar",
+			profileEmailInvalid: "Email inválido.",
+			profileEmailTaken: "Este email já está em uso.",
+			profileEmailSame: "Informe um email diferente do atual.",
+			profileEmailError: "Não foi possível iniciar a troca de email.",
 			tokensTitle: "Tokens de API",
 			tokensHint:
 				"Tokens M2M para integrar via HTTP. O valor completo aparece uma vez — guarde-o. A extração no playground usa só a sessão (cookie), sem expor PAT.",
@@ -1047,21 +1097,25 @@ export const copy: Record<Lang, Copy> = {
 			resetError: "Could not reset the password. Check the code.",
 			pathOverview: "~/demo",
 			pathApi: "~/demo/api",
+			pathProfile: "~/demo/profile",
 			pathExtract: "~/demo/extract",
 			pathCv: "~/demo/cv",
 			pathCvSaved: "~/demo/cv/saved",
 			pathBank: "~/demo/bank",
 			pathOverviewShort: "Demo",
 			pathApiShort: "API",
+			pathProfileShort: "Profile",
 			pathExtractShort: "Extract",
 			pathCvShort: "CV",
 			pathCvSavedShort: "Saved",
 			pathBankShort: "Bank",
 			overviewTitle: "Live demo",
 			overviewIntro:
-				"Bearer tokens for HTTP integration, Brazilian document extraction, structured CVs, or a demo bank.",
+				"Demo bank, Brazilian document extraction, structured CVs, and account settings.",
 			overviewApiCard: "API tokens",
 			overviewApiHint: "Generate, copy, and revoke Bearer credentials.",
+			overviewProfileCard: "Profile & API",
+			overviewProfileHint: "Name, email, password, and integration tokens.",
 			overviewExtractCard: "Extraction",
 			overviewExtractHint: "ID docs, proof of address, and invoices.",
 			overviewCvCard: "Resume / CV",
@@ -1184,6 +1238,28 @@ export const copy: Record<Lang, Copy> = {
 			passwordRuleNumber: "At least one number",
 			passwordRuleMatch: "Confirmation matches new password",
 			capsOn: "Caps Lock on",
+			profileMenuLink: "Profile & API",
+			profileTitle: "Profile",
+			profileIntro:
+				"Update your name and email, change your password, and manage API tokens.",
+			profileIdentityTitle: "Identity",
+			profileIdentityHint: "Display name on your account. Current email is shown below.",
+			profileSaveName: "Save name",
+			profileNameOk: "Name updated.",
+			profileNameRequired: "Enter a name.",
+			profileNameError: "Could not save the name.",
+			profileEmailTitle: "Change email",
+			profileEmailHint:
+				"We send a confirmation code to the new address before switching.",
+			profileNewEmail: "New email",
+			profileEmailSendCode: "Send code",
+			profileEmailSent: "Code sent to {email}.",
+			profileEmailOk: "Email updated.",
+			profileEmailCancel: "Cancel",
+			profileEmailInvalid: "Invalid email.",
+			profileEmailTaken: "That email is already in use.",
+			profileEmailSame: "Enter an email different from the current one.",
+			profileEmailError: "Could not start the email change.",
 			tokensTitle: "API tokens",
 			tokensHint:
 				"M2M tokens for HTTP integration. The full value is shown once — store it. Playground extract uses the site session cookie only; no PAT is exposed.",

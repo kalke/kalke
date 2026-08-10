@@ -7,13 +7,21 @@ import {
 	type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router";
 import { copy, type Lang } from "../content";
-import { PasswordPanel } from "./PasswordPanel";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
-function initials(email: string): string {
+function initials(name: string | undefined, email: string): string {
+	const fromName = (name ?? "").trim();
+	if (fromName) {
+		const parts = fromName.split(/\s+/).filter(Boolean);
+		if (parts.length >= 2) {
+			return (parts[0][0] + parts[1][0]).toUpperCase();
+		}
+		return fromName.slice(0, 2).toUpperCase();
+	}
 	const local = email.split("@")[0] ?? email;
 	const parts = local.split(/[._-]+/).filter(Boolean);
 	if (parts.length >= 2) {
@@ -93,6 +101,7 @@ export function ProfileMenu({ lang }: Props) {
 			>
 				<div className="profile-panel-head">
 					<p className="path-label">{t.signedInAs}</p>
+					{user.name ? <p className="profile-name">{user.name}</p> : null}
 					<p className="profile-email">{user.email}</p>
 					<button
 						type="button"
@@ -102,9 +111,13 @@ export function ProfileMenu({ lang }: Props) {
 						{t.accountClose}
 					</button>
 				</div>
-				<section className="profile-password" aria-labelledby="password-title">
-					<PasswordPanel lang={lang} />
-				</section>
+				<Link
+					className="btn btn-ghost profile-settings-link"
+					to="/playground/profile"
+					onClick={() => setOpen(false)}
+				>
+					{t.profileMenuLink}
+				</Link>
 				<button
 					type="button"
 					className="btn btn-ghost profile-logout"
@@ -128,7 +141,7 @@ export function ProfileMenu({ lang }: Props) {
 				aria-controls={panelId}
 				onClick={() => setOpen((v) => !v)}
 			>
-				{initials(user.email)}
+				{initials(user.name, user.email)}
 			</button>
 			{panel ? createPortal(panel, document.body) : null}
 		</div>

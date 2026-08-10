@@ -14,7 +14,7 @@ async function authFetch(path: string, init: RequestInit = {}): Promise<Response
 	});
 }
 
-export type Me = { email: string; permissions: string[] };
+export type Me = { name?: string; email: string; permissions: string[] };
 
 export type TokenRow = {
 	id: string;
@@ -186,6 +186,53 @@ export async function changePassword(
 		throw new Error(data.error ?? "bad_request");
 	}
 	if (!res.ok) throw new Error("password_change_failed");
+}
+
+export async function updateProfile(name: string): Promise<Me> {
+	const res = await authFetch("/v1/auth/me", {
+		method: "PATCH",
+		body: JSON.stringify({ name }),
+	});
+	if (res.status === 400) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error ?? "bad_request");
+	}
+	if (!res.ok) throw new Error("profile_update_failed");
+	return res.json();
+}
+
+export async function emailChangeStart(email: string): Promise<EmailAuthPending> {
+	const res = await authFetch("/v1/auth/email/change", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	if (res.status === 409) throw new Error("email_taken");
+	if (res.status === 400) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error ?? "bad_request");
+	}
+	if (!res.ok) throw new Error("email_change_failed");
+	return res.json();
+}
+
+export async function emailChangeVerify(email: string, code: string): Promise<Me> {
+	const res = await authFetch("/v1/auth/email/change/verify", {
+		method: "POST",
+		body: JSON.stringify({ email, code }),
+	});
+	if (res.status === 409) throw new Error("email_taken");
+	if (!res.ok) throw new Error("verify_failed");
+	return res.json();
+}
+
+export async function emailChangeResend(
+	email: string,
+): Promise<{ ok: boolean; resend_after_seconds: number }> {
+	const res = await authFetch("/v1/auth/email/change/resend", {
+		method: "POST",
+		body: JSON.stringify({ email }),
+	});
+	return parseResend(res);
 }
 
 export async function logout(): Promise<void> {
