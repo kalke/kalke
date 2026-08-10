@@ -1343,6 +1343,10 @@
 	box-shadow: 0 0 0 1px rgba(231, 163, 57, 0.08);
 }
 
+.playground-consent.is-error {
+	border-color: #c45c4a;
+}
+
 .playground-consent input {
 	appearance: none;
 	margin: 0.2rem 0 0;

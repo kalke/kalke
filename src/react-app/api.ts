@@ -321,6 +321,7 @@ export async function extractDocument(
 	docType: string,
 	consent = true,
 	onProgress?: (progress: ExtractProgress) => void,
+	opts?: { refresh?: boolean },
 ): Promise<unknown> {
 	const body = new FormData();
 	body.append("file", file);
@@ -331,10 +332,9 @@ export async function extractDocument(
 	return new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		// Cookie session on auth BFF — never send a PAT from the browser.
-		xhr.open(
-			"POST",
-			`${AUTH_BASE}/v1/extract?doc_type=${encodeURIComponent(docType)}`,
-		);
+		const qs = new URLSearchParams({ doc_type: docType });
+		if (opts?.refresh) qs.set("refresh", "1");
+		xhr.open("POST", `${AUTH_BASE}/v1/extract?${qs.toString()}`);
 		xhr.withCredentials = true;
 		xhr.responseType = "json";
 

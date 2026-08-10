@@ -75,12 +75,22 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
 
 function summaryFromExtract(result: unknown): Record<string, unknown> | null {
 	if (!isPlainObject(result)) return null;
+	// POST /v1/extract → { data: {...} }
 	if (isPlainObject(result.data)) return result.data;
+	// GET /v1/extractions → { result: { data: {...} } } or { result: {...fields} }
+	if (isPlainObject(result.result)) {
+		const nested = summaryFromExtract(result.result);
+		if (nested) return nested;
+	}
 	if (isPlainObject(result.fields)) return result.fields;
-	const rest = { ...result };
-	delete rest.id;
-	delete rest.doc_type;
-	return Object.keys(rest).length ? rest : null;
+	if (
+		typeof result.nome === "string" ||
+		typeof result.cpf === "string" ||
+		typeof result.full_name === "string"
+	) {
+		return result;
+	}
+	return null;
 }
 
 function strField(data: Record<string, unknown>, ...keys: string[]): string {
@@ -195,10 +205,17 @@ export function BankOnboarding({ lang }: Props) {
 		setProgress(null);
 		try {
 			await bankOnboardingStart();
-			await extractDocument(idFile, "identity_document", true, setProgress);
+			const extracted = await extractDocument(
+				idFile,
+				"identity_document",
+				true,
+				setProgress,
+				{ refresh: true },
+			);
 			const listed = await listExtractions("identity_document");
 			const latest = listed[0];
-			const summary = summaryFromExtract(latest);
+			const summary =
+				summaryFromExtract(extracted) ?? summaryFromExtract(latest);
 			if (summary) {
 				await bankOnboardingDocuments({
 					doc_type: "identity_document",
@@ -329,267 +346,270 @@ export function BankOnboarding({ lang }: Props) {
 				})}
 			</ol>
 
-			<section className="playground-panel bank-panel extract-form">
-				{step === 0 ? (
-					<>
-						<p>{t.bankWizardIdHint}</p>
-						<FileDropzone
-							file={idFile}
-							onFile={setIdFile}
-							disabled={busy}
-							dropHint={t.dropHint}
-							dropBrowse={t.dropBrowse}
-							dropReplace={t.dropReplace}
-							dropRemove={t.dropRemove}
-						/>
-						{progress ? (
-							<div className="extract-progress" role="status">
-								<div className="extract-progress-head">
-									<span>{progress.stage}</span>
-									<span>{Math.round(progress.percent)}%</span>
+			<section className="playground-panel bank-panel">
+				<div className="playground-form extract-form">
+					{step === 0 ? (
+						<>
+							<p>{t.bankWizardIdHint}</p>
+							<FileDropzone
+								file={idFile}
+								onFile={setIdFile}
+								disabled={busy}
+								dropHint={t.dropHint}
+								dropBrowse={t.dropBrowse}
+								dropReplace={t.dropReplace}
+								dropRemove={t.dropRemove}
+							/>
+							{progress ? (
+								<div className="extract-progress" role="status">
+									<div className="extract-progress-head">
+										<span>{progress.stage}</span>
+										<span>{Math.round(progress.percent)}%</span>
+									</div>
+									<div className="extract-progress-track">
+										<div
+											className="extract-progress-bar"
+											style={{ width: `${progress.percent}%` }}
+										/>
+									</div>
 								</div>
-								<div className="extract-progress-track">
-									<div
-										className="extract-progress-bar"
-										style={{ width: `${progress.percent}%` }}
-									/>
-								</div>
+							) : null}
+							<div className="bank-onboarding-actions">
+								<button
+									type="button"
+									className="btn btn-primary"
+									disabled={busy || !idFile}
+									onClick={onExtractId}
+								>
+									{t.bankWizardExtract}
+								</button>
+								<button
+									type="button"
+									className="btn btn-ghost"
+									disabled={busy}
+									onClick={() => setStep(1)}
+								>
+									{t.bankWizardSkipId}
+								</button>
 							</div>
-						) : null}
-						<div className="bank-onboarding-actions">
-							<button
-								type="button"
-								className="btn btn-primary"
-								disabled={busy || !idFile}
-								onClick={onExtractId}
-							>
-								{t.bankWizardExtract}
-							</button>
+						</>
+					) : null}
+
+					{step === 1 ? (
+						<>
+							<label>
+								{t.bankWizardFullName}
+								<input
+									value={form.full_name}
+									onChange={(e) => patch({ full_name: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								{t.bankWizardDob}
+								<input
+									type="date"
+									value={form.birth_date}
+									onChange={(e) => patch({ birth_date: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							{form.birth_date ? (
+								<p className="playground-muted">
+									{t.bankWizardAge}: {ageYears(form.birth_date)}
+								</p>
+							) : null}
+							<label>
+								{t.bankWizardDocument}
+								<input
+									value={form.document_number}
+									onChange={(e) =>
+										patch({ document_number: digitsOnly(e.target.value) })
+									}
+									disabled={busy}
+									inputMode="numeric"
+								/>
+							</label>
+						</>
+					) : null}
+
+					{step === 2 ? (
+						<>
+							<label>
+								CEP
+								<input
+									value={maskCep(form.cep)}
+									onChange={(e) => patch({ cep: digitsOnly(e.target.value) })}
+									onBlur={onCepBlur}
+									disabled={busy || cepLoading}
+									inputMode="numeric"
+								/>
+							</label>
+							{cepLoading ? (
+								<p className="playground-muted">{t.bankWizardCepLoading}</p>
+							) : null}
+							<label>
+								{t.bankWizardStreet}
+								<input
+									value={form.street}
+									onChange={(e) => patch({ street: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								{t.bankWizardNumber}
+								<input
+									value={form.number}
+									onChange={(e) => patch({ number: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								{t.bankWizardComplement}
+								<input
+									value={form.complement}
+									onChange={(e) => patch({ complement: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								{t.bankWizardNeighborhood}
+								<input
+									value={form.neighborhood}
+									onChange={(e) => patch({ neighborhood: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								{t.bankWizardCity}
+								<input
+									value={form.city}
+									onChange={(e) => patch({ city: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								UF
+								<input
+									value={form.state}
+									onChange={(e) =>
+										patch({ state: e.target.value.toUpperCase().slice(0, 2) })
+									}
+									disabled={busy}
+									maxLength={2}
+								/>
+							</label>
+						</>
+					) : null}
+
+					{step === 3 ? (
+						<>
+							<label>
+								Email
+								<input
+									type="email"
+									value={form.email}
+									onChange={(e) => patch({ email: e.target.value })}
+									disabled={busy}
+								/>
+							</label>
+							<label>
+								{t.bankWizardPhone}
+								<input
+									value={maskPhone(form.phone)}
+									onChange={(e) => patch({ phone: digitsOnly(e.target.value) })}
+									disabled={busy}
+									inputMode="tel"
+								/>
+							</label>
+						</>
+					) : null}
+
+					{step === 4 ? (
+						<>
+							<p>{t.bankWizardTermsSummary}</p>
 							<button
 								type="button"
 								className="btn btn-ghost"
-								disabled={busy}
-								onClick={() => setStep(1)}
+								onClick={() => setTermsOpen(true)}
 							>
-								{t.bankWizardSkipId}
+								{t.bankWizardViewTerms}
+							</button>
+							<label
+								className={`playground-consent${form.terms_accepted ? " is-checked" : ""}${termsError ? " is-error" : ""}`}
+							>
+								<input
+									type="checkbox"
+									checked={form.terms_accepted}
+									onChange={(e) => {
+										patch({ terms_accepted: e.target.checked });
+										setTermsError(false);
+									}}
+									disabled={busy}
+								/>
+								<span className="playground-consent-copy">
+									<span className="playground-consent-text">{t.bankTosLabel}</span>
+								</span>
+							</label>
+						</>
+					) : null}
+
+					{step === 5 ? (
+						<form onSubmit={onConfirm}>
+							<dl className="bank-review">
+								<div>
+									<dt>{t.bankWizardFullName}</dt>
+									<dd>
+										{form.full_name}{" "}
+										<button type="button" className="linkish" onClick={() => setStep(1)}>
+											{t.bankWizardEdit}
+										</button>
+									</dd>
+								</div>
+								<div>
+									<dt>{t.bankWizardDob}</dt>
+									<dd>{form.birth_date}</dd>
+								</div>
+								<div>
+									<dt>{t.bankWizardDocument}</dt>
+									<dd>{form.document_number}</dd>
+								</div>
+								<div>
+									<dt>{t.bankWizardStreet}</dt>
+									<dd>
+										{form.street}, {form.number} — {form.city}/{form.state}{" "}
+										<button type="button" className="linkish" onClick={() => setStep(2)}>
+											{t.bankWizardEdit}
+										</button>
+									</dd>
+								</div>
+								<div>
+									<dt>Email</dt>
+									<dd>
+										{form.email} / {maskPhone(form.phone)}{" "}
+										<button type="button" className="linkish" onClick={() => setStep(3)}>
+											{t.bankWizardEdit}
+										</button>
+									</dd>
+								</div>
+							</dl>
+							<button className="btn btn-primary" type="submit" disabled={busy}>
+								{t.bankWizardConfirm}
+							</button>
+						</form>
+					) : null}
+
+					{step > 0 && step < 5 ? (
+						<div className="bank-onboarding-actions">
+							<button type="button" className="btn btn-ghost" onClick={goBack} disabled={busy}>
+								{t.bankWizardBack}
+							</button>
+							<button type="button" className="btn btn-primary" onClick={goNext} disabled={busy}>
+								{t.bankWizardNext}
 							</button>
 						</div>
-					</>
-				) : null}
-
-				{step === 1 ? (
-					<>
-						<label>
-							{t.bankWizardFullName}
-							<input
-								value={form.full_name}
-								onChange={(e) => patch({ full_name: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							{t.bankWizardDob}
-							<input
-								type="date"
-								value={form.birth_date}
-								onChange={(e) => patch({ birth_date: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						{form.birth_date ? (
-							<p className="playground-muted">
-								{t.bankWizardAge}: {ageYears(form.birth_date)}
-							</p>
-						) : null}
-						<label>
-							{t.bankWizardDocument}
-							<input
-								value={form.document_number}
-								onChange={(e) =>
-									patch({ document_number: digitsOnly(e.target.value) })
-								}
-								disabled={busy}
-								inputMode="numeric"
-							/>
-						</label>
-					</>
-				) : null}
-
-				{step === 2 ? (
-					<>
-						<label>
-							CEP
-							<input
-								value={maskCep(form.cep)}
-								onChange={(e) => patch({ cep: digitsOnly(e.target.value) })}
-								onBlur={onCepBlur}
-								disabled={busy || cepLoading}
-								inputMode="numeric"
-							/>
-						</label>
-						{cepLoading ? (
-							<p className="playground-muted">{t.bankWizardCepLoading}</p>
-						) : null}
-						<label>
-							{t.bankWizardStreet}
-							<input
-								value={form.street}
-								onChange={(e) => patch({ street: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							{t.bankWizardNumber}
-							<input
-								value={form.number}
-								onChange={(e) => patch({ number: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							{t.bankWizardComplement}
-							<input
-								value={form.complement}
-								onChange={(e) => patch({ complement: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							{t.bankWizardNeighborhood}
-							<input
-								value={form.neighborhood}
-								onChange={(e) => patch({ neighborhood: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							{t.bankWizardCity}
-							<input
-								value={form.city}
-								onChange={(e) => patch({ city: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							UF
-							<input
-								value={form.state}
-								onChange={(e) =>
-									patch({ state: e.target.value.toUpperCase().slice(0, 2) })
-								}
-								disabled={busy}
-								maxLength={2}
-							/>
-						</label>
-					</>
-				) : null}
-
-				{step === 3 ? (
-					<>
-						<label>
-							Email
-							<input
-								type="email"
-								value={form.email}
-								onChange={(e) => patch({ email: e.target.value })}
-								disabled={busy}
-							/>
-						</label>
-						<label>
-							{t.bankWizardPhone}
-							<input
-								value={maskPhone(form.phone)}
-								onChange={(e) => patch({ phone: digitsOnly(e.target.value) })}
-								disabled={busy}
-								inputMode="tel"
-							/>
-						</label>
-					</>
-				) : null}
-
-				{step === 4 ? (
-					<>
-						<p>{t.bankWizardTermsSummary}</p>
-						<button
-							type="button"
-							className="btn btn-ghost"
-							onClick={() => setTermsOpen(true)}
-						>
-							{t.bankWizardViewTerms}
-						</button>
-						<label
-							className={`bank-terms-toggle${termsError ? " is-error" : ""}`}
-						>
-							<input
-								type="checkbox"
-								role="switch"
-								checked={form.terms_accepted}
-								onChange={(e) => {
-									patch({ terms_accepted: e.target.checked });
-									setTermsError(false);
-								}}
-								disabled={busy}
-							/>
-							<span>{t.bankTosLabel}</span>
-						</label>
-					</>
-				) : null}
-
-				{step === 5 ? (
-					<form onSubmit={onConfirm}>
-						<dl className="bank-review">
-							<div>
-								<dt>{t.bankWizardFullName}</dt>
-								<dd>
-									{form.full_name}{" "}
-									<button type="button" className="linkish" onClick={() => setStep(1)}>
-										{t.bankWizardEdit}
-									</button>
-								</dd>
-							</div>
-							<div>
-								<dt>{t.bankWizardDob}</dt>
-								<dd>{form.birth_date}</dd>
-							</div>
-							<div>
-								<dt>{t.bankWizardDocument}</dt>
-								<dd>{form.document_number}</dd>
-							</div>
-							<div>
-								<dt>{t.bankWizardStreet}</dt>
-								<dd>
-									{form.street}, {form.number} — {form.city}/{form.state}{" "}
-									<button type="button" className="linkish" onClick={() => setStep(2)}>
-										{t.bankWizardEdit}
-									</button>
-								</dd>
-							</div>
-							<div>
-								<dt>Email</dt>
-								<dd>
-									{form.email} / {maskPhone(form.phone)}{" "}
-									<button type="button" className="linkish" onClick={() => setStep(3)}>
-										{t.bankWizardEdit}
-									</button>
-								</dd>
-							</div>
-						</dl>
-						<button className="btn btn-primary" type="submit" disabled={busy}>
-							{t.bankWizardConfirm}
-						</button>
-					</form>
-				) : null}
-
-				{step > 0 && step < 5 ? (
-					<div className="bank-onboarding-actions">
-						<button type="button" className="btn btn-ghost" onClick={goBack} disabled={busy}>
-							{t.bankWizardBack}
-						</button>
-						<button type="button" className="btn btn-primary" onClick={goNext} disabled={busy}>
-							{t.bankWizardNext}
-						</button>
-					</div>
-				) : null}
+					) : null}
+				</div>
 			</section>
 
 			<p className="bank-skip-cta">
