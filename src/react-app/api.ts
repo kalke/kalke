@@ -559,21 +559,41 @@ export async function bankTransferResolve(input: {
 	});
 }
 
-export async function bankTransfer(input: {
+export type BankTransferChallenge = {
+	status: string;
+	email_masked: string;
+	amount?: string;
+	destination_display?: string;
+	destination_holder?: string;
+	resend_after_seconds: number;
+	expires_in_seconds: number;
+};
+
+export async function bankTransferChallenge(input: {
 	destination_account_id?: string;
 	destination_account?: string;
 	destination_document?: string;
+	source_account_id?: string;
 	amount: string;
 	memo?: string;
-	idempotencyKey?: string;
-}): Promise<BankTransferResult> {
-	const { idempotencyKey, ...body } = input;
+}): Promise<BankTransferChallenge> {
+	return bankJson<BankTransferChallenge>("/v1/bank/transfer/challenge", {
+		method: "POST",
+		body: JSON.stringify(input),
+	});
+}
+
+export async function bankTransferChallengeResend(): Promise<BankTransferChallenge> {
+	return bankJson<BankTransferChallenge>("/v1/bank/transfer/challenge/resend", {
+		method: "POST",
+		body: JSON.stringify({}),
+	});
+}
+
+export async function bankTransferConfirm(code: string): Promise<BankTransferResult> {
 	return bankJson<BankTransferResult>("/v1/bank/transfer", {
 		method: "POST",
-		headers: idempotencyKey
-			? { "Idempotency-Key": idempotencyKey }
-			: undefined,
-		body: JSON.stringify(body),
+		body: JSON.stringify({ code }),
 	});
 }
 

@@ -175,9 +175,16 @@ export type PlaygroundCopy = {
 	bankTransferTitle: string;
 	bankTransferIntro: string;
 	bankTransferDest: string;
+	bankTransferSource: string;
 	bankTransferAmount: string;
 	bankTransferMemo: string;
 	bankTransferSubmit: string;
+	bankTransferSendCode: string;
+	bankTransferCode: string;
+	bankTransferCodeHint: string;
+	bankTransferResend: string;
+	bankTransferResendBusy: string;
+	bankTransferChange: string;
 	bankTransferOk: string;
 	bankTransferError: string;
 	bankTransferBack: string;
@@ -679,15 +686,23 @@ export const copy: Record<Lang, Copy> = {
 			bankOpenExtraBusy: "Abrindo conta…",
 			bankOpenExtraError: "Não foi possível abrir outra conta.",
 			bankTransferResolve: "Resolver destinatário",
-			bankTransferConfirm: "Confirmar transferência",
+			bankTransferConfirm: "Confirmar com o código",
 			bankTransferHolder: "Titular",
 			bankTransferTitle: "Transferência demo",
 			bankTransferIntro:
-				"Envie saldo fictício para outro account id. DEMO ONLY — nada é liquidado de verdade.",
+				"Transfira entre contas da demo. Escolha a origem, resolva o destino e confirme com o código enviado ao seu email.",
 			bankTransferDest: "Conta destino",
+			bankTransferSource: "Conta origem",
 			bankTransferAmount: "Valor",
 			bankTransferMemo: "Memo (opcional)",
 			bankTransferSubmit: "Transferir",
+			bankTransferSendCode: "Enviar código por email",
+			bankTransferCode: "Código do email",
+			bankTransferCodeHint:
+				"Enviamos um código para {email}. Ele expira em 15 minutos.",
+			bankTransferResend: "Reenviar código",
+			bankTransferResendBusy: "Reenviando…",
+			bankTransferChange: "Alterar transferência",
 			bankTransferOk: "Transferência registrada na demo.",
 			bankTransferError: "Não foi possível transferir.",
 			bankTransferBack: "Voltar à demo bancária",
@@ -1215,15 +1230,23 @@ export const copy: Record<Lang, Copy> = {
 			bankOpenExtraBusy: "Opening account…",
 			bankOpenExtraError: "Could not open another account.",
 			bankTransferResolve: "Resolve recipient",
-			bankTransferConfirm: "Confirm transfer",
+			bankTransferConfirm: "Confirm with code",
 			bankTransferHolder: "Holder",
 			bankTransferTitle: "Demo transfer",
 			bankTransferIntro:
-				"Send fictional balance to another account id. DEMO ONLY — nothing settles for real.",
+				"Move demo balance between accounts. Pick the source, resolve the destination, then confirm with the code emailed to you.",
 			bankTransferDest: "Destination account",
+			bankTransferSource: "Source account",
 			bankTransferAmount: "Amount",
 			bankTransferMemo: "Memo (optional)",
 			bankTransferSubmit: "Transfer",
+			bankTransferSendCode: "Email me a code",
+			bankTransferCode: "Email code",
+			bankTransferCodeHint:
+				"We sent a code to {email}. It expires in 15 minutes.",
+			bankTransferResend: "Resend code",
+			bankTransferResendBusy: "Resending…",
+			bankTransferChange: "Change transfer",
 			bankTransferOk: "Transfer recorded in the demo.",
 			bankTransferError: "Could not transfer.",
 			bankTransferBack: "Back to banking demo",
