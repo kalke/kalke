@@ -2,18 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { bankAccounts, bankOpenAdditionalAccount, type BankAccount } from "../api";
 import { copy, type Lang } from "../content";
+import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-
-function formatMoney(amount: string, currency: string, lang: Lang): string {
-	const n = Number(amount);
-	if (!Number.isFinite(n)) return `${amount} ${currency}`;
-	return new Intl.NumberFormat(lang === "pt" ? "pt-BR" : "en-US", {
-		style: "currency",
-		currency: currency || "USD",
-	}).format(n);
-}
 
 export function BankAccounts({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -87,7 +79,7 @@ export function BankAccounts({ lang }: Props) {
 			</div>
 			<p className="section-intro">{t.bankAccountsIntro}</p>
 
-			<p className="cv-page-actions">
+			<div className="cv-page-actions bank-page-actions">
 				<Link className="btn btn-ghost" to="/playground/bank">
 					{t.bankTransferBack}
 				</Link>
@@ -102,14 +94,17 @@ export function BankAccounts({ lang }: Props) {
 				<Link className="btn btn-ghost" to="/playground/bank/transfer">
 					{t.bankGoTransfer}
 				</Link>
-			</p>
+			</div>
 
 			<label className="bank-search">
-				{t.bankAccountsSearch}
+				<span>{t.bankAccountsSearch}</span>
 				<input
 					value={q}
 					onChange={(e) => setQ(e.target.value)}
 					disabled={loading}
+					autoComplete="off"
+					spellCheck={false}
+					enterKeyHint="search"
 				/>
 			</label>
 
@@ -120,39 +115,31 @@ export function BankAccounts({ lang }: Props) {
 					<p>{t.bankAccountsEmpty}</p>
 				</section>
 			) : (
-				<div className="bank-accounts-table-wrap">
-					<table className="bank-accounts-table">
-						<thead>
-							<tr>
-								<th>{t.bankAccountId}</th>
-								<th>{t.bankWizardFullName}</th>
-								<th>{t.bankBalance}</th>
-								<th />
-							</tr>
-						</thead>
-						<tbody>
-							{filtered.map((row) => (
-								<tr key={row.id}>
-									<td>
-										<code>{row.display_number || row.id}</code>
-									</td>
-									<td>{row.holder_name || "—"}</td>
-									<td>{formatMoney(row.balance, row.currency, lang)}</td>
-									<td>
-										<Link
-											className="bank-eye"
-											to="/playground/bank"
-											aria-label={t.bankAccountsOpen}
-											title={t.bankAccountsOpen}
-										>
-											◉
-										</Link>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
+				<ul className="bank-account-list">
+					{filtered.map((row) => (
+						<li key={row.id} className="bank-account-card">
+							<div className="bank-account-card-top">
+								<code className="bank-account-number">
+									{row.display_number || row.id}
+								</code>
+								<Link
+									className="bank-eye"
+									to="/playground/bank"
+									aria-label={t.bankAccountsOpen}
+									title={t.bankAccountsOpen}
+								>
+									<span aria-hidden="true">◉</span>
+								</Link>
+							</div>
+							<p className="bank-account-holder">
+								{row.holder_name || "—"}
+							</p>
+							<p className="bank-account-balance">
+								{formatBankMoney(row.balance, row.currency, lang)}
+							</p>
+						</li>
+					))}
+				</ul>
 			)}
 		</>
 	);

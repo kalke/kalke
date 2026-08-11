@@ -333,13 +333,17 @@ export function BankOnboarding({ lang }: Props) {
 				</p>
 			) : null}
 
+			<p className="bank-step-progress" aria-live="polite">
+				{step + 1} / {stepLabels.length}
+				<span className="bank-step-progress-label"> · {stepLabels[step]}</span>
+			</p>
 			<ol className="bank-stepper" aria-label="Onboarding steps">
 				{stepLabels.map((label, i) => {
 					const state =
 						i < step ? "done" : i === step ? "current" : "pending";
 					return (
 						<li key={label} className={`bank-step bank-step-${state}`}>
-							<span className="bank-step-index">{i}</span>
+							<span className="bank-step-index">{i + 1}</span>
 							<span className="bank-step-label">{label}</span>
 						</li>
 					);
@@ -456,22 +460,24 @@ export function BankOnboarding({ lang }: Props) {
 									disabled={busy}
 								/>
 							</label>
-							<label>
-								{t.bankWizardNumber}
-								<input
-									value={form.number}
-									onChange={(e) => patch({ number: e.target.value })}
-									disabled={busy}
-								/>
-							</label>
-							<label>
-								{t.bankWizardComplement}
-								<input
-									value={form.complement}
-									onChange={(e) => patch({ complement: e.target.value })}
-									disabled={busy}
-								/>
-							</label>
+							<div className="bank-field-row">
+								<label>
+									{t.bankWizardNumber}
+									<input
+										value={form.number}
+										onChange={(e) => patch({ number: e.target.value })}
+										disabled={busy}
+									/>
+								</label>
+								<label>
+									{t.bankWizardComplement}
+									<input
+										value={form.complement}
+										onChange={(e) => patch({ complement: e.target.value })}
+										disabled={busy}
+									/>
+								</label>
+							</div>
 							<label>
 								{t.bankWizardNeighborhood}
 								<input
@@ -480,25 +486,28 @@ export function BankOnboarding({ lang }: Props) {
 									disabled={busy}
 								/>
 							</label>
-							<label>
-								{t.bankWizardCity}
-								<input
-									value={form.city}
-									onChange={(e) => patch({ city: e.target.value })}
-									disabled={busy}
-								/>
-							</label>
-							<label>
-								UF
-								<input
-									value={form.state}
-									onChange={(e) =>
-										patch({ state: e.target.value.toUpperCase().slice(0, 2) })
-									}
-									disabled={busy}
-									maxLength={2}
-								/>
-							</label>
+							<div className="bank-field-row">
+								<label className="bank-field-grow">
+									{t.bankWizardCity}
+									<input
+										value={form.city}
+										onChange={(e) => patch({ city: e.target.value })}
+										disabled={busy}
+									/>
+								</label>
+								<label className="bank-field-uf">
+									UF
+									<input
+										value={form.state}
+										onChange={(e) =>
+											patch({ state: e.target.value.toUpperCase().slice(0, 2) })
+										}
+										disabled={busy}
+										maxLength={2}
+										autoCapitalize="characters"
+									/>
+								</label>
+							</div>
 						</>
 					) : null}
 
@@ -629,7 +638,11 @@ export function BankOnboarding({ lang }: Props) {
 						<h2>{t.bankWizardViewTerms}</h2>
 						<p>{t.bankTosLabel}</p>
 						<p className="playground-muted">{meta?.disclaimer}</p>
-						<button type="button" className="btn btn-primary" onClick={() => setTermsOpen(false)}>
+						<button
+							type="button"
+							className="btn btn-primary bank-modal-close"
+							onClick={() => setTermsOpen(false)}
+						>
 							OK
 						</button>
 					</div>

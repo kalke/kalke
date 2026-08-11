@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router";
 import { bankTransactions, type BankTransaction } from "../api";
 import { copy, type Lang } from "../content";
+import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
@@ -59,11 +60,11 @@ export function BankActivity({ lang }: Props) {
 			</div>
 			<p className="section-intro">{t.bankActivityIntro}</p>
 
-			<p className="cv-page-actions">
+			<div className="cv-page-actions bank-page-actions">
 				<Link className="btn btn-ghost" to="/playground/bank">
 					{t.bankActivityBack}
 				</Link>
-			</p>
+			</div>
 
 			{loading ? (
 				<p className="playground-muted">{t.loading}</p>
@@ -74,21 +75,23 @@ export function BankActivity({ lang }: Props) {
 					{items.map((tx) => (
 						<li key={tx.id} className="bank-tx-item">
 							<div className="bank-tx-main">
-								<strong>{tx.type}</strong>
-								<span className="bank-tx-amount">{tx.amount}</span>
+								<strong className="bank-tx-type">{tx.type}</strong>
+								<span className="bank-tx-amount">
+									{formatBankMoney(tx.amount, "USD", lang)}
+								</span>
 							</div>
 							<div className="bank-tx-meta">
 								<span>
 									{t.bankTxWhen}: {formatWhen(tx.created_at, lang)}
 								</span>
 								{tx.counterparty_account_id ? (
-									<span>
+									<span className="bank-tx-counterparty">
 										{t.bankTxCounterparty}:{" "}
 										<code>{tx.counterparty_account_id}</code>
 									</span>
 								) : null}
 								{tx.memo ? (
-									<span>
+									<span className="bank-tx-memo">
 										{t.bankTxMemo}: {tx.memo}
 									</span>
 								) : null}
@@ -99,7 +102,7 @@ export function BankActivity({ lang }: Props) {
 			)}
 
 			{cursor != null && items.length > 0 ? (
-				<p className="cv-page-actions">
+				<div className="cv-page-actions bank-page-actions">
 					<button
 						type="button"
 						className="btn btn-ghost"
@@ -108,7 +111,7 @@ export function BankActivity({ lang }: Props) {
 					>
 						{t.bankActivityMore}
 					</button>
-				</p>
+				</div>
 			) : null}
 		</>
 	);

@@ -8,6 +8,7 @@
 	--accent-soft: rgba(231, 163, 57, 0.16);
 	--cool-soft: rgba(79, 182, 176, 0.14);
 	--line: rgba(242, 236, 228, 0.12);
+	--border: var(--line);
 	--danger: #e08a7a;
 	--danger-bg: rgba(80, 30, 20, 0.4);
 	--max: 68rem;

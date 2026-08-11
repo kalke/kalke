@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router";
 import { bankTransfer, bankTransferResolve, type BankResolveResult } from "../api";
 import { copy, type Lang } from "../content";
-import { digitsOnly } from "./bankValidation";
+import { digitsOnly, formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
@@ -74,14 +74,14 @@ export function BankTransfer({ lang }: Props) {
 			</div>
 			<p className="section-intro">{t.bankTransferIntro}</p>
 
-			<p className="cv-page-actions">
+			<div className="cv-page-actions bank-page-actions">
 				<Link className="btn btn-ghost" to="/playground/bank">
 					{t.bankTransferBack}
 				</Link>
-			</p>
+			</div>
 
-			<form className="playground-form extract-form" onSubmit={onResolve}>
-				<div className="bank-mode-toggle">
+			<form className="playground-form extract-form bank-transfer-form" onSubmit={onResolve}>
+				<div className="bank-mode-toggle" role="group" aria-label={t.bankTransferDest}>
 					<button
 						type="button"
 						className={mode === "account" ? "btn btn-primary" : "btn btn-ghost"}
@@ -112,7 +112,8 @@ export function BankTransfer({ lang }: Props) {
 						disabled={busy}
 						autoComplete="off"
 						spellCheck={false}
-						placeholder={mode === "account" ? "000123-4" : "000.000.000-00"}
+						placeholder={mode === "account" ? "1-7" : "000.000.000-00"}
+						inputMode={mode === "document" ? "numeric" : "text"}
 					/>
 				</label>
 				<button
@@ -125,12 +126,12 @@ export function BankTransfer({ lang }: Props) {
 			</form>
 
 			{resolved ? (
-				<form className="playground-form extract-form" onSubmit={onConfirm}>
-					<section className="surface-panel bank-panel">
-						<p>
+				<form className="playground-form extract-form bank-transfer-form" onSubmit={onConfirm}>
+					<section className="surface-panel bank-panel bank-resolve-panel">
+						<p className="bank-resolve-holder">
 							{t.bankTransferHolder}: <strong>{resolved.holder_name}</strong>
 						</p>
-						<p className="playground-muted">
+						<p className="playground-muted bank-resolve-meta">
 							<code>{resolved.account_display}</code>
 							{resolved.document_masked
 								? ` · ${resolved.document_masked}`
@@ -172,7 +173,8 @@ export function BankTransfer({ lang }: Props) {
 					<p>{ok}</p>
 					{newBalance ? (
 						<p className="playground-muted">
-							{t.bankBalance}: <code>{newBalance}</code>
+							{t.bankBalance}:{" "}
+							<code>{formatBankMoney(newBalance, "USD", lang)}</code>
 						</p>
 					) : null}
 				</section>

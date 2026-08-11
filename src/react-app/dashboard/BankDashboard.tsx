@@ -2,18 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { bankAccount, type BankAccount } from "../api";
 import { copy, type Lang } from "../content";
+import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-
-function formatMoney(amount: string, currency: string, lang: Lang): string {
-	const n = Number(amount);
-	if (!Number.isFinite(n)) return `${amount} ${currency}`;
-	return new Intl.NumberFormat(lang === "pt" ? "pt-BR" : "en-US", {
-		style: "currency",
-		currency: currency || "USD",
-	}).format(n);
-}
 
 export function BankDashboard({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -68,27 +60,27 @@ export function BankDashboard({ lang }: Props) {
 			) : missing || !account ? (
 				<section className="playground-panel bank-panel">
 					<p>{t.bankNoAccount}</p>
-					<p className="cv-page-actions">
+					<div className="cv-page-actions bank-page-actions">
 						<Link className="btn btn-primary" to="/playground/bank/onboarding">
 							{t.bankOpenAccount}
 						</Link>
-					</p>
+					</div>
 				</section>
 			) : (
 				<>
 					<section className="surface-panel bank-balance-panel">
 						<p className="path-label">{t.bankBalance}</p>
 						<p className="bank-balance">
-							{formatMoney(account.balance, account.currency, lang)}
+							{formatBankMoney(account.balance, account.currency, lang)}
 						</p>
-						<p className="playground-muted">
+						<p className="playground-muted bank-balance-meta">
 							{t.bankAccountId}:{" "}
 							<code>{account.display_number || account.id}</code>
 							{account.holder_name ? ` · ${account.holder_name}` : null}
 						</p>
 					</section>
 
-					<p className="cv-page-actions">
+					<nav className="bank-action-grid" aria-label={t.bankTitle}>
 						<Link className="btn btn-primary" to="/playground/bank/transfer">
 							{t.bankGoTransfer}
 						</Link>
@@ -101,7 +93,7 @@ export function BankDashboard({ lang }: Props) {
 						<Link className="btn btn-ghost" to="/playground/bank/onboarding">
 							{t.bankGoOnboarding}
 						</Link>
-					</p>
+					</nav>
 				</>
 			)}
 		</>

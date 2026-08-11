@@ -37,3 +37,16 @@ export function maskCep(value: string): string {
 export function isEmail(value: string): boolean {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
+
+export function formatBankMoney(
+	amount: string,
+	currency: string,
+	lang: "pt" | "en",
+): string {
+	const n = Number(amount);
+	if (!Number.isFinite(n)) return `${amount} ${currency}`.trim();
+	return new Intl.NumberFormat(lang === "pt" ? "pt-BR" : "en-US", {
+		style: "currency",
+		currency: currency || (lang === "pt" ? "BRL" : "USD"),
+	}).format(n);
+}
