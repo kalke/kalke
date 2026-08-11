@@ -201,6 +201,11 @@ export type PlaygroundCopy = {
 	bankTxWhen: string;
 	passwordTitle: string;
 	passwordHint: string;
+	passwordSendCode: string;
+	passwordConfirmCode: string;
+	passwordCancelCode: string;
+	passwordCodeHint: string;
+	passwordCurrentWrong: string;
 	currentPassword: string;
 	newPassword: string;
 	confirmPassword: string;
@@ -718,7 +723,14 @@ export const copy: Record<Lang, Copy> = {
 			bankTxCounterparty: "Contraparte",
 			bankTxWhen: "Quando",
 			passwordTitle: "Alterar senha",
-			passwordHint: "A sessão permanece ativa após a alteração.",
+			passwordHint:
+				"Para trocar a senha, confirmamos com um código no seu email. A sessão permanece ativa depois.",
+			passwordSendCode: "Enviar código por email",
+			passwordConfirmCode: "Confirmar nova senha",
+			passwordCancelCode: "Cancelar",
+			passwordCodeHint:
+				"Enviamos um código para {email}. Digite-o para concluir a troca de senha.",
+			passwordCurrentWrong: "Senha atual incorreta.",
 			currentPassword: "Senha atual",
 			newPassword: "Nova senha",
 			confirmPassword: "Confirmar nova senha",
@@ -1262,7 +1274,14 @@ export const copy: Record<Lang, Copy> = {
 			bankTxCounterparty: "Counterparty",
 			bankTxWhen: "When",
 			passwordTitle: "Change password",
-			passwordHint: "Your session stays active after the change.",
+			passwordHint:
+				"Password changes are confirmed with a code emailed to you. Your session stays active afterward.",
+			passwordSendCode: "Email me a code",
+			passwordConfirmCode: "Confirm new password",
+			passwordCancelCode: "Cancel",
+			passwordCodeHint:
+				"We sent a code to {email}. Enter it to finish changing your password.",
+			passwordCurrentWrong: "Current password is incorrect.",
 			currentPassword: "Current password",
 			newPassword: "New password",
 			confirmPassword: "Confirm new password",

@@ -50,9 +50,12 @@ export function Profile({ lang }: Props) {
 		try {
 			const me = await updateProfile(next);
 			setUser(me);
+			setName(me.name ?? next);
 			setNameMsg(t.profileNameOk);
-		} catch {
-			setNameErr(t.profileNameError);
+		} catch (err) {
+			const code = err instanceof Error ? err.message : "";
+			if (code === "invalid name") setNameErr(t.profileNameRequired);
+			else setNameErr(t.profileNameError);
 		} finally {
 			setBusy(false);
 		}

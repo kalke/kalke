@@ -169,10 +169,18 @@ export async function signupResend(
 	return parseResend(res);
 }
 
-export async function changePassword(
+export type PasswordChangePending = {
+	ok: boolean;
+	status: "pending_verification";
+	email_masked: string;
+	resend_after_seconds: number;
+	expires_in_seconds: number;
+};
+
+export async function changePasswordStart(
 	currentPassword: string,
 	newPassword: string,
-): Promise<void> {
+): Promise<PasswordChangePending> {
 	const res = await authFetch("/v1/auth/password", {
 		method: "POST",
 		body: JSON.stringify({
@@ -180,12 +188,57 @@ export async function changePassword(
 			new_password: newPassword,
 		}),
 	});
-	if (res.status === 401) throw new Error("invalid_credentials");
+	if (res.status === 401) throw new Error("invalid credentials");
 	if (res.status === 400) {
 		const data = (await res.json().catch(() => ({}))) as { error?: string };
 		throw new Error(data.error ?? "bad_request");
 	}
 	if (!res.ok) throw new Error("password_change_failed");
+	return res.json();
+}
+
+export async function changePasswordVerify(code: string): Promise<void> {
+	const res = await authFetch("/v1/auth/password/verify", {
+		method: "POST",
+		body: JSON.stringify({ code }),
+	});
+	if (res.status === 401) {
+		const data = (await res.json().catch(() => ({}))) as { error?: string };
+		throw new Error(data.error ?? "invalid code");
+	}
+	if (!res.ok) throw new Error("password_change_failed");
+}
+
+export async function changePasswordResend(): Promise<{
+	ok: boolean;
+	resend_after_seconds: number;
+	email_masked?: string;
+}> {
+	const res = await authFetch("/v1/auth/password/resend", {
+		method: "POST",
+		body: JSON.stringify({}),
+	});
+	if (res.status === 429) {
+		const data = (await res.json().catch(() => ({}))) as {
+			resend_after_seconds?: number;
+			email_masked?: string;
+		};
+		return {
+			ok: false,
+			resend_after_seconds: data.resend_after_seconds ?? 120,
+			email_masked: data.email_masked,
+		};
+	}
+	if (!res.ok) throw new Error("resend_failed");
+	const data = (await res.json().catch(() => ({}))) as {
+		resend_after_seconds?: number;
+		email_masked?: string;
+	};
+	return {
+		ok: true,
+		resend_after_seconds: data.resend_after_seconds ?? 120,
+		email_masked: data.email_masked,
+	};
 }
 
 export async function updateProfile(name: string): Promise<Me> {
