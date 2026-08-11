@@ -182,10 +182,15 @@ export type PlaygroundCopy = {
 	bankTransferSendCode: string;
 	bankTransferCode: string;
 	bankTransferCodeHint: string;
+	bankTransferCodeTitle: string;
 	bankTransferResend: string;
 	bankTransferResendBusy: string;
 	bankTransferChange: string;
 	bankTransferOk: string;
+	bankTransferSuccessTitle: string;
+	bankTransferSuccessDest: string;
+	bankTransferSuccessBalance: string;
+	bankTransferAnother: string;
 	bankTransferError: string;
 	bankTransferBack: string;
 	bankActivityTitle: string;
@@ -705,10 +710,15 @@ export const copy: Record<Lang, Copy> = {
 			bankTransferCode: "Código do email",
 			bankTransferCodeHint:
 				"Enviamos um código para {email}. Ele expira em 15 minutos.",
+			bankTransferCodeTitle: "Confirmar transferência",
 			bankTransferResend: "Reenviar código",
 			bankTransferResendBusy: "Reenviando…",
 			bankTransferChange: "Alterar transferência",
 			bankTransferOk: "Transferência registrada na demo.",
+			bankTransferSuccessTitle: "Transferência concluída",
+			bankTransferSuccessDest: "Destino",
+			bankTransferSuccessBalance: "Novo saldo da origem",
+			bankTransferAnother: "Nova transferência",
 			bankTransferError: "Não foi possível transferir.",
 			bankTransferBack: "Voltar à demo bancária",
 			bankActivityTitle: "Extrato demo",
@@ -1256,10 +1266,15 @@ export const copy: Record<Lang, Copy> = {
 			bankTransferCode: "Email code",
 			bankTransferCodeHint:
 				"We sent a code to {email}. It expires in 15 minutes.",
+			bankTransferCodeTitle: "Confirm transfer",
 			bankTransferResend: "Resend code",
 			bankTransferResendBusy: "Resending…",
 			bankTransferChange: "Change transfer",
 			bankTransferOk: "Transfer recorded in the demo.",
+			bankTransferSuccessTitle: "Transfer complete",
+			bankTransferSuccessDest: "Destination",
+			bankTransferSuccessBalance: "New source balance",
+			bankTransferAnother: "New transfer",
 			bankTransferError: "Could not transfer.",
 			bankTransferBack: "Back to banking demo",
 			bankActivityTitle: "Demo activity",

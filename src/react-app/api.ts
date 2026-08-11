@@ -496,12 +496,18 @@ export type BankTransferResult = {
 		id: string;
 		balance: string;
 		display_number?: string | null;
+		holder_name?: string | null;
 	};
 	destination: {
 		id: string;
 		balance: string;
 		display_number?: string | null;
+		holder_name?: string | null;
+		holder_email?: string | null;
 	};
+	amount?: string;
+	memo?: string | null;
+	currency?: string;
 	demo?: boolean;
 };
 

@@ -16,6 +16,14 @@ import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
+type TransferSuccess = {
+	amount: string;
+	currency: string;
+	destination: string;
+	holder: string;
+	originBalance: string;
+};
+
 export function BankTransfer({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { busy, setBusy, setError } = useDashboard();
@@ -28,8 +36,7 @@ export function BankTransfer({ lang }: Props) {
 	const [resolved, setResolved] = useState<BankResolveResult | null>(null);
 	const [challenge, setChallenge] = useState<BankTransferChallenge | null>(null);
 	const [code, setCode] = useState("");
-	const [ok, setOk] = useState("");
-	const [newBalance, setNewBalance] = useState("");
+	const [success, setSuccess] = useState<TransferSuccess | null>(null);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -53,7 +60,7 @@ export function BankTransfer({ lang }: Props) {
 		e.preventDefault();
 		setBusy(true);
 		setError("");
-		setOk("");
+		setSuccess(null);
 		setResolved(null);
 		setChallenge(null);
 		try {
@@ -76,7 +83,7 @@ export function BankTransfer({ lang }: Props) {
 		if (!resolved) return;
 		setBusy(true);
 		setError("");
-		setOk("");
+		setSuccess(null);
 		try {
 			const result = await bankTransferChallenge({
 				destination_account: resolved.account_display,
@@ -98,11 +105,24 @@ export function BankTransfer({ lang }: Props) {
 		if (!challenge) return;
 		setBusy(true);
 		setError("");
-		setOk("");
 		try {
 			const result = await bankTransferConfirm(code.trim());
-			setOk(t.bankTransferOk);
-			setNewBalance(result.origin.balance);
+			const currency = result.currency || "USD";
+			setSuccess({
+				amount: result.amount || challenge.amount || amount,
+				currency,
+				destination:
+					result.destination.display_number ||
+					challenge.destination_display ||
+					resolved?.account_display ||
+					"",
+				holder:
+					result.destination.holder_name ||
+					challenge.destination_holder ||
+					resolved?.holder_name ||
+					"",
+				originBalance: result.origin.balance,
+			});
 			setAmount("");
 			setMemo("");
 			setResolved(null);
@@ -135,9 +155,14 @@ export function BankTransfer({ lang }: Props) {
 		}
 	}
 
-	function resetChallenge() {
+	function closeChallenge() {
 		setChallenge(null);
 		setCode("");
+		setError("");
+	}
+
+	function startAnother() {
+		setSuccess(null);
 		setError("");
 	}
 
@@ -161,7 +186,32 @@ export function BankTransfer({ lang }: Props) {
 				</Link>
 			</div>
 
-			{!challenge ? (
+			{success ? (
+				<section className="surface-panel bank-success-panel" role="status">
+					<p className="bank-success-title">{t.bankTransferSuccessTitle}</p>
+					<p className="bank-success-amount">
+						{formatBankMoney(success.amount, success.currency, lang)}
+					</p>
+					<p className="playground-muted bank-success-meta">
+						{t.bankTransferSuccessDest}: <code>{success.destination}</code>
+						{success.holder ? ` · ${success.holder}` : null}
+					</p>
+					<p className="playground-muted bank-success-meta">
+						{t.bankTransferSuccessBalance}:{" "}
+						<strong>
+							{formatBankMoney(success.originBalance, success.currency, lang)}
+						</strong>
+					</p>
+					<p className="playground-muted">{t.bankTransferOk}</p>
+					<button
+						type="button"
+						className="btn btn-primary"
+						onClick={startAnother}
+					>
+						{t.bankTransferAnother}
+					</button>
+				</section>
+			) : (
 				<>
 					<form
 						className="playground-form extract-form bank-transfer-form"
@@ -173,7 +223,7 @@ export function BankTransfer({ lang }: Props) {
 								<select
 									value={sourceId}
 									onChange={(e) => setSourceId(e.target.value)}
-									disabled={busy}
+									disabled={busy || !!challenge}
 								>
 									{accounts.map((row) => (
 										<option key={row.id} value={row.id}>
@@ -195,6 +245,7 @@ export function BankTransfer({ lang }: Props) {
 								className={
 									mode === "account" ? "btn btn-primary" : "btn btn-ghost"
 								}
+								disabled={busy || !!challenge}
 								onClick={() => {
 									setMode("account");
 									setResolved(null);
@@ -207,6 +258,7 @@ export function BankTransfer({ lang }: Props) {
 								className={
 									mode === "document" ? "btn btn-primary" : "btn btn-ghost"
 								}
+								disabled={busy || !!challenge}
 								onClick={() => {
 									setMode("document");
 									setResolved(null);
@@ -221,7 +273,7 @@ export function BankTransfer({ lang }: Props) {
 								value={destination}
 								onChange={(e) => setDestination(e.target.value)}
 								required
-								disabled={busy}
+								disabled={busy || !!challenge}
 								autoComplete="off"
 								spellCheck={false}
 								placeholder={mode === "account" ? "2-9" : "000.000.000-00"}
@@ -231,7 +283,7 @@ export function BankTransfer({ lang }: Props) {
 						<button
 							className="btn btn-primary"
 							type="submit"
-							disabled={busy || !destination.trim()}
+							disabled={busy || !!challenge || !destination.trim()}
 						>
 							{t.bankTransferResolve}
 						</button>
@@ -260,7 +312,7 @@ export function BankTransfer({ lang }: Props) {
 									value={amount}
 									onChange={(e) => setAmount(e.target.value)}
 									required
-									disabled={busy}
+									disabled={busy || !!challenge}
 									inputMode="decimal"
 									placeholder="25.50"
 								/>
@@ -270,101 +322,100 @@ export function BankTransfer({ lang }: Props) {
 								<input
 									value={memo}
 									onChange={(e) => setMemo(e.target.value)}
-									disabled={busy}
+									disabled={busy || !!challenge}
 									maxLength={280}
 								/>
 							</label>
 							<button
 								className="btn btn-primary"
 								type="submit"
-								disabled={busy || !amount.trim()}
+								disabled={busy || !!challenge || !amount.trim()}
 							>
 								{t.bankTransferSendCode}
 							</button>
 						</form>
 					) : null}
 				</>
-			) : (
-				<form
-					className="playground-form extract-form bank-transfer-form"
-					onSubmit={onConfirm}
-				>
-					<section className="surface-panel bank-panel bank-resolve-panel">
-						<p className="bank-resolve-holder">{codeHint}</p>
-						<p className="playground-muted bank-resolve-meta">
-							{challenge.amount ? (
-								<>
-									{t.bankTransferAmount}:{" "}
-									<strong>
-										{formatBankMoney(challenge.amount, "USD", lang)}
-									</strong>
-								</>
-							) : null}
-							{challenge.destination_display ? (
-								<>
-									<br />
-									<code>{challenge.destination_display}</code>
-									{challenge.destination_holder
-										? ` · ${challenge.destination_holder}`
-										: null}
-								</>
-							) : null}
-						</p>
-					</section>
-					<label>
-						{t.bankTransferCode}
-						<input
-							className="bank-otp-input"
-							value={code}
-							onChange={(e) =>
-								setCode(digitsOnly(e.target.value).slice(0, 6))
-							}
-							required
-							disabled={busy}
-							inputMode="numeric"
-							autoComplete="one-time-code"
-							placeholder="000000"
-							maxLength={6}
-						/>
-					</label>
-					<button
-						className="btn btn-primary"
-						type="submit"
-						disabled={busy || code.trim().length < 6}
-					>
-						{t.bankTransferConfirm}
-					</button>
-					<div className="bank-onboarding-actions">
-						<button
-							type="button"
-							className="btn btn-ghost"
-							disabled={busy}
-							onClick={() => void onResend()}
-						>
-							{busy ? t.bankTransferResendBusy : t.bankTransferResend}
-						</button>
-						<button
-							type="button"
-							className="btn btn-ghost"
-							disabled={busy}
-							onClick={resetChallenge}
-						>
-							{t.bankTransferChange}
-						</button>
-					</div>
-				</form>
 			)}
 
-			{ok ? (
-				<section className="surface-panel bank-panel">
-					<p>{ok}</p>
-					{newBalance ? (
-						<p className="playground-muted">
-							{t.bankBalance}:{" "}
-							<code>{formatBankMoney(newBalance, "USD", lang)}</code>
-						</p>
-					) : null}
-				</section>
+			{challenge ? (
+				<div
+					className="bank-modal"
+					role="dialog"
+					aria-modal="true"
+					aria-labelledby="bank-transfer-otp-title"
+				>
+					<button
+						type="button"
+						className="bank-modal-backdrop"
+						aria-label={t.bankTransferChange}
+						onClick={closeChallenge}
+					/>
+					<div className="bank-modal-card bank-otp-modal-card">
+						<h2 id="bank-transfer-otp-title">{t.bankTransferCodeTitle}</h2>
+						<p className="playground-muted">{codeHint}</p>
+						{challenge.amount ? (
+							<p className="bank-otp-summary">
+								<strong>
+									{formatBankMoney(challenge.amount, "USD", lang)}
+								</strong>
+								{challenge.destination_display ? (
+									<>
+										{" · "}
+										<code>{challenge.destination_display}</code>
+										{challenge.destination_holder
+											? ` · ${challenge.destination_holder}`
+											: null}
+									</>
+								) : null}
+							</p>
+						) : null}
+						<form className="playground-form bank-otp-modal-form" onSubmit={onConfirm}>
+							<label>
+								{t.bankTransferCode}
+								<input
+									className="bank-otp-input"
+									value={code}
+									onChange={(e) =>
+										setCode(digitsOnly(e.target.value).slice(0, 6))
+									}
+									required
+									disabled={busy}
+									inputMode="numeric"
+									autoComplete="one-time-code"
+									placeholder="000000"
+									maxLength={6}
+									autoFocus
+								/>
+							</label>
+							<button
+								className="btn btn-primary"
+								type="submit"
+								disabled={busy || code.trim().length < 6}
+							>
+								{t.bankTransferConfirm}
+							</button>
+							<div className="bank-onboarding-actions">
+								<button
+									type="button"
+									className="btn btn-ghost"
+									disabled={busy}
+									onClick={() => void onResend()}
+								>
+									{busy ? t.bankTransferResendBusy : t.bankTransferResend}
+								</button>
+								<button
+									type="button"
+									className="btn btn-ghost"
+									disabled={busy}
+									onClick={closeChallenge}
+								>
+									{t.bankTransferChange}
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
 			) : null}
 		</>
 	);
