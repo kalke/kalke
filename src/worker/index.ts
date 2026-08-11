@@ -26,6 +26,32 @@ app.use(
 	}),
 );
 
+app.use("/api/*", async (c, next) => {
+	const path = new URL(c.req.url).pathname;
+	const requestId = c.req.header("x-request-id") || crypto.randomUUID();
+	c.header("X-Request-ID", requestId);
+	if (path === "/api/health") {
+		await next();
+		return;
+	}
+	const start = Date.now();
+	await next();
+	const status = c.res.status;
+	console.log(
+		JSON.stringify({
+			ts: new Date().toISOString(),
+			service: "kalke-worker",
+			event: "http.request",
+			request_id: requestId,
+			method: c.req.method,
+			path,
+			status_code: status,
+			duration_ms: Date.now() - start,
+			outcome: status >= 400 ? "error" : "ok",
+		}),
+	);
+});
+
 app.get("/api/health", (c) => c.json({ ok: true, site: "kalke.dev" }));
 
 export default app;
