@@ -204,6 +204,32 @@ export type PlaygroundCopy = {
 	bankTxMemo: string;
 	bankTxCounterparty: string;
 	bankTxWhen: string;
+	bankTxClose: string;
+	bankTxDetailError: string;
+	bankReceiptDownload: string;
+	bankReceiptError: string;
+	bankExportCsv: string;
+	bankExportPdf: string;
+	bankExportError: string;
+	bankFilterAccount: string;
+	bankFilterPeriod: string;
+	bankFilterFrom: string;
+	bankFilterTo: string;
+	bankFilterType: string;
+	bankFilterDirection: string;
+	bankPeriod7d: string;
+	bankPeriod30d: string;
+	bankPeriodThisMonth: string;
+	bankPeriodLastMonth: string;
+	bankPeriodCustom: string;
+	bankPeriodAll: string;
+	bankTypeAll: string;
+	bankTypeTransfer: string;
+	bankTypeGrant: string;
+	bankTypeWithdraw: string;
+	bankDirAll: string;
+	bankDirIn: string;
+	bankDirOut: string;
 	passwordTitle: string;
 	passwordHint: string;
 	passwordSendCode: string;
@@ -722,16 +748,43 @@ export const copy: Record<Lang, Copy> = {
 			bankTransferError: "Não foi possível transferir.",
 			bankTransferBack: "Voltar à demo bancária",
 			bankActivityTitle: "Extrato demo",
-			bankActivityIntro: "Movimentações desta conta playground.",
-			bankActivityEmpty: "Nenhuma movimentação ainda.",
+			bankActivityIntro:
+				"Movimentações apresentadas de forma legível. Toque em uma linha para o comprovante.",
+			bankActivityEmpty: "Nenhuma movimentação neste filtro.",
 			bankActivityLoadError: "Não foi possível carregar o extrato.",
 			bankActivityMore: "Carregar mais",
 			bankActivityBack: "Voltar à demo bancária",
 			bankTxType: "Tipo",
 			bankTxAmount: "Valor",
-			bankTxMemo: "Memo",
+			bankTxMemo: "Mensagem",
 			bankTxCounterparty: "Contraparte",
 			bankTxWhen: "Quando",
+			bankTxClose: "Fechar",
+			bankTxDetailError: "Não foi possível carregar o detalhe.",
+			bankReceiptDownload: "Baixar comprovante PDF",
+			bankReceiptError: "Falha ao baixar o comprovante.",
+			bankExportCsv: "Exportar CSV",
+			bankExportPdf: "Exportar PDF",
+			bankExportError: "Falha ao exportar o extrato.",
+			bankFilterAccount: "Conta",
+			bankFilterPeriod: "Período",
+			bankFilterFrom: "De",
+			bankFilterTo: "Até",
+			bankFilterType: "Tipo",
+			bankFilterDirection: "Direção",
+			bankPeriod7d: "7 dias",
+			bankPeriod30d: "30 dias",
+			bankPeriodThisMonth: "Este mês",
+			bankPeriodLastMonth: "Mês passado",
+			bankPeriodCustom: "Personalizado",
+			bankPeriodAll: "Tudo",
+			bankTypeAll: "Todos",
+			bankTypeTransfer: "Transferências",
+			bankTypeGrant: "Créditos",
+			bankTypeWithdraw: "Saques",
+			bankDirAll: "Entradas e saídas",
+			bankDirIn: "Entradas",
+			bankDirOut: "Saídas",
 			passwordTitle: "Alterar senha",
 			passwordHint:
 				"Para trocar a senha, confirmamos com um código no seu email. A sessão permanece ativa depois.",
@@ -1277,9 +1330,10 @@ export const copy: Record<Lang, Copy> = {
 			bankTransferAnother: "New transfer",
 			bankTransferError: "Could not transfer.",
 			bankTransferBack: "Back to banking demo",
-			bankActivityTitle: "Demo activity",
-			bankActivityIntro: "Movements on this playground account.",
-			bankActivityEmpty: "No movements yet.",
+			bankActivityTitle: "Demo statement",
+			bankActivityIntro:
+				"Readable movements for this playground account. Tap a row for a receipt.",
+			bankActivityEmpty: "No movements for this filter.",
 			bankActivityLoadError: "Could not load activity.",
 			bankActivityMore: "Load more",
 			bankActivityBack: "Back to banking demo",
@@ -1288,6 +1342,32 @@ export const copy: Record<Lang, Copy> = {
 			bankTxMemo: "Memo",
 			bankTxCounterparty: "Counterparty",
 			bankTxWhen: "When",
+			bankTxClose: "Close",
+			bankTxDetailError: "Could not load transaction detail.",
+			bankReceiptDownload: "Download PDF receipt",
+			bankReceiptError: "Could not download the receipt.",
+			bankExportCsv: "Export CSV",
+			bankExportPdf: "Export PDF",
+			bankExportError: "Could not export the statement.",
+			bankFilterAccount: "Account",
+			bankFilterPeriod: "Period",
+			bankFilterFrom: "From",
+			bankFilterTo: "To",
+			bankFilterType: "Type",
+			bankFilterDirection: "Direction",
+			bankPeriod7d: "7 days",
+			bankPeriod30d: "30 days",
+			bankPeriodThisMonth: "This month",
+			bankPeriodLastMonth: "Last month",
+			bankPeriodCustom: "Custom",
+			bankPeriodAll: "All",
+			bankTypeAll: "All types",
+			bankTypeTransfer: "Transfers",
+			bankTypeGrant: "Credits",
+			bankTypeWithdraw: "Withdrawals",
+			bankDirAll: "In & out",
+			bankDirIn: "Incoming",
+			bankDirOut: "Outgoing",
 			passwordTitle: "Change password",
 			passwordHint:
 				"Password changes are confirmed with a code emailed to you. Your session stays active afterward.",

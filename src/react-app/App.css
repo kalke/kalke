@@ -1704,9 +1704,79 @@
 	gap: 0;
 }
 
+.bank-tx-groups {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+}
+
+.bank-tx-day {
+	margin: 0 0 0.35rem;
+	font-family: var(--font-display);
+	font-size: 0.85rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: capitalize;
+}
+
+.bank-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem 1rem;
+	align-items: end;
+	margin: 0 0 1.25rem;
+	padding: 0.85rem 0;
+	border-top: 1px solid var(--line);
+	border-bottom: 1px solid var(--line);
+}
+
+.bank-filter-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	min-width: 8rem;
+}
+
+.bank-filter-field select,
+.bank-filter-field input {
+	font: inherit;
+	color: var(--text);
+	background: var(--surface, transparent);
+	border: 1px solid var(--line);
+	border-radius: 6px;
+	padding: 0.4rem 0.55rem;
+}
+
+.bank-filter-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-left: auto;
+}
+
 .bank-tx-item {
 	padding: 0.9rem 0.15rem;
 	border-bottom: 1px solid var(--line);
+}
+
+.bank-tx-item-btn {
+	width: 100%;
+	text-align: left;
+	background: transparent;
+	border: 0;
+	color: inherit;
+	cursor: pointer;
+	font: inherit;
+	border-radius: 8px;
+	padding: 0.9rem 0.35rem;
+}
+
+.bank-tx-item-btn:hover,
+.bank-tx-item-btn:focus-visible {
+	background: color-mix(in srgb, var(--accent) 8%, transparent);
+	outline: none;
 }
 
 .bank-tx-item:last-child {
@@ -1721,12 +1791,44 @@
 	margin-bottom: 0.3rem;
 }
 
+.bank-tx-heading {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.45rem;
+	min-width: 0;
+}
+
 .bank-tx-type {
 	font-family: var(--font-display);
 	font-weight: 600;
 	font-size: 0.95rem;
-	text-transform: capitalize;
 	overflow-wrap: anywhere;
+}
+
+.bank-tx-badge {
+	display: inline-block;
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	padding: 0.15rem 0.4rem;
+	border-radius: 4px;
+	border: 1px solid var(--line);
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.bank-tx-badge.badge-transfer_in,
+.bank-tx-badge.badge-grant {
+	border-color: color-mix(in srgb, #2f7d4a 40%, var(--line));
+	color: #2f7d4a;
+}
+
+.bank-tx-badge.badge-transfer_out,
+.bank-tx-badge.badge-withdraw {
+	border-color: color-mix(in srgb, #a14a2d 40%, var(--line));
+	color: #a14a2d;
 }
 
 .bank-tx-amount {
@@ -1735,6 +1837,14 @@
 	font-size: 0.95rem;
 	white-space: nowrap;
 	flex-shrink: 0;
+}
+
+.bank-tx-amount.is-credit {
+	color: #2f7d4a;
+}
+
+.bank-tx-amount.is-debit {
+	color: #a14a2d;
 }
 
 .bank-tx-meta {
@@ -1751,6 +1861,28 @@
 .bank-tx-memo {
 	overflow-wrap: anywhere;
 	word-break: break-word;
+}
+
+.bank-tx-detail-grid {
+	display: grid;
+	gap: 0.75rem;
+	margin: 1rem 0;
+}
+
+.bank-tx-detail-grid dt {
+	font-size: 0.75rem;
+	color: var(--text-muted);
+	margin: 0 0 0.15rem;
+}
+
+.bank-tx-detail-grid dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+}
+
+.bank-tx-modal-card {
+	max-width: 28rem;
+	width: min(100%, 28rem);
 }
 
 .cv-history-item:hover,

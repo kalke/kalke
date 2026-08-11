@@ -463,16 +463,51 @@ export type BankTransaction = {
 	id: string;
 	account_id: string;
 	amount: string;
+	signed_amount?: string;
 	type: string;
 	counterparty_account_id?: string | null;
 	memo?: string | null;
 	created_at: string;
+	currency?: string;
+	direction?: "in" | "out" | string;
+	title?: string;
+	title_key?: string;
+	subtitle?: string;
+	badge?: string;
+	counterparty_display?: string | null;
+	counterparty_name?: string | null;
+	counterparty_document_masked?: string | null;
+	status?: string;
+	parties?: {
+		origin?: BankTxParty;
+		destination?: BankTxParty;
+	};
+	demo?: boolean;
+};
+
+export type BankTxParty = {
+	account_id?: string | null;
+	display_number?: string | null;
+	holder_name?: string | null;
+	document_masked?: string | null;
 };
 
 export type BankTransactionsPage = {
 	transactions: BankTransaction[];
 	next_cursor: string | null;
 	demo: boolean;
+};
+
+export type BankTransactionFilters = {
+	limit?: number;
+	cursor?: string | null;
+	account_id?: string;
+	from?: string;
+	to?: string;
+	type?: string;
+	direction?: string;
+	min_amount?: string;
+	max_amount?: string;
 };
 
 export type BankOnboardingDoc = {
@@ -597,15 +632,86 @@ export async function bankAccountDetail(display: string): Promise<BankAccount> {
 }
 
 export async function bankTransactions(
-	limit = 20,
+	limitOrFilters: number | BankTransactionFilters = 20,
 	cursor?: string | null,
 ): Promise<BankTransactionsPage> {
+	const filters: BankTransactionFilters =
+		typeof limitOrFilters === "number"
+			? { limit: limitOrFilters, cursor }
+			: limitOrFilters;
 	const params = new URLSearchParams();
-	params.set("limit", String(limit));
-	if (cursor) params.set("cursor", cursor);
+	params.set("limit", String(filters.limit ?? 20));
+	if (filters.cursor) params.set("cursor", filters.cursor);
+	if (filters.account_id) params.set("account_id", filters.account_id);
+	if (filters.from) params.set("from", filters.from);
+	if (filters.to) params.set("to", filters.to);
+	if (filters.type && filters.type !== "all") params.set("type", filters.type);
+	if (filters.direction && filters.direction !== "all") {
+		params.set("direction", filters.direction);
+	}
+	if (filters.min_amount) params.set("min_amount", filters.min_amount);
+	if (filters.max_amount) params.set("max_amount", filters.max_amount);
 	return bankJson<BankTransactionsPage>(
 		`/v1/bank/transactions?${params.toString()}`,
 	);
+}
+
+export async function bankTransactionDetail(
+	id: string,
+): Promise<BankTransaction> {
+	return bankJson<BankTransaction>(
+		`/v1/bank/transactions/${encodeURIComponent(id)}`,
+	);
+}
+
+async function bankDownloadBlob(
+	path: string,
+	fallbackName: string,
+): Promise<void> {
+	const res = await authFetch(path);
+	if (!res.ok) {
+		const data = (await res.json().catch(() => ({}))) as {
+			error?: string;
+			message?: string;
+		};
+		throw new Error(data.message || data.error || `download_${res.status}`);
+	}
+	const blob = await res.blob();
+	const cd = res.headers.get("Content-Disposition") || "";
+	const match = /filename="?([^";]+)"?/i.exec(cd);
+	const name = match?.[1] || fallbackName;
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement("a");
+	a.href = url;
+	a.download = name;
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+export async function bankTransactionReceiptPdf(id: string): Promise<void> {
+	await bankDownloadBlob(
+		`/v1/bank/transactions/${encodeURIComponent(id)}/receipt.pdf`,
+		`receipt-${id}.pdf`,
+	);
+}
+
+export async function bankStatementExport(
+	fmt: "csv" | "pdf",
+	filters: Omit<BankTransactionFilters, "limit" | "cursor"> = {},
+): Promise<void> {
+	const params = new URLSearchParams();
+	if (filters.account_id) params.set("account_id", filters.account_id);
+	if (filters.from) params.set("from", filters.from);
+	if (filters.to) params.set("to", filters.to);
+	if (filters.type && filters.type !== "all") params.set("type", filters.type);
+	if (filters.direction && filters.direction !== "all") {
+		params.set("direction", filters.direction);
+	}
+	if (filters.min_amount) params.set("min_amount", filters.min_amount);
+	if (filters.max_amount) params.set("max_amount", filters.max_amount);
+	const q = params.toString();
+	const path = `/v1/bank/statement/export.${fmt}${q ? `?${q}` : ""}`;
+	await bankDownloadBlob(path, `statement.${fmt}`);
 }
 
 export async function bankTransferResolve(input: {
