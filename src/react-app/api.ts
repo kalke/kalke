@@ -522,6 +522,17 @@ export async function bankAccounts(): Promise<{
 	return bankJson("/v1/bank/accounts");
 }
 
+export async function bankOpenAdditionalAccount(
+	idempotencyKey?: string,
+): Promise<BankAccount> {
+	return bankJson<BankAccount>("/v1/bank/accounts", {
+		method: "POST",
+		headers: idempotencyKey
+			? { "Idempotency-Key": idempotencyKey }
+			: undefined,
+	});
+}
+
 export async function bankAccountDetail(display: string): Promise<BankAccount> {
 	return bankJson(`/v1/bank/accounts/${encodeURIComponent(display)}`);
 }

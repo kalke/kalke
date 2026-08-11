@@ -166,6 +166,9 @@ export type PlaygroundCopy = {
 	bankAccountsEmpty: string;
 	bankAccountsSearch: string;
 	bankAccountsOpen: string;
+	bankOpenExtraAccount: string;
+	bankOpenExtraBusy: string;
+	bankOpenExtraError: string;
 	bankTransferResolve: string;
 	bankTransferConfirm: string;
 	bankTransferHolder: string;
@@ -667,10 +670,14 @@ export const copy: Record<Lang, Copy> = {
 			bankWizardBack: "Voltar",
 			bankWizardNext: "Continuar",
 			bankAccountsTitle: "Contas",
-			bankAccountsIntro: "Sua conta demo com número, titular e saldo do ledger.",
+			bankAccountsIntro:
+				"Todas as suas contas da demo bancária — mesmo CPF, números diferentes para testar transferências.",
 			bankAccountsEmpty: "Nenhuma conta ainda — conclua o onboarding.",
 			bankAccountsSearch: "Buscar por nome ou número",
 			bankAccountsOpen: "Abrir",
+			bankOpenExtraAccount: "Abrir outra conta",
+			bankOpenExtraBusy: "Abrindo conta…",
+			bankOpenExtraError: "Não foi possível abrir outra conta.",
 			bankTransferResolve: "Resolver destinatário",
 			bankTransferConfirm: "Confirmar transferência",
 			bankTransferHolder: "Titular",
@@ -1199,10 +1206,14 @@ export const copy: Record<Lang, Copy> = {
 			bankWizardBack: "Back",
 			bankWizardNext: "Continue",
 			bankAccountsTitle: "Accounts",
-			bankAccountsIntro: "Your demo account with number, holder, and ledger balance.",
+			bankAccountsIntro:
+				"All accounts in the banking demo — same CPF, different numbers for transfer tests.",
 			bankAccountsEmpty: "No account yet — finish onboarding.",
 			bankAccountsSearch: "Search by name or number",
 			bankAccountsOpen: "Open",
+			bankOpenExtraAccount: "Open another account",
+			bankOpenExtraBusy: "Opening account…",
+			bankOpenExtraError: "Could not open another account.",
 			bankTransferResolve: "Resolve recipient",
 			bankTransferConfirm: "Confirm transfer",
 			bankTransferHolder: "Holder",

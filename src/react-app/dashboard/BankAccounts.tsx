@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import { bankAccounts, type BankAccount } from "../api";
+import { bankAccounts, bankOpenAdditionalAccount, type BankAccount } from "../api";
 import { copy, type Lang } from "../content";
 import { useDashboard } from "./useDashboard";
 
@@ -17,10 +17,15 @@ function formatMoney(amount: string, currency: string, lang: Lang): string {
 
 export function BankAccounts({ lang }: Props) {
 	const t = copy[lang].playground;
-	const { setError } = useDashboard();
+	const { busy, setBusy, setError } = useDashboard();
 	const [rows, setRows] = useState<BankAccount[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [q, setQ] = useState("");
+
+	const reload = useCallback(async () => {
+		const data = await bankAccounts();
+		setRows(data.accounts ?? []);
+	}, []);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -28,8 +33,7 @@ export function BankAccounts({ lang }: Props) {
 			setLoading(true);
 			setError("");
 			try {
-				const data = await bankAccounts();
-				if (!cancelled) setRows(data.accounts ?? []);
+				await reload();
 			} catch (err) {
 				if (!cancelled) {
 					setRows([]);
@@ -42,7 +46,7 @@ export function BankAccounts({ lang }: Props) {
 		return () => {
 			cancelled = true;
 		};
-	}, [setError, t.bankLoadError]);
+	}, [reload, setError, t.bankLoadError]);
 
 	const filtered = useMemo(() => {
 		const needle = q.trim().toLowerCase();
@@ -61,6 +65,19 @@ export function BankAccounts({ lang }: Props) {
 		});
 	}, [rows, q]);
 
+	async function onOpenExtra() {
+		setBusy(true);
+		setError("");
+		try {
+			await bankOpenAdditionalAccount(crypto.randomUUID());
+			await reload();
+		} catch (err) {
+			setError(err instanceof Error ? err.message : t.bankOpenExtraError);
+		} finally {
+			setBusy(false);
+		}
+	}
+
 	return (
 		<>
 			<p className="eyebrow">{t.pathBank}</p>
@@ -74,8 +91,16 @@ export function BankAccounts({ lang }: Props) {
 				<Link className="btn btn-ghost" to="/playground/bank">
 					{t.bankTransferBack}
 				</Link>
-				<Link className="btn btn-primary" to="/playground/bank/onboarding">
-					{t.bankGoOnboarding}
+				<button
+					type="button"
+					className="btn btn-primary"
+					disabled={busy || loading || rows.length === 0}
+					onClick={onOpenExtra}
+				>
+					{busy ? t.bankOpenExtraBusy : t.bankOpenExtraAccount}
+				</button>
+				<Link className="btn btn-ghost" to="/playground/bank/transfer">
+					{t.bankGoTransfer}
 				</Link>
 			</p>
 
