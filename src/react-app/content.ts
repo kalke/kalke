@@ -166,6 +166,9 @@ export type PlaygroundCopy = {
 	bankAccountsEmpty: string;
 	bankAccountsSearch: string;
 	bankAccountsOpen: string;
+	bankStatusIncomplete: string;
+	bankIncompleteHint: string;
+	bankContinueOnboarding: string;
 	bankOpenExtraAccount: string;
 	bankOpenExtraBusy: string;
 	bankOpenExtraError: string;
@@ -715,9 +718,13 @@ export const copy: Record<Lang, Copy> = {
 			bankAccountsTitle: "Contas",
 			bankAccountsIntro:
 				"Todas as suas contas da demo bancária — mesmo CPF, números diferentes para testar transferências.",
-			bankAccountsEmpty: "Nenhuma conta ainda — conclua o onboarding.",
+			bankAccountsEmpty: "Nenhuma conta ainda.",
 			bankAccountsSearch: "Buscar por nome ou número",
 			bankAccountsOpen: "Abrir",
+			bankStatusIncomplete: "Incompleto",
+			bankIncompleteHint:
+				"Onboarding em andamento — toque na conta para continuar.",
+			bankContinueOnboarding: "Continuar onboarding",
 			bankOpenExtraAccount: "Abrir outra conta",
 			bankOpenExtraBusy: "Abrindo conta…",
 			bankOpenExtraError: "Não foi possível abrir outra conta.",
@@ -1298,9 +1305,13 @@ export const copy: Record<Lang, Copy> = {
 			bankAccountsTitle: "Accounts",
 			bankAccountsIntro:
 				"All accounts in the banking demo — same CPF, different numbers for transfer tests.",
-			bankAccountsEmpty: "No account yet — finish onboarding.",
+			bankAccountsEmpty: "No accounts yet.",
 			bankAccountsSearch: "Search by name or number",
 			bankAccountsOpen: "Open",
+			bankStatusIncomplete: "Incomplete",
+			bankIncompleteHint:
+				"Onboarding in progress — tap the account to continue.",
+			bankContinueOnboarding: "Continue onboarding",
 			bankOpenExtraAccount: "Open another account",
 			bankOpenExtraBusy: "Opening account…",
 			bankOpenExtraError: "Could not open another account.",

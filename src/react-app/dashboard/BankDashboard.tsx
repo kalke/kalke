@@ -11,6 +11,11 @@ import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
+function isIncomplete(row: BankAccount): boolean {
+	const status = row.onboarding_status;
+	return status !== "completed" && status !== "skipped";
+}
+
 export function BankDashboard({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { setError } = useDashboard();
@@ -31,11 +36,13 @@ export function BankDashboard({ lang }: Props) {
 				if (cancelled) return;
 				const msg = err instanceof Error ? err.message : "";
 				if (
-					/not found|onboarding|complete onboarding/i.test(msg) ||
-					msg.includes("bank_404") ||
-					msg.includes("bank_400") ||
-					msg.includes("404")
+					/not found|bank_404|404/i.test(msg) &&
+					!/onboarding|complete onboarding/i.test(msg)
 				) {
+					setMissing(true);
+					setAccount(null);
+				} else if (/onboarding|complete onboarding|bank_400/i.test(msg)) {
+					// Legacy gate — still treat as missing only when no account body.
 					setMissing(true);
 					setAccount(null);
 				} else {
@@ -49,6 +56,8 @@ export function BankDashboard({ lang }: Props) {
 			cancelled = true;
 		};
 	}, [setError, t.bankLoadError]);
+
+	const incomplete = account ? isIncomplete(account) : false;
 
 	return (
 		<>
@@ -75,16 +84,35 @@ export function BankDashboard({ lang }: Props) {
 					<p className="text-fg">{t.bankNoAccount}</p>
 					<div className="flex flex-wrap gap-2">
 						<Button asChild>
-							<Link to="/playground/bank/onboarding">{t.bankOpenAccount}</Link>
+							<Link to="/playground/bank/onboarding" viewTransition>
+								{t.bankOpenAccount}
+							</Link>
 						</Button>
+						<Link
+							className={buttonVariants({ variant: "ghost" })}
+							to="/playground/bank/accounts"
+							viewTransition
+						>
+							{t.bankAccountsTitle}
+						</Link>
 					</div>
 				</SurfacePanel>
 			) : (
 				<>
 					<SurfacePanel className="mb-5">
-						<p className="mb-1 font-display text-xs tracking-[0.18em] text-muted uppercase">
-							{t.bankBalance}
-						</p>
+						<div className="mb-2 flex flex-wrap items-center gap-2">
+							<p className="font-display text-xs tracking-[0.18em] text-muted uppercase">
+								{t.bankBalance}
+							</p>
+							{incomplete ? (
+								<Badge
+									variant="outline"
+									className="border-accent/50 bg-accent/10 text-[0.65rem] tracking-wide text-accent uppercase"
+								>
+									{t.bankStatusIncomplete}
+								</Badge>
+							) : null}
+						</div>
 						<p className="font-display my-1 text-[clamp(1.75rem,4vw,2.35rem)] font-semibold tracking-tight text-fg [overflow-wrap:anywhere]">
 							{formatBankMoney(account.balance, account.currency, lang)}
 						</p>
@@ -95,48 +123,72 @@ export function BankDashboard({ lang }: Props) {
 							</code>
 							{account.holder_name ? ` · ${account.holder_name}` : null}
 						</p>
+						{incomplete ? (
+							<p className="mt-3 text-sm text-accent">{t.bankIncompleteHint}</p>
+						) : null}
 					</SurfacePanel>
 
 					<nav
 						className="grid grid-cols-1 gap-2 sm:grid-cols-2"
 						aria-label={t.bankTitle}
 					>
-						<Link
-							className={cn(
-								buttonVariants(),
-								"min-h-11 justify-center text-center touch-manipulation",
-							)}
-							to="/playground/bank/transfer"
-						>
-							{t.bankGoTransfer}
-						</Link>
-						<Link
-							className={cn(
-								buttonVariants({ variant: "ghost" }),
-								"min-h-11 justify-center text-center touch-manipulation",
-							)}
-							to="/playground/bank/activity"
-						>
-							{t.bankGoActivity}
-						</Link>
+						{incomplete ? (
+							<Link
+								className={cn(
+									buttonVariants(),
+									"min-h-11 justify-center text-center touch-manipulation sm:col-span-2",
+								)}
+								to="/playground/bank/onboarding"
+								viewTransition
+							>
+								{t.bankContinueOnboarding}
+							</Link>
+						) : (
+							<>
+								<Link
+									className={cn(
+										buttonVariants(),
+										"min-h-11 justify-center text-center touch-manipulation",
+									)}
+									to="/playground/bank/transfer"
+									viewTransition
+								>
+									{t.bankGoTransfer}
+								</Link>
+								<Link
+									className={cn(
+										buttonVariants({ variant: "ghost" }),
+										"min-h-11 justify-center text-center touch-manipulation",
+									)}
+									to="/playground/bank/activity"
+									viewTransition
+								>
+									{t.bankGoActivity}
+								</Link>
+							</>
+						)}
 						<Link
 							className={cn(
 								buttonVariants({ variant: "ghost" }),
 								"min-h-11 justify-center text-center touch-manipulation",
 							)}
 							to="/playground/bank/accounts"
+							viewTransition
 						>
 							{t.bankAccountsTitle}
 						</Link>
-						<Link
-							className={cn(
-								buttonVariants({ variant: "ghost" }),
-								"min-h-11 justify-center text-center touch-manipulation",
-							)}
-							to="/playground/bank/onboarding"
-						>
-							{t.bankGoOnboarding}
-						</Link>
+						{!incomplete ? (
+							<Link
+								className={cn(
+									buttonVariants({ variant: "ghost" }),
+									"min-h-11 justify-center text-center touch-manipulation",
+								)}
+								to="/playground/bank/onboarding"
+								viewTransition
+							>
+								{t.bankGoOnboarding}
+							</Link>
+						) : null}
 					</nav>
 				</>
 			)}

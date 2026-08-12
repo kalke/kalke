@@ -13,6 +13,11 @@ import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 
+function isIncomplete(row: BankAccount): boolean {
+	const status = row.onboarding_status;
+	return status !== "completed" && status !== "skipped";
+}
+
 export function BankAccounts({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { busy, setBusy, setError } = useDashboard();
@@ -63,6 +68,9 @@ export function BankAccounts({ lang }: Props) {
 		});
 	}, [rows, q]);
 
+	const canOpenExtra =
+		rows.length > 0 && rows.every((row) => !isIncomplete(row));
+
 	async function onOpenExtra() {
 		setBusy(true);
 		setError("");
@@ -98,12 +106,13 @@ export function BankAccounts({ lang }: Props) {
 				<Link
 					className={buttonVariants({ variant: "ghost" })}
 					to="/playground/bank"
+					viewTransition
 				>
 					{t.bankTransferBack}
 				</Link>
 				<Button
 					type="button"
-					disabled={busy || loading || rows.length === 0}
+					disabled={busy || loading || !canOpenExtra}
 					onClick={onOpenExtra}
 				>
 					{busy ? t.bankOpenExtraBusy : t.bankOpenExtraAccount}
@@ -111,6 +120,7 @@ export function BankAccounts({ lang }: Props) {
 				<Link
 					className={buttonVariants({ variant: "ghost" })}
 					to="/playground/bank/transfer"
+					viewTransition
 				>
 					{t.bankGoTransfer}
 				</Link>
@@ -132,39 +142,77 @@ export function BankAccounts({ lang }: Props) {
 			{loading ? (
 				<p className="text-sm text-muted">{t.bankLoading}</p>
 			) : filtered.length === 0 ? (
-				<SurfacePanel>
+				<SurfacePanel className="grid gap-4">
 					<p className="text-fg">{t.bankAccountsEmpty}</p>
+					<div>
+						<Button asChild>
+							<Link to="/playground/bank/onboarding" viewTransition>
+								{t.bankOpenAccount}
+							</Link>
+						</Button>
+					</div>
 				</SurfacePanel>
 			) : (
 				<ul className="m-0 grid list-none gap-3 p-0">
-					{filtered.map((row) => (
-						<li key={row.id}>
-							<SurfacePanel className="p-4">
-								<div className="mb-2 flex items-start justify-between gap-3">
-									<code className="rounded bg-bg-deep px-1.5 py-0.5 text-sm text-fg">
-										{row.display_number || row.id}
-									</code>
-									<Link
+					{filtered.map((row) => {
+						const incomplete = isIncomplete(row);
+						const href = incomplete
+							? "/playground/bank/onboarding"
+							: "/playground/bank";
+						return (
+							<li key={row.id}>
+								<Link
+									to={href}
+									viewTransition
+									className="block rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring"
+									aria-label={
+										incomplete
+											? t.bankContinueOnboarding
+											: t.bankAccountsOpen
+									}
+								>
+									<SurfacePanel
 										className={cn(
-											buttonVariants({ variant: "ghost", size: "icon" }),
-											"shrink-0 text-accent",
+											"p-4 transition-colors hover:border-accent/40",
+											incomplete && "border-accent/35",
 										)}
-										to="/playground/bank"
-										aria-label={t.bankAccountsOpen}
-										title={t.bankAccountsOpen}
 									>
-										<span aria-hidden="true">◉</span>
-									</Link>
-								</div>
-								<p className="mb-1 text-sm text-muted">
-									{row.holder_name || "—"}
-								</p>
-								<p className="font-display m-0 text-lg font-semibold text-fg">
-									{formatBankMoney(row.balance, row.currency, lang)}
-								</p>
-							</SurfacePanel>
-						</li>
-					))}
+										<div className="mb-2 flex items-start justify-between gap-3">
+											<code className="rounded bg-bg-deep px-1.5 py-0.5 text-sm text-fg">
+												{row.display_number || row.id}
+											</code>
+											{incomplete ? (
+												<Badge
+													variant="outline"
+													className="border-accent/50 bg-accent/10 text-[0.65rem] tracking-wide text-accent uppercase"
+												>
+													{t.bankStatusIncomplete}
+												</Badge>
+											) : (
+												<span
+													className="shrink-0 text-accent"
+													aria-hidden="true"
+												>
+													◉
+												</span>
+											)}
+										</div>
+										<p className="mb-1 text-sm text-muted">
+											{row.holder_name || "—"}
+										</p>
+										<p className="font-display m-0 text-lg font-semibold text-fg">
+											{formatBankMoney(row.balance, row.currency, lang)}
+										</p>
+										{incomplete ? (
+											<p className="mt-2 text-xs text-accent">
+												{t.bankIncompleteHint}
+											</p>
+										) : null}
+									</SurfacePanel>
+								</Link>
+							</li>
+						);
+					})}
 				</ul>
 			)}
 		</>
