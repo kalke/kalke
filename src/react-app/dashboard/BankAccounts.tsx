@@ -8,15 +8,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { isBankOnboardingIncomplete } from "./bankOnboardingStatus";
 import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-
-function isIncomplete(row: BankAccount): boolean {
-	const status = row.onboarding_status;
-	return status !== "completed" && status !== "skipped";
-}
 
 export function BankAccounts({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -69,7 +65,8 @@ export function BankAccounts({ lang }: Props) {
 	}, [rows, q]);
 
 	const canOpenExtra =
-		rows.length > 0 && rows.every((row) => !isIncomplete(row));
+		rows.length > 0 && rows.every((row) => !isBankOnboardingIncomplete(row));
+	const anyIncomplete = rows.some(isBankOnboardingIncomplete);
 
 	async function onOpenExtra() {
 		setBusy(true);
@@ -117,13 +114,23 @@ export function BankAccounts({ lang }: Props) {
 				>
 					{busy ? t.bankOpenExtraBusy : t.bankOpenExtraAccount}
 				</Button>
-				<Link
-					className={buttonVariants({ variant: "ghost" })}
-					to="/playground/bank/transfer"
-					viewTransition
-				>
-					{t.bankGoTransfer}
-				</Link>
+				{!anyIncomplete ? (
+					<Link
+						className={buttonVariants({ variant: "ghost" })}
+						to="/playground/bank/transfer"
+						viewTransition
+					>
+						{t.bankGoTransfer}
+					</Link>
+				) : (
+					<Link
+						className={buttonVariants()}
+						to="/playground/bank/onboarding"
+						viewTransition
+					>
+						{t.bankContinueOnboarding}
+					</Link>
+				)}
 			</div>
 
 			<div className="mb-6 grid max-w-md gap-2">
@@ -155,7 +162,7 @@ export function BankAccounts({ lang }: Props) {
 			) : (
 				<ul className="m-0 grid list-none gap-3 p-0">
 					{filtered.map((row) => {
-						const incomplete = isIncomplete(row);
+						const incomplete = isBankOnboardingIncomplete(row);
 						const href = incomplete
 							? "/playground/bank/onboarding"
 							: "/playground/bank";

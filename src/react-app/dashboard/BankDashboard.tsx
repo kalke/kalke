@@ -6,15 +6,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SurfacePanel } from "@/components/layout";
 import { cn } from "@/lib/utils";
+import { isBankOnboardingIncomplete } from "./bankOnboardingStatus";
 import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-
-function isIncomplete(row: BankAccount): boolean {
-	const status = row.onboarding_status;
-	return status !== "completed" && status !== "skipped";
-}
 
 export function BankDashboard({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -35,14 +31,8 @@ export function BankDashboard({ lang }: Props) {
 			} catch (err) {
 				if (cancelled) return;
 				const msg = err instanceof Error ? err.message : "";
-				if (
-					/not found|bank_404|404/i.test(msg) &&
-					!/onboarding|complete onboarding/i.test(msg)
-				) {
-					setMissing(true);
-					setAccount(null);
-				} else if (/onboarding|complete onboarding|bank_400/i.test(msg)) {
-					// Legacy gate — still treat as missing only when no account body.
+				// Incomplete accounts return 200 with status; missing is 404-only.
+				if (/not found|bank_404|\b404\b/i.test(msg)) {
 					setMissing(true);
 					setAccount(null);
 				} else {
@@ -57,7 +47,7 @@ export function BankDashboard({ lang }: Props) {
 		};
 	}, [setError, t.bankLoadError]);
 
-	const incomplete = account ? isIncomplete(account) : false;
+	const incomplete = account ? isBankOnboardingIncomplete(account) : false;
 
 	return (
 		<>
