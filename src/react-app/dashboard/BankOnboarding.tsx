@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router";
 import {
 	bankCepLookup,
 	bankMeta,
+	bankOnboarding,
 	bankOnboardingComplete,
 	bankOnboardingDocuments,
 	bankOnboardingSkip,
@@ -83,6 +84,62 @@ const empty: WizardState = {
 	terms_accepted: false,
 };
 
+type PersistedWizard = {
+	form: WizardState;
+	step: Step;
+};
+
+function loadPersisted(): PersistedWizard | null {
+	try {
+		const raw = sessionStorage.getItem(STORAGE_KEY);
+		if (!raw) return null;
+		const parsed = JSON.parse(raw) as Partial<PersistedWizard> &
+			Partial<WizardState>;
+		if (parsed && typeof parsed === "object" && "form" in parsed) {
+			const stepNum = Number((parsed as PersistedWizard).step);
+			const step = (
+				Number.isInteger(stepNum) && stepNum >= 0 && stepNum <= 5 ? stepNum : 0
+			) as Step;
+			return {
+				form: { ...empty, ...(parsed as PersistedWizard).form },
+				step,
+			};
+		}
+		return { form: { ...empty, ...(parsed as WizardState) }, step: 0 };
+	} catch {
+		return null;
+	}
+}
+
+function validateFieldsForStep(form: WizardState, s: Step): string | null {
+	if (s === 1) {
+		if (form.full_name.trim().length < 2) return "name";
+		if (!form.birth_date) return "dob";
+		if (!isAdult(form.birth_date)) return "age";
+		if (digitsOnly(form.document_number).length < 11) return "doc";
+	}
+	if (s === 2) {
+		if (digitsOnly(form.cep).length !== 8) return "cep";
+		if (!form.street.trim() || !form.number.trim()) return "address";
+	}
+	if (s === 3) {
+		if (!isEmail(form.email)) return "email";
+		if (digitsOnly(form.phone).length < 10) return "phone";
+	}
+	if (s === 4 && !form.terms_accepted) return "terms";
+	return null;
+}
+
+function inferStepFromForm(form: WizardState, hasIdDoc: boolean): Step {
+	if (validateFieldsForStep(form, 4) == null && form.terms_accepted) return 5;
+	if (validateFieldsForStep(form, 3) == null) return 4;
+	if (validateFieldsForStep(form, 2) == null) return 3;
+	if (validateFieldsForStep(form, 1) == null) return 2;
+	if (hasIdDoc || form.full_name.trim().length >= 2) return 1;
+	return 0;
+}
+
+
 function isPlainObject(v: unknown): v is Record<string, unknown> {
 	return v != null && typeof v === "object" && !Array.isArray(v);
 }
@@ -137,16 +194,9 @@ export function BankOnboarding({ lang }: Props) {
 	const navigate = useNavigate();
 	const { busy, setBusy, setError } = useDashboard();
 	const [meta, setMeta] = useState<BankMeta | null>(null);
-	const [step, setStep] = useState<Step>(0);
-	const [form, setForm] = useState<WizardState>(() => {
-		try {
-			const raw = sessionStorage.getItem(STORAGE_KEY);
-			if (raw) return { ...empty, ...JSON.parse(raw) };
-		} catch {
-			/* ignore */
-		}
-		return empty;
-	});
+	const persisted = useMemo(() => loadPersisted(), []);
+	const [step, setStep] = useState<Step>(() => persisted?.step ?? 0);
+	const [form, setForm] = useState<WizardState>(() => persisted?.form ?? empty);
 	const [idFile, setIdFile] = useState<File | null>(null);
 	const [progress, setProgress] = useState<ExtractProgress | null>(null);
 	const [cepLoading, setCepLoading] = useState(false);
@@ -154,15 +204,27 @@ export function BankOnboarding({ lang }: Props) {
 	const [termsError, setTermsError] = useState(false);
 
 	useEffect(() => {
-		sessionStorage.setItem(STORAGE_KEY, JSON.stringify(form));
-	}, [form]);
+		sessionStorage.setItem(
+			STORAGE_KEY,
+			JSON.stringify({ form, step } satisfies PersistedWizard),
+		);
+	}, [form, step]);
 
 	useEffect(() => {
 		let cancelled = false;
 		(async () => {
 			try {
-				const m = await bankMeta();
-				if (!cancelled) setMeta(m);
+				const [m, status] = await Promise.all([
+					bankMeta().catch(() => null),
+					bankOnboarding().catch(() => null),
+				]);
+				if (cancelled) return;
+				if (m) setMeta(m);
+				const hasIdDoc = Boolean(
+					status?.documents?.some((d) => d.doc_type === "identity_document"),
+				);
+				const inferred = inferStepFromForm(form, hasIdDoc);
+				setStep((current) => Math.max(current, inferred) as Step);
 			} catch {
 				/* optional */
 			}
@@ -170,6 +232,7 @@ export function BankOnboarding({ lang }: Props) {
 		return () => {
 			cancelled = true;
 		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount resume only
 	}, []);
 
 	const stepLabels = useMemo(
