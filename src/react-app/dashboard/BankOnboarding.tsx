@@ -1,17 +1,13 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import {
 	bankCepLookup,
-	bankMeta,
-	bankOnboarding,
 	bankOnboardingComplete,
 	bankOnboardingDocuments,
 	bankOnboardingSkip,
 	bankOnboardingStart,
 	extractDocument,
 	listExtractions,
-	type BankMeta,
-	type BankOnboardingHolder,
 	type ExtractProgress,
 } from "../api";
 import { copy, type Lang } from "../content";
@@ -39,27 +35,14 @@ import {
 } from "./bankValidation";
 import { FileDropzone } from "./FileDropzone";
 import { useDashboard } from "./useDashboard";
+import {
+	useBankOnboardingAccount,
+	type Step,
+	type WizardState,
+} from "./useBankOnboardingAccount";
 
 type Props = { lang: Lang };
-type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
-type WizardState = {
-	full_name: string;
-	birth_date: string;
-	document_number: string;
-	cep: string;
-	street: string;
-	number: string;
-	complement: string;
-	neighborhood: string;
-	city: string;
-	state: string;
-	email: string;
-	phone: string;
-	terms_accepted: boolean;
-};
-
-const STORAGE_PREFIX = "kalke-bank-onboarding-v1";
 const STEPS = [
 	"ID document",
 	"Account holder",
@@ -68,82 +51,6 @@ const STEPS = [
 	"Terms",
 	"Review",
 ] as const;
-
-const empty: WizardState = {
-	full_name: "",
-	birth_date: "",
-	document_number: "",
-	cep: "",
-	street: "",
-	number: "",
-	complement: "",
-	neighborhood: "",
-	city: "",
-	state: "",
-	email: "",
-	phone: "",
-	terms_accepted: false,
-};
-
-type PersistedWizard = {
-	form: WizardState;
-	step: Step;
-};
-
-function storageKey(accountId: string): string {
-	return accountId ? `${STORAGE_PREFIX}:${accountId}` : STORAGE_PREFIX;
-}
-
-function loadPersisted(key: string): PersistedWizard | null {
-	try {
-		const raw = sessionStorage.getItem(key);
-		if (!raw) return null;
-		const parsed = JSON.parse(raw) as Partial<PersistedWizard> &
-			Partial<WizardState>;
-		if (parsed && typeof parsed === "object" && "form" in parsed) {
-			const stepNum = Number((parsed as PersistedWizard).step);
-			const step = (
-				Number.isInteger(stepNum) && stepNum >= 0 && stepNum <= 5 ? stepNum : 0
-			) as Step;
-			return {
-				form: { ...empty, ...(parsed as PersistedWizard).form },
-				step,
-			};
-		}
-		return { form: { ...empty, ...(parsed as WizardState) }, step: 0 };
-	} catch {
-		return null;
-	}
-}
-
-function validateFieldsForStep(form: WizardState, s: Step): string | null {
-	if (s === 1) {
-		if (form.full_name.trim().length < 2) return "name";
-		if (!form.birth_date) return "dob";
-		if (!isAdult(form.birth_date)) return "age";
-		if (digitsOnly(form.document_number).length < 11) return "doc";
-	}
-	if (s === 2) {
-		if (digitsOnly(form.cep).length !== 8) return "cep";
-		if (!form.street.trim() || !form.number.trim()) return "address";
-	}
-	if (s === 3) {
-		if (!isEmail(form.email)) return "email";
-		if (digitsOnly(form.phone).length < 10) return "phone";
-	}
-	if (s === 4 && !form.terms_accepted) return "terms";
-	return null;
-}
-
-function inferStepFromForm(form: WizardState, hasIdDoc: boolean): Step {
-	if (validateFieldsForStep(form, 4) == null && form.terms_accepted) return 5;
-	if (validateFieldsForStep(form, 3) == null) return 4;
-	if (validateFieldsForStep(form, 2) == null) return 3;
-	if (validateFieldsForStep(form, 1) == null) return 2;
-	if (hasIdDoc || form.full_name.trim().length >= 2) return 1;
-	return 0;
-}
-
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
 	return v != null && typeof v === "object" && !Array.isArray(v);
@@ -194,100 +101,43 @@ function Field({
 	);
 }
 
-function holderPrefill(
-	holder: BankOnboardingHolder | null | undefined,
-	form: WizardState,
-): Partial<WizardState> {
-	if (!holder) return {};
-	const patch: Partial<WizardState> = {};
-	if (!form.full_name.trim() && holder.full_name) {
-		patch.full_name = holder.full_name;
-	}
-	if (!form.birth_date && holder.birth_date) {
-		patch.birth_date = holder.birth_date.slice(0, 10);
-	}
-	if (!form.document_number.trim() && holder.document_number) {
-		patch.document_number = holder.document_number;
-	}
-	if (!form.cep.trim() && holder.cep) patch.cep = holder.cep;
-	if (!form.street.trim() && holder.street) patch.street = holder.street;
-	if (!form.number.trim() && holder.number) patch.number = holder.number;
-	if (!form.complement.trim() && holder.complement) {
-		patch.complement = holder.complement;
-	}
-	if (!form.neighborhood.trim() && holder.neighborhood) {
-		patch.neighborhood = holder.neighborhood;
-	}
-	if (!form.city.trim() && holder.city) patch.city = holder.city;
-	if (!form.state.trim() && holder.state) patch.state = holder.state;
-	if (!form.email.trim() && holder.email) patch.email = holder.email;
-	if (!form.phone.trim() && holder.phone) patch.phone = holder.phone;
-	return patch;
-}
-
 export function BankOnboarding({ lang }: Props) {
-	const t = copy[lang].playground;
-	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const accountId = searchParams.get("account") ?? "";
-	const persistKey = storageKey(accountId);
+	return (
+		<BankOnboardingWizard
+			key={accountId || "new"}
+			lang={lang}
+			accountId={accountId}
+		/>
+	);
+}
+
+function BankOnboardingWizard({
+	lang,
+	accountId,
+}: {
+	lang: Lang;
+	accountId: string;
+}) {
+	const t = copy[lang].playground;
+	const navigate = useNavigate();
 	const { busy, setBusy, setError } = useDashboard();
-	const [meta, setMeta] = useState<BankMeta | null>(null);
-	const persisted = useMemo(() => loadPersisted(persistKey), [persistKey]);
-	const [boundAccountId, setBoundAccountId] = useState(accountId);
-	const [step, setStep] = useState<Step>(() => persisted?.step ?? 0);
-	const [form, setForm] = useState<WizardState>(() => persisted?.form ?? empty);
+	const {
+		persistKey,
+		form,
+		setForm,
+		step,
+		setStep,
+		patch,
+		meta,
+		bindAccountUrl,
+	} = useBankOnboardingAccount(accountId);
 	const [idFile, setIdFile] = useState<File | null>(null);
 	const [progress, setProgress] = useState<ExtractProgress | null>(null);
 	const [cepLoading, setCepLoading] = useState(false);
 	const [termsOpen, setTermsOpen] = useState(false);
 	const [termsError, setTermsError] = useState(false);
-
-	useEffect(() => {
-		const loaded = loadPersisted(persistKey);
-		setForm(loaded?.form ?? empty);
-		setStep(loaded?.step ?? 0);
-		setBoundAccountId(accountId);
-	}, [accountId, persistKey]);
-
-	useEffect(() => {
-		sessionStorage.setItem(
-			persistKey,
-			JSON.stringify({ form, step } satisfies PersistedWizard),
-		);
-	}, [form, step, persistKey]);
-
-	useEffect(() => {
-		let cancelled = false;
-		(async () => {
-			try {
-				const [m, status] = await Promise.all([
-					bankMeta().catch(() => null),
-					bankOnboarding(accountId || undefined).catch(() => null),
-				]);
-				if (cancelled) return;
-				if (m) setMeta(m);
-				if (status?.account_id) setBoundAccountId(status.account_id);
-				const hasIdDoc = Boolean(
-					status?.documents?.some((d) => d.doc_type === "identity_document"),
-				);
-				setForm((current) => {
-					const patch = holderPrefill(status?.holder, current);
-					const next = Object.keys(patch).length
-						? { ...current, ...patch }
-						: current;
-					const inferred = inferStepFromForm(next, hasIdDoc);
-					setStep((s) => Math.max(s, inferred) as Step);
-					return next;
-				});
-			} catch {
-				/* optional */
-			}
-		})();
-		return () => {
-			cancelled = true;
-		};
-	}, [accountId]);
 
 	const stepLabels = useMemo(
 		() =>
@@ -303,10 +153,6 @@ export function BankOnboarding({ lang }: Props) {
 				: [...STEPS],
 		[lang],
 	);
-
-	function patch(partial: Partial<WizardState>) {
-		setForm((prev) => ({ ...prev, ...partial }));
-	}
 
 	function validateStep(s: Step): string | null {
 		if (s === 1) {
@@ -352,8 +198,8 @@ export function BankOnboarding({ lang }: Props) {
 		setError("");
 		setProgress(null);
 		try {
-			const started = await bankOnboardingStart(boundAccountId || undefined);
-			if (started.account_id) setBoundAccountId(started.account_id);
+			const started = await bankOnboardingStart(accountId || undefined);
+			const target = started.account_id || accountId || undefined;
 			const extracted = await extractDocument(
 				idFile,
 				"identity_document",
@@ -365,25 +211,30 @@ export function BankOnboarding({ lang }: Props) {
 			const latest = listed[0];
 			const summary =
 				summaryFromExtract(extracted) ?? summaryFromExtract(latest);
+			const nextForm: WizardState = summary
+				? {
+						...form,
+						full_name:
+							strField(summary, "nome", "name", "full_name") || form.full_name,
+						birth_date:
+							strField(summary, "data_nascimento", "birth_date") ||
+							form.birth_date,
+						document_number:
+							digitsOnly(
+								strField(summary, "cpf", "numero_documento", "document_number"),
+							) || form.document_number,
+					}
+				: form;
 			if (summary) {
 				await bankOnboardingDocuments({
 					doc_type: "identity_document",
 					pde_extraction_id: typeof latest?.id === "string" ? latest.id : null,
 					summary,
-					account_id: boundAccountId || undefined,
+					account_id: target,
 				});
-				patch({
-					full_name:
-						strField(summary, "nome", "name", "full_name") || form.full_name,
-					birth_date:
-						strField(summary, "data_nascimento", "birth_date") ||
-						form.birth_date,
-					document_number:
-						digitsOnly(
-							strField(summary, "cpf", "numero_documento", "document_number"),
-						) || form.document_number,
-				});
+				setForm(nextForm);
 			}
+			bindAccountUrl(target, nextForm, 1);
 			setStep(1);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.bankOnboardingError);
@@ -418,10 +269,10 @@ export function BankOnboarding({ lang }: Props) {
 		setBusy(true);
 		setError("");
 		try {
-			const started = await bankOnboardingStart(boundAccountId || undefined);
-			const target = started.account_id || boundAccountId || undefined;
-			if (started.account_id) setBoundAccountId(started.account_id);
-			await bankOnboardingSkip(crypto.randomUUID(), target);
+			await bankOnboardingSkip({
+				idempotencyKey: crypto.randomUUID(),
+				accountId: accountId || undefined,
+			});
 			sessionStorage.removeItem(persistKey);
 			navigate("/playground/bank", { replace: true });
 		} catch (err) {
@@ -441,12 +292,9 @@ export function BankOnboarding({ lang }: Props) {
 		setBusy(true);
 		setError("");
 		try {
-			const started = await bankOnboardingStart(boundAccountId || undefined);
-			const target = started.account_id || boundAccountId || undefined;
-			if (started.account_id) setBoundAccountId(started.account_id);
 			await bankOnboardingComplete(
 				{
-					account_id: target,
+					account_id: accountId || undefined,
 					full_name: form.full_name.trim(),
 					birth_date: form.birth_date,
 					document_number: digitsOnly(form.document_number),

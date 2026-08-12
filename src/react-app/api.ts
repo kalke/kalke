@@ -601,8 +601,9 @@ export type BankOnboardingCompleteInput = {
 
 function withAccountQuery(path: string, accountId?: string | null): string {
 	if (!accountId) return path;
-	const join = path.includes("?") ? "&" : "?";
-	return `${path}${join}account_id=${encodeURIComponent(accountId)}`;
+	const params = new URLSearchParams();
+	params.set("account_id", accountId);
+	return `${path}?${params.toString()}`;
 }
 
 async function bankJson<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -817,16 +818,16 @@ export async function bankOnboardingConsent(
 	});
 }
 
-export async function bankOnboardingSkip(
-	idempotencyKey?: string,
-	accountId?: string | null,
-): Promise<BankAccount> {
+export async function bankOnboardingSkip(input: {
+	idempotencyKey?: string;
+	accountId?: string | null;
+}): Promise<BankAccount> {
 	return bankJson<BankAccount>(
-		withAccountQuery("/v1/bank/onboarding/skip", accountId),
+		withAccountQuery("/v1/bank/onboarding/skip", input.accountId),
 		{
 			method: "POST",
-			headers: idempotencyKey
-				? { "Idempotency-Key": idempotencyKey }
+			headers: input.idempotencyKey
+				? { "Idempotency-Key": input.idempotencyKey }
 				: undefined,
 		},
 	);
@@ -838,27 +839,21 @@ export async function bankOnboardingDocuments(input: {
 	summary?: Record<string, unknown> | null;
 	account_id?: string | null;
 }): Promise<BankOnboardingStatus> {
-	return bankJson<BankOnboardingStatus>(
-		withAccountQuery("/v1/bank/onboarding/documents", input.account_id),
-		{
-			method: "POST",
-			body: JSON.stringify(input),
-		},
-	);
+	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/documents", {
+		method: "POST",
+		body: JSON.stringify(input),
+	});
 }
 
 export async function bankOnboardingComplete(
 	input: BankOnboardingCompleteInput,
 	idempotencyKey?: string,
 ): Promise<BankAccount> {
-	return bankJson<BankAccount>(
-		withAccountQuery("/v1/bank/onboarding/complete", input.account_id),
-		{
-			method: "POST",
-			headers: idempotencyKey
-				? { "Idempotency-Key": idempotencyKey }
-				: undefined,
-			body: JSON.stringify(input),
-		},
-	);
+	return bankJson<BankAccount>("/v1/bank/onboarding/complete", {
+		method: "POST",
+		headers: idempotencyKey
+			? { "Idempotency-Key": idempotencyKey }
+			: undefined,
+		body: JSON.stringify(input),
+	});
 }
