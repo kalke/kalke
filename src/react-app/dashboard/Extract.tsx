@@ -1,14 +1,11 @@
-import {
-	useId,
-	useMemo,
-	useRef,
-	useState,
-	type ChangeEvent,
-	type DragEvent,
-	type FormEvent,
-} from "react";
+import { useMemo, useState, type FormEvent } from "react";
+import { SurfacePanel } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { extractDocument, type ExtractProgress } from "../api";
 import { copy, type Lang } from "../content";
+import { FileDropzone } from "./FileDropzone";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
@@ -89,20 +86,6 @@ function formatScalar(v: unknown, lang?: Lang, key?: string): string | null {
 		return String(v);
 	}
 	return null;
-}
-
-function formatBytes(n: number): string {
-	if (n < 1024) return `${n} B`;
-	if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-	return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function fileKind(file: File): "pdf" | "image" | "other" {
-	if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) return "pdf";
-	if (file.type.startsWith("image/") || /\.(png|jpe?g|webp|gif)$/i.test(file.name)) {
-		return "image";
-	}
-	return "other";
 }
 
 function pushRow(
@@ -252,6 +235,9 @@ function isUnauthorized(err: unknown): boolean {
 	return msg === "unauthorized" || msg.includes("unauthorized");
 }
 
+const selectClassName =
+	"flex h-10 w-full rounded-md border border-input bg-bg-deep px-3 py-2 text-sm text-fg shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+
 export function Extract({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { busy, setBusy, error, setError } = useDashboard();
@@ -260,10 +246,7 @@ export function Extract({ lang }: Props) {
 	const [consent, setConsent] = useState(false);
 	const [result, setResult] = useState<unknown>(null);
 	const [showJson, setShowJson] = useState(false);
-	const [dragging, setDragging] = useState(false);
 	const [progress, setProgress] = useState<ExtractProgress | null>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
-	const fileInputId = useId();
 
 	const summary = useMemo(
 		() => (result != null ? summarize(result, docType, t.fieldLabels, lang) : null),
@@ -276,19 +259,6 @@ export function Extract({ lang }: Props) {
 		setResult(null);
 		setShowJson(false);
 		setProgress(null);
-	}
-
-	function onFileChange(e: ChangeEvent<HTMLInputElement>) {
-		pickFile(e.target.files?.[0] ?? null);
-		e.target.value = "";
-	}
-
-	function onDrop(e: DragEvent<HTMLLabelElement>) {
-		e.preventDefault();
-		setDragging(false);
-		if (busy) return;
-		const next = e.dataTransfer.files?.[0] ?? null;
-		if (next) pickFile(next);
 	}
 
 	async function onExtract(e: FormEvent) {
@@ -325,169 +295,147 @@ export function Extract({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathExtract}</p>
-			<h1>{t.pdeTitle}</h1>
-			<p className="section-intro">{t.pdeHint}</p>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathExtract}
+			</p>
+			<h1 className="font-display mb-3 text-3xl font-semibold tracking-tight">
+				{t.pdeTitle}
+			</h1>
+			<p className="mb-8 max-w-2xl text-muted">{t.pdeHint}</p>
 
-			<form className="playground-form extract-form" onSubmit={onExtract}>
-					<label>
-						{t.docType}
-						<select
-							value={docType}
-							onChange={(e) => setDocType(e.target.value)}
-							disabled={busy}
-						>
-							<option value="identity_document">{t.docTypeIdentity}</option>
-							<option value="address_proof">{t.docTypeAddress}</option>
-							<option value="invoice_nf">{t.docTypeInvoice}</option>
-						</select>
-					</label>
+			<form className="grid w-full max-w-md gap-4" onSubmit={onExtract}>
+				<div className="grid gap-2">
+					<Label htmlFor="extract-doc-type">{t.docType}</Label>
+					<select
+						id="extract-doc-type"
+						className={selectClassName}
+						value={docType}
+						onChange={(e) => setDocType(e.target.value)}
+						disabled={busy}
+					>
+						<option value="identity_document">{t.docTypeIdentity}</option>
+						<option value="address_proof">{t.docTypeAddress}</option>
+						<option value="invoice_nf">{t.docTypeInvoice}</option>
+					</select>
+				</div>
 
-					<div className="file-field">
-						<span className="file-field-label">{t.chooseFile}</span>
-						<input
-							ref={inputRef}
-							id={fileInputId}
-							className="file-input-hidden"
-							type="file"
-							accept="image/*,.pdf,application/pdf"
-							onChange={onFileChange}
-							disabled={busy}
-						/>
-						{!file ? (
-							<label
-								htmlFor={fileInputId}
-								className={`file-dropzone${dragging ? " is-dragging" : ""}`}
-								onDragEnter={(e) => {
-									e.preventDefault();
-									if (!busy) setDragging(true);
-								}}
-								onDragOver={(e) => {
-									e.preventDefault();
-									if (!busy) setDragging(true);
-								}}
-								onDragLeave={(e) => {
-									e.preventDefault();
-									if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-									setDragging(false);
-								}}
-								onDrop={onDrop}
-							>
-								<span className="file-dropzone-icon" aria-hidden="true">
-									↑
-								</span>
-								<span className="file-dropzone-title">{t.dropHint}</span>
-								<span className="file-dropzone-browse">{t.dropBrowse}</span>
-							</label>
-						) : (
-							<div className={`file-selected kind-${fileKind(file)}`}>
-								<div className="file-selected-badge" aria-hidden="true">
-									{fileKind(file) === "pdf" ? "PDF" : "IMG"}
-								</div>
-								<div className="file-selected-meta">
-									<strong title={file.name}>{file.name}</strong>
-									<span>{formatBytes(file.size)}</span>
-								</div>
-								<div className="file-selected-actions">
-									<button
-										type="button"
-										className="btn btn-ghost"
-										disabled={busy}
-										onClick={() => inputRef.current?.click()}
-									>
-										{t.dropReplace}
-									</button>
-									<button
-										type="button"
-										className="btn btn-ghost"
-										disabled={busy}
-										onClick={() => pickFile(null)}
-									>
-										{t.dropRemove}
-									</button>
-								</div>
-							</div>
-						)}
-					</div>
+				<div className="grid gap-2">
+					<span className="font-display text-xs text-muted">{t.chooseFile}</span>
+					<FileDropzone
+						file={file}
+						onFile={pickFile}
+						disabled={busy}
+						dropHint={t.dropHint}
+						dropBrowse={t.dropBrowse}
+						dropReplace={t.dropReplace}
+						dropRemove={t.dropRemove}
+					/>
+				</div>
 
-					{progress ? (
-						<div
-							className={`extract-progress${progress.stage === "extract" ? " is-extracting" : ""}`}
-							role="status"
-							aria-live="polite"
-						>
-							<div className="extract-progress-head">
-								<span>{progressLabel}</span>
-								<span>{Math.round(progress.percent)}%</span>
-							</div>
-							<div
-								className="extract-progress-track"
-								aria-valuemin={0}
-								aria-valuemax={100}
-								aria-valuenow={Math.round(progress.percent)}
-								role="progressbar"
-							>
-								<span
-									className="extract-progress-fill"
-									style={{ width: `${Math.max(4, progress.percent)}%` }}
-								/>
-							</div>
+				{progress ? (
+					<div
+						className="grid gap-2 rounded-md border border-border bg-bg-deep/50 p-3"
+						role="status"
+						aria-live="polite"
+					>
+						<div className="flex justify-between gap-3 font-display text-xs text-muted">
+							<span>{progressLabel}</span>
+							<span>{Math.round(progress.percent)}%</span>
 						</div>
-					) : null}
+						<div
+							className="h-1.5 overflow-hidden rounded-full bg-fg/5"
+							aria-valuemin={0}
+							aria-valuemax={100}
+							aria-valuenow={Math.round(progress.percent)}
+							role="progressbar"
+						>
+							<span
+								className="block h-full rounded-full bg-gradient-to-r from-[#c4872f] via-accent to-accent-cool transition-[width] duration-250"
+								style={{
+									width: `${Math.max(4, progress.percent)}%`,
+									...(progress.stage === "extract"
+										? {
+												backgroundSize: "200% 100%",
+												animation:
+													"extract-shimmer 1.1s linear infinite",
+											}
+										: {}),
+								}}
+							/>
+						</div>
+					</div>
+				) : null}
 
-					<label
-						className={`playground-consent${consent ? " is-checked" : ""}`}
-					>
-						<input
-							type="checkbox"
-							checked={consent}
-							onChange={(e) => setConsent(e.target.checked)}
-							required
-							disabled={busy}
-						/>
-						<span className="playground-consent-copy">
-							<span className="playground-consent-title">{t.consentTitle}</span>
-							<span className="playground-consent-text">{t.consentLabel}</span>
+				<label
+					className={cn(
+						"grid cursor-pointer grid-cols-[auto_1fr] items-start gap-3 rounded-md border border-accent/25 bg-gradient-to-br from-accent/[0.07] to-transparent bg-bg-deep/55 p-4 transition-colors hover:border-accent/40",
+						consent &&
+							"border-accent/55 from-accent/15 bg-surface/70 shadow-[0_0_0_1px_rgba(231,163,57,0.08)]",
+					)}
+				>
+					<input
+						type="checkbox"
+						className="mt-1 size-4 shrink-0 accent-accent"
+						checked={consent}
+						onChange={(e) => setConsent(e.target.checked)}
+						required
+						disabled={busy}
+					/>
+					<span className="grid min-w-0 gap-1.5">
+						<span className="font-display text-sm font-semibold tracking-wide text-accent">
+							{t.consentTitle}
 						</span>
-					</label>
-					<button
-						className="btn btn-primary"
-						type="submit"
-						disabled={busy || !consent || !file}
-					>
-						{busy ? t.extracting : t.extract}
-					</button>
-				</form>
+						<span className="text-sm leading-relaxed text-muted">
+							{t.consentLabel}
+						</span>
+					</span>
+				</label>
+				<Button type="submit" disabled={busy || !consent || !file}>
+					{busy ? t.extracting : t.extract}
+				</Button>
+			</form>
 
 			{summary ? (
-				<div className="extract-result surface-panel">
-					<h2>{t.extracted}</h2>
-					<p className="path-label">{t.resultSummary}</p>
-					<dl className="extract-summary">
+				<SurfacePanel className="my-4 grid gap-4">
+					<h2 className="font-display text-xl font-semibold tracking-tight">
+						{t.extracted}
+					</h2>
+					<p className="font-display text-xs font-medium tracking-wide text-accent-cool">
+						{t.resultSummary}
+					</p>
+					<dl className="mb-2 grid gap-2">
 						{summary.rows.map((row) => (
-							<div key={row.k}>
-								<dt>{row.label}</dt>
-								<dd className={row.v.includes("\n") ? "is-multiline" : undefined}>
+							<div
+								key={row.k}
+								className="grid gap-1 border-b border-border pb-2 sm:grid-cols-[minmax(6rem,10rem)_1fr] sm:gap-3"
+							>
+								<dt className="font-display text-xs text-muted">{row.label}</dt>
+								<dd
+									className={cn(
+										"m-0 break-words text-fg",
+										row.v.includes("\n") && "whitespace-pre-line",
+									)}
+								>
 									{row.v}
 								</dd>
 							</div>
 						))}
 					</dl>
-					<button
+					<Button
 						type="button"
-						className="btn btn-ghost"
+						variant="ghost"
 						onClick={() => setShowJson((v) => !v)}
 					>
 						{showJson ? t.resultHideJson : t.resultJson}
-					</button>
+					</Button>
 					{showJson ? (
-						<pre className="playground-result-json">
+						<pre className="mt-3 max-h-88 overflow-auto rounded-md border border-border bg-bg-deep/55 p-3.5 font-display text-xs leading-relaxed break-words whitespace-pre-wrap text-fg">
 							{JSON.stringify(result, null, 2)}
 						</pre>
 					) : null}
-				</div>
+				</SurfacePanel>
 			) : !error && !busy ? (
-				<p className="playground-muted">{t.extractEmpty}</p>
+				<p className="mt-6 text-muted">{t.extractEmpty}</p>
 			) : null}
 		</>
 	);

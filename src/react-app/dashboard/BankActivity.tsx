@@ -9,6 +9,11 @@ import {
 	type BankTransactionFilters,
 } from "../api";
 import { copy, type Lang } from "../content";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
 	amountToneClass,
 	formatSignedBankMoney,
@@ -21,6 +26,38 @@ import { useDashboard } from "./useDashboard";
 type Props = { lang: Lang };
 
 type PeriodPreset = "7d" | "30d" | "this_month" | "last_month" | "custom" | "all";
+
+const selectClassName = cn(
+	"flex h-10 w-full min-w-[8rem] rounded-md border border-input bg-bg-deep px-3 py-2 text-sm text-fg shadow-sm",
+	"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+	"disabled:cursor-not-allowed disabled:opacity-50",
+);
+
+function toneClass(direction?: string, amount?: string): string {
+	const tone = amountToneClass(direction, amount);
+	if (tone === "is-credit") return "text-[#2f7d4a]";
+	if (tone === "is-debit") return "text-[#a14a2d]";
+	return "";
+}
+
+function TxBadge({ badge, type }: { badge?: string; type: string }) {
+	const kind = badge || type || "other";
+	const credit = kind === "transfer_in" || kind === "grant";
+	const debit = kind === "transfer_out" || kind === "withdraw";
+	return (
+		<Badge
+			variant="outline"
+			className={cn(
+				"shrink-0 text-[0.65rem] tracking-wide uppercase",
+				credit && "border-[#2f7d4a]/40 text-[#2f7d4a]",
+				debit && "border-[#a14a2d]/40 text-[#a14a2d]",
+				!credit && !debit && "border-border text-muted",
+			)}
+		>
+			{kind}
+		</Badge>
+	);
+}
 
 export function BankActivity({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -124,24 +161,37 @@ export function BankActivity({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathBank}</p>
-			<div className="bank-title-row">
-				<h1>{t.bankActivityTitle}</h1>
-				<span className="bank-demo-badge">{t.bankDemoBadge}</span>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathBank}
+			</p>
+			<div className="mb-1 flex flex-wrap items-baseline gap-x-3.5 gap-y-2.5">
+				<h1 className="font-display m-0 text-3xl font-semibold tracking-tight">
+					{t.bankActivityTitle}
+				</h1>
+				<Badge
+					variant="outline"
+					className="border-accent/45 bg-accent/10 text-[0.68rem] font-semibold tracking-[0.08em] text-accent uppercase"
+				>
+					{t.bankDemoBadge}
+				</Badge>
 			</div>
-			<p className="section-intro">{t.bankActivityIntro}</p>
+			<p className="mb-8 text-muted">{t.bankActivityIntro}</p>
 
-			<div className="cv-page-actions bank-page-actions">
-				<Link className="btn btn-ghost" to="/playground/bank">
+			<div className="mb-6 flex flex-wrap gap-2">
+				<Link
+					className={buttonVariants({ variant: "ghost" })}
+					to="/playground/bank"
+				>
 					{t.bankActivityBack}
 				</Link>
 			</div>
 
-			<div className="bank-filters">
+			<div className="mb-6 flex flex-wrap items-end gap-x-4 gap-y-3 border-y border-border py-3.5">
 				{accounts.length > 1 ? (
-					<label className="bank-filter-field">
-						<span>{t.bankFilterAccount}</span>
+					<div className="grid min-w-[8rem] gap-1">
+						<Label className="text-xs text-muted">{t.bankFilterAccount}</Label>
 						<select
+							className={selectClassName}
 							value={accountId}
 							onChange={(e) => setAccountId(e.target.value)}
 						>
@@ -151,11 +201,12 @@ export function BankActivity({ lang }: Props) {
 								</option>
 							))}
 						</select>
-					</label>
+					</div>
 				) : null}
-				<label className="bank-filter-field">
-					<span>{t.bankFilterPeriod}</span>
+				<div className="grid min-w-[8rem] gap-1">
+					<Label className="text-xs text-muted">{t.bankFilterPeriod}</Label>
 					<select
+						className={selectClassName}
 						value={period}
 						onChange={(e) => setPeriod(e.target.value as PeriodPreset)}
 					>
@@ -166,39 +217,44 @@ export function BankActivity({ lang }: Props) {
 						<option value="custom">{t.bankPeriodCustom}</option>
 						<option value="all">{t.bankPeriodAll}</option>
 					</select>
-				</label>
+				</div>
 				{period === "custom" ? (
 					<>
-						<label className="bank-filter-field">
-							<span>{t.bankFilterFrom}</span>
-							<input
+						<div className="grid min-w-[8rem] gap-1">
+							<Label className="text-xs text-muted">{t.bankFilterFrom}</Label>
+							<Input
 								type="date"
 								value={customFrom}
 								onChange={(e) => setCustomFrom(e.target.value)}
 							/>
-						</label>
-						<label className="bank-filter-field">
-							<span>{t.bankFilterTo}</span>
-							<input
+						</div>
+						<div className="grid min-w-[8rem] gap-1">
+							<Label className="text-xs text-muted">{t.bankFilterTo}</Label>
+							<Input
 								type="date"
 								value={customTo}
 								onChange={(e) => setCustomTo(e.target.value)}
 							/>
-						</label>
+						</div>
 					</>
 				) : null}
-				<label className="bank-filter-field">
-					<span>{t.bankFilterType}</span>
-					<select value={txType} onChange={(e) => setTxType(e.target.value)}>
+				<div className="grid min-w-[8rem] gap-1">
+					<Label className="text-xs text-muted">{t.bankFilterType}</Label>
+					<select
+						className={selectClassName}
+						value={txType}
+						onChange={(e) => setTxType(e.target.value)}
+					>
 						<option value="all">{t.bankTypeAll}</option>
 						<option value="transfer">{t.bankTypeTransfer}</option>
 						<option value="grant">{t.bankTypeGrant}</option>
 						<option value="withdraw">{t.bankTypeWithdraw}</option>
 					</select>
-				</label>
-				<label className="bank-filter-field">
-					<span>{t.bankFilterDirection}</span>
+				</div>
+				<div className="grid min-w-[8rem] gap-1">
+					<Label className="text-xs text-muted">{t.bankFilterDirection}</Label>
 					<select
+						className={selectClassName}
 						value={direction}
 						onChange={(e) => setDirection(e.target.value)}
 					>
@@ -206,57 +262,58 @@ export function BankActivity({ lang }: Props) {
 						<option value="in">{t.bankDirIn}</option>
 						<option value="out">{t.bankDirOut}</option>
 					</select>
-				</label>
-				<div className="bank-filter-actions">
-					<button
+				</div>
+				<div className="ml-auto flex flex-wrap gap-2">
+					<Button
 						type="button"
-						className="btn btn-ghost"
+						variant="ghost"
 						disabled={!!exporting}
 						onClick={() => void onExport("csv")}
 					>
 						{exporting === "csv" ? t.loading : t.bankExportCsv}
-					</button>
-					<button
+					</Button>
+					<Button
 						type="button"
-						className="btn btn-ghost"
+						variant="ghost"
 						disabled={!!exporting}
 						onClick={() => void onExport("pdf")}
 					>
 						{exporting === "pdf" ? t.loading : t.bankExportPdf}
-					</button>
+					</Button>
 				</div>
 			</div>
 
 			{loading ? (
-				<p className="playground-muted">{t.loading}</p>
+				<p className="text-sm text-muted">{t.loading}</p>
 			) : items.length === 0 ? (
-				<p className="playground-muted">{t.bankActivityEmpty}</p>
+				<p className="text-sm text-muted">{t.bankActivityEmpty}</p>
 			) : (
-				<div className="bank-tx-groups">
+				<div className="flex flex-col gap-5">
 					{groups.map((group) => (
-						<section key={group.key} className="bank-tx-group">
-							<h2 className="bank-tx-day">{group.label}</h2>
-							<ul className="bank-tx-list">
+						<section key={group.key}>
+							<h2 className="font-display mb-1.5 text-sm font-semibold capitalize text-muted">
+								{group.label}
+							</h2>
+							<ul className="m-0 flex list-none flex-col p-0">
 								{group.items.map((tx) => (
-									<li key={tx.id}>
+									<li key={tx.id} className="border-b border-border last:border-0">
 										<button
 											type="button"
-											className="bank-tx-item bank-tx-item-btn"
+											className="w-full rounded-lg px-1.5 py-3.5 text-left text-inherit transition-colors hover:bg-accent/10 focus-visible:bg-accent/10 focus-visible:outline-none"
 											onClick={() => setSelected(tx)}
 										>
-											<div className="bank-tx-main">
-												<div className="bank-tx-heading">
-													<span
-														className={`bank-tx-badge badge-${tx.badge || "other"}`}
-													>
-														{tx.badge || tx.type}
-													</span>
-													<strong className="bank-tx-type">
+											<div className="mb-1 flex items-baseline justify-between gap-3">
+												<div className="flex min-w-0 flex-wrap items-center gap-2">
+													<TxBadge badge={tx.badge} type={tx.type} />
+													<strong className="font-display text-[0.95rem] font-semibold [overflow-wrap:anywhere]">
 														{tx.title || tx.type}
 													</strong>
 												</div>
 												<span
-													className={`bank-tx-amount ${amountToneClass(tx.direction, tx.amount)}`}
+													className={cn(
+														"font-display shrink-0 text-[0.95rem] whitespace-nowrap tabular-nums",
+														toneClass(tx.direction, tx.amount),
+													)}
 												>
 													{formatSignedBankMoney(
 														tx.amount,
@@ -266,7 +323,7 @@ export function BankActivity({ lang }: Props) {
 													)}
 												</span>
 											</div>
-											<div className="bank-tx-meta">
+											<div className="min-w-0 text-xs text-muted">
 												<span>{tx.subtitle || "—"}</span>
 											</div>
 										</button>
@@ -279,15 +336,15 @@ export function BankActivity({ lang }: Props) {
 			)}
 
 			{cursor != null && items.length > 0 ? (
-				<div className="cv-page-actions bank-page-actions">
-					<button
+				<div className="mt-6 flex flex-wrap gap-2">
+					<Button
 						type="button"
-						className="btn btn-ghost"
+						variant="ghost"
 						disabled={loadingMore}
 						onClick={() => void load(cursor, true)}
 					>
 						{t.bankActivityMore}
-					</button>
+					</Button>
 				</div>
 			) : null}
 

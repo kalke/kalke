@@ -1,4 +1,6 @@
 import { useId, useRef, useState, type ChangeEvent, type DragEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Props = {
 	file: File | null;
@@ -55,11 +57,11 @@ export function FileDropzone({
 	}
 
 	return (
-		<div className="file-field">
+		<div className="grid gap-2">
 			<input
 				ref={inputRef}
 				id={inputId}
-				className="file-input-hidden"
+				className="sr-only"
 				type="file"
 				accept={accept}
 				onChange={onChange}
@@ -68,7 +70,13 @@ export function FileDropzone({
 			{!file ? (
 				<label
 					htmlFor={inputId}
-					className={`file-dropzone${dragging ? " is-dragging" : ""}`}
+					className={cn(
+						"grid cursor-pointer justify-items-center gap-1 rounded-md border border-dashed border-accent/35 bg-gradient-to-b from-accent/10 to-transparent bg-bg-deep/45 px-4 py-5 text-center text-muted transition-colors",
+						dragging &&
+							"-translate-y-px border-accent/70 from-accent/20 text-fg",
+						!disabled && "hover:border-accent/70 hover:from-accent/20 hover:text-fg",
+						disabled && "pointer-events-none opacity-50",
+					)}
 					onDragEnter={(e) => {
 						e.preventDefault();
 						if (!disabled) setDragging(true);
@@ -84,38 +92,55 @@ export function FileDropzone({
 					}}
 					onDrop={onDrop}
 				>
-					<span className="file-dropzone-icon" aria-hidden="true">
+					<span
+						className="mb-1 grid size-8 place-items-center rounded-full border border-accent/35 font-display text-base leading-none text-accent"
+						aria-hidden="true"
+					>
 						↑
 					</span>
-					<span className="file-dropzone-title">{dropHint}</span>
-					<span className="file-dropzone-browse">{dropBrowse}</span>
+					<span className="text-sm text-fg">{dropHint}</span>
+					<span className="font-display text-xs text-accent underline underline-offset-2">
+						{dropBrowse}
+					</span>
 				</label>
 			) : (
-				<div className={`file-selected kind-${fileKind(file)}`}>
-					<div className="file-selected-badge" aria-hidden="true">
+				<div className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 rounded-md border border-accent/30 bg-bg-deep/55 p-3.5">
+					<div
+						className="grid size-10 place-items-center rounded border border-accent/35 bg-accent-soft font-display text-[0.68rem] font-bold tracking-wide text-accent"
+						aria-hidden="true"
+					>
 						{fileKind(file) === "pdf" ? "PDF" : "IMG"}
 					</div>
-					<div className="file-selected-meta">
-						<strong title={file.name}>{file.name}</strong>
-						<span>{formatBytes(file.size)}</span>
+					<div className="grid min-w-0 gap-0.5">
+						<strong
+							className="truncate text-sm font-semibold text-fg"
+							title={file.name}
+						>
+							{file.name}
+						</strong>
+						<span className="font-display text-xs text-muted">
+							{formatBytes(file.size)}
+						</span>
 					</div>
-					<div className="file-selected-actions">
-						<button
+					<div className="col-span-full flex flex-wrap gap-1.5">
+						<Button
 							type="button"
-							className="btn btn-ghost"
+							variant="ghost"
+							size="sm"
 							disabled={disabled}
 							onClick={() => inputRef.current?.click()}
 						>
 							{dropReplace}
-						</button>
-						<button
+						</Button>
+						<Button
 							type="button"
-							className="btn btn-ghost"
+							variant="ghost"
+							size="sm"
 							disabled={disabled}
 							onClick={() => pick(null)}
 						>
 							{dropRemove}
-						</button>
+						</Button>
 					</div>
 				</div>
 			)}

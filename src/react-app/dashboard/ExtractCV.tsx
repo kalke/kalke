@@ -1,12 +1,7 @@
-import {
-	useId,
-	useRef,
-	useState,
-	type ChangeEvent,
-	type DragEvent,
-	type FormEvent,
-} from "react";
+import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
 	extractDocument,
 	listExtractions,
@@ -14,23 +9,10 @@ import {
 } from "../api";
 import { copy, type Lang } from "../content";
 import { CV_DOC_TYPE } from "./cvShared";
+import { FileDropzone } from "./FileDropzone";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
-
-function formatBytes(n: number): string {
-	if (n < 1024) return `${n} B`;
-	if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-	return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function fileKind(file: File): "pdf" | "image" | "other" {
-	if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) return "pdf";
-	if (file.type.startsWith("image/") || /\.(png|jpe?g|webp|gif)$/i.test(file.name)) {
-		return "image";
-	}
-	return "other";
-}
 
 function isUnauthorized(err: unknown): boolean {
 	if (!(err instanceof Error)) return false;
@@ -49,28 +31,12 @@ export function ExtractCV({ lang }: Props) {
 	const { busy, setBusy, setError } = useDashboard();
 	const [file, setFile] = useState<File | null>(null);
 	const [consent, setConsent] = useState(false);
-	const [dragging, setDragging] = useState(false);
 	const [progress, setProgress] = useState<ExtractProgress | null>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
-	const fileInputId = useId();
 
 	function pickFile(next: File | null) {
 		setFile(next);
 		setError("");
 		setProgress(null);
-	}
-
-	function onFileChange(e: ChangeEvent<HTMLInputElement>) {
-		pickFile(e.target.files?.[0] ?? null);
-		e.target.value = "";
-	}
-
-	function onDrop(e: DragEvent<HTMLLabelElement>) {
-		e.preventDefault();
-		setDragging(false);
-		if (busy) return;
-		const next = e.dataTransfer.files?.[0] ?? null;
-		if (next) pickFile(next);
 	}
 
 	async function onExtract(e: FormEvent) {
@@ -112,129 +78,99 @@ export function ExtractCV({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathCv}</p>
-			<h1>{t.cvTitle}</h1>
-			<p className="section-intro">{t.cvHint}</p>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathCv}
+			</p>
+			<h1 className="font-display mb-3 text-3xl font-semibold tracking-tight">
+				{t.cvTitle}
+			</h1>
+			<p className="mb-6 max-w-2xl text-muted">{t.cvHint}</p>
 
-			<p className="cv-page-actions">
-				<Link className="btn btn-ghost" to="/playground/cv/saved">
+			<p className="mb-6 flex flex-wrap gap-2">
+				<Link
+					className={buttonVariants({ variant: "ghost" })}
+					to="/playground/cv/saved"
+					viewTransition
+				>
 					{t.cvViewSaved}
 				</Link>
 			</p>
 
-			<form className="playground-form extract-form" onSubmit={onExtract}>
-				<div className="file-field">
-					<span className="file-field-label">{t.chooseFile}</span>
-					<input
-						ref={inputRef}
-						id={fileInputId}
-						className="file-input-hidden"
-						type="file"
-						accept="image/*,.pdf,application/pdf"
-						onChange={onFileChange}
+			<form className="grid w-full max-w-md gap-4" onSubmit={onExtract}>
+				<div className="grid gap-2">
+					<span className="font-display text-xs text-muted">{t.chooseFile}</span>
+					<FileDropzone
+						file={file}
+						onFile={pickFile}
 						disabled={busy}
+						dropHint={t.dropHint}
+						dropBrowse={t.dropBrowse}
+						dropReplace={t.dropReplace}
+						dropRemove={t.dropRemove}
 					/>
-					{!file ? (
-						<label
-							htmlFor={fileInputId}
-							className={`file-dropzone${dragging ? " is-dragging" : ""}`}
-							onDragEnter={(e) => {
-								e.preventDefault();
-								if (!busy) setDragging(true);
-							}}
-							onDragOver={(e) => {
-								e.preventDefault();
-								if (!busy) setDragging(true);
-							}}
-							onDragLeave={(e) => {
-								e.preventDefault();
-								if (e.currentTarget.contains(e.relatedTarget as Node)) return;
-								setDragging(false);
-							}}
-							onDrop={onDrop}
-						>
-							<span className="file-dropzone-icon" aria-hidden="true">
-								↑
-							</span>
-							<span className="file-dropzone-title">{t.dropHint}</span>
-							<span className="file-dropzone-browse">{t.dropBrowse}</span>
-						</label>
-					) : (
-						<div className={`file-selected kind-${fileKind(file)}`}>
-							<div className="file-selected-badge" aria-hidden="true">
-								{fileKind(file) === "pdf" ? "PDF" : "IMG"}
-							</div>
-							<div className="file-selected-meta">
-								<strong title={file.name}>{file.name}</strong>
-								<span>{formatBytes(file.size)}</span>
-							</div>
-							<div className="file-selected-actions">
-								<button
-									type="button"
-									className="btn btn-ghost"
-									disabled={busy}
-									onClick={() => inputRef.current?.click()}
-								>
-									{t.dropReplace}
-								</button>
-								<button
-									type="button"
-									className="btn btn-ghost"
-									disabled={busy}
-									onClick={() => pickFile(null)}
-								>
-									{t.dropRemove}
-								</button>
-							</div>
-						</div>
-					)}
 				</div>
 
 				{progress ? (
 					<div
-						className={`extract-progress${progress.stage === "extract" ? " is-extracting" : ""}`}
+						className="grid gap-2 rounded-md border border-border bg-bg-deep/50 p-3"
 						role="status"
 						aria-live="polite"
 					>
-						<div className="extract-progress-head">
+						<div className="flex justify-between gap-3 font-display text-xs text-muted">
 							<span>{progressLabel}</span>
 							<span>{Math.round(progress.percent)}%</span>
 						</div>
 						<div
-							className="extract-progress-track"
+							className="h-1.5 overflow-hidden rounded-full bg-fg/5"
 							aria-valuemin={0}
 							aria-valuemax={100}
 							aria-valuenow={Math.round(progress.percent)}
 							role="progressbar"
 						>
 							<span
-								className="extract-progress-fill"
-								style={{ width: `${Math.max(4, progress.percent)}%` }}
+								className="block h-full rounded-full bg-gradient-to-r from-[#c4872f] via-accent to-accent-cool transition-[width] duration-250"
+								style={{
+									width: `${Math.max(4, progress.percent)}%`,
+									...(progress.stage === "extract"
+										? {
+												backgroundSize: "200% 100%",
+												animation:
+													"extract-shimmer 1.1s linear infinite",
+											}
+										: {}),
+								}}
 							/>
 						</div>
 					</div>
 				) : null}
 
-				<label className={`playground-consent${consent ? " is-checked" : ""}`}>
+				<label
+					className={cn(
+						"grid cursor-pointer grid-cols-[auto_1fr] items-start gap-3 rounded-md border border-accent/25 bg-gradient-to-br from-accent/[0.07] to-transparent bg-bg-deep/55 p-4 transition-colors hover:border-accent/40",
+						consent &&
+							"border-accent/55 from-accent/15 bg-surface/70 shadow-[0_0_0_1px_rgba(231,163,57,0.08)]",
+					)}
+				>
 					<input
 						type="checkbox"
+						className="mt-1 size-4 shrink-0 accent-accent"
 						checked={consent}
 						onChange={(e) => setConsent(e.target.checked)}
 						required
 						disabled={busy}
 					/>
-					<span className="playground-consent-copy">
-						<span className="playground-consent-title">{t.cvConsentTitle}</span>
-						<span className="playground-consent-text">{t.cvConsentLabel}</span>
+					<span className="grid min-w-0 gap-1.5">
+						<span className="font-display text-sm font-semibold tracking-wide text-accent">
+							{t.cvConsentTitle}
+						</span>
+						<span className="text-sm leading-relaxed text-muted">
+							{t.cvConsentLabel}
+						</span>
 					</span>
 				</label>
-				<button
-					className="btn btn-primary"
-					type="submit"
-					disabled={busy || !consent || !file}
-				>
+				<Button type="submit" disabled={busy || !consent || !file}>
 					{busy ? t.extracting : t.extract}
-				</button>
+				</Button>
 			</form>
 		</>
 	);

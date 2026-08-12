@@ -5,6 +5,17 @@ import {
 	type BankTransaction,
 } from "../api";
 import { copy, type Lang } from "../content";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import {
 	amountToneClass,
 	formatSignedBankMoney,
@@ -23,6 +34,32 @@ function formatWhen(iso: string, lang: Lang): string {
 		dateStyle: "medium",
 		timeStyle: "short",
 	}).format(d);
+}
+
+function toneClass(direction?: string, amount?: string): string {
+	const tone = amountToneClass(direction, amount);
+	if (tone === "is-credit") return "text-[#2f7d4a]";
+	if (tone === "is-debit") return "text-[#a14a2d]";
+	return "";
+}
+
+function TxBadge({ badge, type }: { badge?: string; type: string }) {
+	const kind = badge || type || "other";
+	const credit = kind === "transfer_in" || kind === "grant";
+	const debit = kind === "transfer_out" || kind === "withdraw";
+	return (
+		<Badge
+			variant="outline"
+			className={cn(
+				"shrink-0 text-[0.65rem] tracking-wide uppercase",
+				credit && "border-[#2f7d4a]/40 text-[#2f7d4a]",
+				debit && "border-[#a14a2d]/40 text-[#a14a2d]",
+				!credit && !debit && "border-border text-muted",
+			)}
+		>
+			{kind}
+		</Badge>
+	);
 }
 
 export function BankTxDetailModal({ lang, tx, onClose }: Props) {
@@ -72,27 +109,46 @@ export function BankTxDetailModal({ lang, tx, onClose }: Props) {
 	};
 
 	return (
-		<div className="bank-modal" role="dialog" aria-modal="true">
-			<button
-				type="button"
-				className="bank-modal-backdrop"
-				aria-label={t.bankTxClose}
-				onClick={onClose}
-			/>
-			<div className="bank-modal-card bank-tx-modal-card">
-				<div className="bank-title-row">
-					<h2>{row.title || row.type}</h2>
-					<span className={`bank-tx-badge badge-${row.badge || "other"}`}>
-						{row.badge || row.type}
-					</span>
-				</div>
-				{loading ? <p className="playground-muted">{t.loading}</p> : null}
-				{error ? <p className="form-error">{error}</p> : null}
-				<dl className="bank-tx-detail-grid">
+		<Dialog
+			open
+			onOpenChange={(open) => {
+				if (!open) onClose();
+			}}
+		>
+			<DialogContent className="max-w-md">
+				<DialogHeader>
+					<div className="flex flex-wrap items-baseline gap-x-3 gap-y-2 pr-6">
+						<DialogTitle className="m-0">
+							{row.title || row.type}
+						</DialogTitle>
+						<TxBadge badge={row.badge} type={row.type} />
+					</div>
+					<DialogDescription className="sr-only">
+						{t.bankTxAmount}:{" "}
+						{formatSignedBankMoney(
+							row.amount,
+							currency,
+							lang,
+							row.direction,
+						)}
+					</DialogDescription>
+				</DialogHeader>
+
+				{loading ? <p className="text-sm text-muted">{t.loading}</p> : null}
+				{error ? (
+					<p className="text-sm text-danger" role="alert">
+						{error}
+					</p>
+				) : null}
+
+				<dl className="m-0 grid gap-3">
 					<div>
-						<dt>{t.bankTxAmount}</dt>
+						<dt className="mb-0.5 text-xs text-muted">{t.bankTxAmount}</dt>
 						<dd
-							className={`bank-tx-amount ${amountToneClass(row.direction, row.amount)}`}
+							className={cn(
+								"font-display m-0 text-[0.95rem] tabular-nums",
+								toneClass(row.direction, row.amount),
+							)}
 						>
 							{formatSignedBankMoney(
 								row.amount,
@@ -103,42 +159,48 @@ export function BankTxDetailModal({ lang, tx, onClose }: Props) {
 						</dd>
 					</div>
 					<div>
-						<dt>{t.bankTxWhen}</dt>
-						<dd>{formatWhen(row.created_at, lang)}</dd>
+						<dt className="mb-0.5 text-xs text-muted">{t.bankTxWhen}</dt>
+						<dd className="m-0 [overflow-wrap:anywhere]">
+							{formatWhen(row.created_at, lang)}
+						</dd>
 					</div>
 					{row.subtitle ? (
 						<div>
-							<dt>{t.bankTxCounterparty}</dt>
-							<dd>{row.subtitle}</dd>
+							<dt className="mb-0.5 text-xs text-muted">
+								{t.bankTxCounterparty}
+							</dt>
+							<dd className="m-0 [overflow-wrap:anywhere]">{row.subtitle}</dd>
 						</div>
 					) : null}
 					{row.memo ? (
 						<div>
-							<dt>{t.bankTxMemo}</dt>
-							<dd>{row.memo}</dd>
+							<dt className="mb-0.5 text-xs text-muted">{t.bankTxMemo}</dt>
+							<dd className="m-0 [overflow-wrap:anywhere]">{row.memo}</dd>
 						</div>
 					) : null}
 					<div>
-						<dt>ID</dt>
-						<dd>
-							<code>{row.id}</code>
+						<dt className="mb-0.5 text-xs text-muted">ID</dt>
+						<dd className="m-0">
+							<code className="rounded bg-bg-deep px-1 py-0.5 text-xs">
+								{row.id}
+							</code>
 						</dd>
 					</div>
 				</dl>
-				<div className="cv-page-actions bank-page-actions">
-					<button
+
+				<DialogFooter className="gap-2 sm:justify-start">
+					<Button
 						type="button"
-						className="btn btn-primary"
 						disabled={downloading}
 						onClick={() => void download()}
 					>
 						{downloading ? t.loading : t.bankReceiptDownload}
-					</button>
-					<button type="button" className="btn btn-ghost" onClick={onClose}>
+					</Button>
+					<Button type="button" variant="ghost" onClick={onClose}>
 						{t.bankTxClose}
-					</button>
-				</div>
-			</div>
-		</div>
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 }

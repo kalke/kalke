@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
 	changePasswordResend,
 	changePasswordStart,
@@ -10,6 +14,21 @@ import { evaluatePassword, passwordIsStrong } from "./passwordRules";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
+
+function Field({
+	label,
+	children,
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="grid gap-2">
+			<Label>{label}</Label>
+			{children}
+		</div>
+	);
+}
 
 export function PasswordPanel({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -128,13 +147,17 @@ export function PasswordPanel({ lang }: Props) {
 
 	return (
 		<>
-			<h2 id="password-title">{t.passwordTitle}</h2>
-			<p>{t.passwordHint}</p>
+			<h2
+				id="password-title"
+				className="mb-1 font-display text-lg font-semibold tracking-tight"
+			>
+				{t.passwordTitle}
+			</h2>
+			<p className="mb-4 text-sm text-muted">{t.passwordHint}</p>
 			{!pendingEmail ? (
-				<form className="playground-form" onSubmit={onStart}>
-					<label>
-						{t.currentPassword}
-						<input
+				<form className="grid max-w-sm gap-4" onSubmit={onStart}>
+					<Field label={t.currentPassword}>
+						<Input
 							type="password"
 							autoComplete="current-password"
 							value={currentPassword}
@@ -143,10 +166,9 @@ export function PasswordPanel({ lang }: Props) {
 							onKeyUp={onKeyEvent}
 							required
 						/>
-					</label>
-					<label>
-						{t.newPassword}
-						<input
+					</Field>
+					<Field label={t.newPassword}>
+						<Input
 							type="password"
 							autoComplete="new-password"
 							value={newPassword}
@@ -156,10 +178,9 @@ export function PasswordPanel({ lang }: Props) {
 							minLength={10}
 							required
 						/>
-					</label>
-					<label>
-						{t.confirmPassword}
-						<input
+					</Field>
+					<Field label={t.confirmPassword}>
+						<Input
 							type="password"
 							autoComplete="new-password"
 							value={confirmPassword}
@@ -169,44 +190,54 @@ export function PasswordPanel({ lang }: Props) {
 							minLength={10}
 							required
 						/>
-					</label>
+					</Field>
 					{capsOn ? (
-						<p className="caps-indicator is-on" role="status" aria-live="polite">
+						<p
+							className="font-display text-xs tracking-wide text-accent"
+							role="status"
+							aria-live="polite"
+						>
 							{t.capsOn}
 						</p>
 					) : null}
-					<ul className="password-rules" aria-label={t.passwordTitle}>
-						<li className={rules.minLength ? "is-ok" : undefined}>
+					<ul
+						className="grid gap-1.5 rounded-md border border-border bg-bg-deep/45 px-3 py-2.5 font-display text-xs text-muted"
+						aria-label={t.passwordTitle}
+					>
+						<li className={cn(rules.minLength && "text-accent-cool")}>
+							{rules.minLength ? "● " : "○ "}
 							{t.passwordRuleLen}
 						</li>
-						<li className={rules.hasLetter ? "is-ok" : undefined}>
+						<li className={cn(rules.hasLetter && "text-accent-cool")}>
+							{rules.hasLetter ? "● " : "○ "}
 							{t.passwordRuleLetter}
 						</li>
-						<li className={rules.hasNumber ? "is-ok" : undefined}>
+						<li className={cn(rules.hasNumber && "text-accent-cool")}>
+							{rules.hasNumber ? "● " : "○ "}
 							{t.passwordRuleNumber}
 						</li>
-						<li className={rules.matches ? "is-ok" : undefined}>
+						<li className={cn(rules.matches && "text-accent-cool")}>
+							{rules.matches ? "● " : "○ "}
 							{t.passwordRuleMatch}
 						</li>
 					</ul>
-					{localError ? <p className="playground-error">{localError}</p> : null}
-					<button
-						className="btn btn-primary"
-						type="submit"
-						disabled={busy || !strong}
-					>
+					{localError ? (
+						<p className="rounded-md border border-danger/45 bg-danger-bg px-3 py-2 text-sm text-danger" role="alert">
+							{localError}
+						</p>
+					) : null}
+					<Button type="submit" disabled={busy || !strong}>
 						{t.passwordSendCode}
-					</button>
+					</Button>
 				</form>
 			) : (
-				<form className="playground-form" onSubmit={onVerify}>
-					<p className="playground-muted">
+				<form className="grid max-w-sm gap-4" onSubmit={onVerify}>
+					<p className="text-sm text-muted">
 						{t.passwordCodeHint.replace("{email}", pendingEmail)}
 					</p>
-					<label>
-						{t.verifyCode}
-						<input
-							className="bank-otp-input"
+					<Field label={t.verifyCode}>
+						<Input
+							className="font-display tracking-[0.35em]"
 							value={code}
 							onChange={(e) =>
 								setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
@@ -217,18 +248,18 @@ export function PasswordPanel({ lang }: Props) {
 							maxLength={6}
 							required
 						/>
-					</label>
-					{localError ? <p className="playground-error">{localError}</p> : null}
-					<button
-						className="btn btn-primary"
-						type="submit"
-						disabled={busy || code.trim().length < 6}
-					>
+					</Field>
+					{localError ? (
+						<p className="rounded-md border border-danger/45 bg-danger-bg px-3 py-2 text-sm text-danger" role="alert">
+							{localError}
+						</p>
+					) : null}
+					<Button type="submit" disabled={busy || code.trim().length < 6}>
 						{t.passwordConfirmCode}
-					</button>
-					<div className="profile-email-actions">
-						<button
-							className="btn btn-ghost"
+					</Button>
+					<div className="flex flex-wrap items-center gap-2">
+						<Button
+							variant="ghost"
 							type="button"
 							disabled={busy || resendIn > 0}
 							onClick={() => void onResend()}
@@ -236,19 +267,19 @@ export function PasswordPanel({ lang }: Props) {
 							{resendIn > 0
 								? t.resendIn.replace("{seconds}", String(resendIn))
 								: t.resend}
-						</button>
-						<button
-							className="btn btn-ghost"
+						</Button>
+						<Button
+							variant="ghost"
 							type="button"
 							disabled={busy}
 							onClick={onCancelPending}
 						>
 							{t.passwordCancelCode}
-						</button>
+						</Button>
 					</div>
 				</form>
 			)}
-			{passwordMsg ? <p className="playground-muted">{passwordMsg}</p> : null}
+			{passwordMsg ? <p className="mt-3 text-sm text-muted">{passwordMsg}</p> : null}
 		</>
 	);
 }

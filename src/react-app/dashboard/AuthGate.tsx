@@ -4,7 +4,6 @@ import {
 	forgotPasswordStart,
 	forgotPasswordVerify,
 	login,
-	oauthStartURL,
 	passwordlessResend,
 	passwordlessStart,
 	passwordlessVerify,
@@ -15,12 +14,23 @@ import {
 } from "../api";
 import { copy, type Lang } from "../content";
 import { useCapsLock } from "../hooks/useCapsLock";
+import { SurfacePanel } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+	AuthDivider,
+	AuthVerifyDialog,
+	Field,
+	OAuthButtons,
+	PasswordRules,
+	type VerifyKind,
+} from "./authShared";
 import { evaluatePassword, passwordIsStrong } from "./passwordRules";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
 type AuthMode = "login" | "signup" | "forgot";
-type VerifyKind = "signup" | "passwordless" | "reset";
 
 export function AuthGate({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -63,6 +73,15 @@ export function AuthGate({ lang }: Props) {
 		const url = `${window.location.pathname}${next ? `?${next}` : ""}${window.location.hash}`;
 		window.history.replaceState({}, "", url);
 	}, [setError, t.oauthError]);
+
+	function closeVerify() {
+		setVerifyKind(null);
+		setOtpCode("");
+		setConfirmPassword("");
+		if (verifyKind === "reset" || verifyKind === "passwordless") {
+			setPassword("");
+		}
+	}
 
 	function switchMode(next: AuthMode) {
 		setMode(next);
@@ -216,57 +235,46 @@ export function AuthGate({ lang }: Props) {
 			: t.verifyHint.replace("{email}", email);
 
 	return (
-		<>
-			<p className="eyebrow">{t.eyebrow}</p>
-			<h1>{t.title}</h1>
-			<p className="section-intro">{t.intro}</p>
+		<div className="mx-auto max-w-md">
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.eyebrow}
+			</p>
+			<h1 className="font-display mb-3 text-3xl font-semibold tracking-tight">
+				{t.title}
+			</h1>
+			<p className="mb-8 text-muted">{t.intro}</p>
 
 			{mode === "login" || mode === "signup" ? (
-				<div className="playground-modes" role="tablist" aria-label="Auth">
-					<button
-						type="button"
-						role="tab"
-						aria-selected={mode === "login"}
-						className={mode === "login" ? "is-active" : undefined}
-						onClick={() => switchMode("login")}
-					>
-						{t.modeLogin}
-					</button>
-					<button
-						type="button"
-						role="tab"
-						aria-selected={mode === "signup"}
-						className={mode === "signup" ? "is-active" : undefined}
-						onClick={() => switchMode("signup")}
-					>
-						{t.modeSignup}
-					</button>
-				</div>
+				<Tabs
+					value={mode}
+					onValueChange={(v) => switchMode(v as AuthMode)}
+					className="mb-4"
+				>
+					<TabsList className="grid w-full grid-cols-2">
+						<TabsTrigger value="login">{t.modeLogin}</TabsTrigger>
+						<TabsTrigger value="signup">{t.modeSignup}</TabsTrigger>
+					</TabsList>
+				</Tabs>
 			) : (
-				<p className="auth-panel-title">{t.forgotTitle}</p>
+				<p className="mb-4 font-display text-lg font-semibold">{t.forgotTitle}</p>
 			)}
 
-			<div className="auth-panel">
+			<SurfacePanel className="grid gap-6">
 				{mode === "signup" ? (
-					<div className="auth-methods">
-						<a className="auth-method" href={oauthStartURL("google")}>
-							{t.continueWithGoogle}
-						</a>
-						<a className="auth-method" href={oauthStartURL("github")}>
-							{t.continueWithGitHub}
-						</a>
-						<p className="auth-social-hint">{t.authSocialHint}</p>
-						<p className="auth-divider">
-							<span>{t.authOr}</span>
-						</p>
-					</div>
+					<>
+						<OAuthButtons
+							google={t.continueWithGoogle}
+							github={t.continueWithGitHub}
+							hint={t.authSocialHint}
+						/>
+						<AuthDivider label={t.authOr} />
+					</>
 				) : null}
 
-				<form className="playground-form" onSubmit={formSubmit}>
+				<form className="grid gap-4" onSubmit={formSubmit}>
 					{mode === "signup" ? (
-						<label>
-							{t.name}
-							<input
+						<Field label={t.name}>
+							<Input
 								type="text"
 								autoComplete="name"
 								value={name}
@@ -275,22 +283,20 @@ export function AuthGate({ lang }: Props) {
 								minLength={2}
 								maxLength={80}
 							/>
-						</label>
+						</Field>
 					) : null}
-					<label>
-						{t.email}
-						<input
+					<Field label={t.email}>
+						<Input
 							type="email"
 							autoComplete="username"
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							required
 						/>
-					</label>
+					</Field>
 					{mode === "login" && showPassword ? (
-						<label>
-							{t.password}
-							<input
+						<Field label={t.password}>
+							<Input
 								type="password"
 								autoComplete="current-password"
 								value={password}
@@ -299,12 +305,11 @@ export function AuthGate({ lang }: Props) {
 								onKeyUp={onKeyEvent}
 								required
 							/>
-						</label>
+						</Field>
 					) : null}
 					{mode === "signup" ? (
-						<label>
-							{t.password}
-							<input
+						<Field label={t.password}>
+							<Input
 								type="password"
 								autoComplete="new-password"
 								value={password}
@@ -314,31 +319,30 @@ export function AuthGate({ lang }: Props) {
 								minLength={10}
 								required
 							/>
-						</label>
+						</Field>
 					) : null}
 					{capsOn &&
 					((mode === "login" && showPassword) || mode === "signup") ? (
-						<p className="caps-indicator is-on" role="status" aria-live="polite">
+						<p className="text-xs text-accent" role="status" aria-live="polite">
 							{t.capsOn}
 						</p>
 					) : null}
 					{mode === "signup" ? (
-						<ul className="password-rules" aria-label={t.password}>
-							<li className={signupRules.minLength ? "is-ok" : undefined}>
-								{t.passwordRuleLen}
-							</li>
-							<li className={signupRules.hasLetter ? "is-ok" : undefined}>
-								{t.passwordRuleLetter}
-							</li>
-							<li className={signupRules.hasNumber ? "is-ok" : undefined}>
-								{t.passwordRuleNumber}
-							</li>
-						</ul>
+						<PasswordRules
+							rules={signupRules}
+							labels={{
+								len: t.passwordRuleLen,
+								letter: t.passwordRuleLetter,
+								number: t.passwordRuleNumber,
+							}}
+						/>
 					) : null}
-					{mode === "forgot" ? <p className="auth-hint">{t.forgotHint}</p> : null}
-					<button
-						className="btn btn-primary auth-submit"
+					{mode === "forgot" ? (
+						<p className="text-sm text-muted">{t.forgotHint}</p>
+					) : null}
+					<Button
 						type="submit"
+						className="w-full"
 						disabled={busy || (mode === "signup" && !signupStrong)}
 					>
 						{mode === "login"
@@ -348,14 +352,15 @@ export function AuthGate({ lang }: Props) {
 							: mode === "signup"
 								? t.signup
 								: t.forgotSubmit}
-					</button>
+					</Button>
 				</form>
 
 				{mode === "login" ? (
 					<>
-						<p className="auth-footnotes">
+						<p className="flex flex-wrap items-center justify-center gap-2 text-sm text-muted">
 							<button
 								type="button"
+								className="underline-offset-4 hover:text-fg hover:underline"
 								onClick={() => {
 									setError("");
 									if (showPassword) {
@@ -368,156 +373,65 @@ export function AuthGate({ lang }: Props) {
 							>
 								{showPassword ? t.hidePassword : t.usePassword}
 							</button>
-							<span aria-hidden="true">·</span>
-							<button type="button" onClick={() => switchMode("forgot")}>
+							<span aria-hidden>·</span>
+							<button
+								type="button"
+								className="underline-offset-4 hover:text-fg hover:underline"
+								onClick={() => switchMode("forgot")}
+							>
 								{t.forgotPassword}
 							</button>
 						</p>
-						<p className="auth-divider">
-							<span>{t.authOr}</span>
-						</p>
-						<div className="auth-methods">
-							<a className="auth-method" href={oauthStartURL("google")}>
-								{t.continueWithGoogle}
-							</a>
-							<a className="auth-method" href={oauthStartURL("github")}>
-								{t.continueWithGitHub}
-							</a>
-							<p className="auth-social-hint">{t.authSocialHint}</p>
-						</div>
+						<AuthDivider label={t.authOr} />
+						<OAuthButtons
+							google={t.continueWithGoogle}
+							github={t.continueWithGitHub}
+							hint={t.authSocialHint}
+						/>
 					</>
 				) : null}
 
 				{mode === "forgot" ? (
-					<p className="auth-footnotes">
-						<button type="button" onClick={() => switchMode("login")}>
+					<p className="text-center text-sm">
+						<button
+							type="button"
+							className="text-muted underline-offset-4 hover:text-fg hover:underline"
+							onClick={() => switchMode("login")}
+						>
 							{t.forgotBack}
 						</button>
 					</p>
 				) : null}
 
-				{error ? <p className="playground-error">{error}</p> : null}
-			</div>
+				{error ? (
+					<p className="text-sm text-danger" role="alert">
+						{error}
+					</p>
+				) : null}
+			</SurfacePanel>
 
-			{verifyKind ? (
-				<div
-					className="playground-modal"
-					role="dialog"
-					aria-modal="true"
-					aria-labelledby="verify-title"
-				>
-					<div className="playground-modal-panel surface-panel">
-						<h2 id="verify-title">{verifyTitle}</h2>
-						<p>{verifyHint}</p>
-						<form className="playground-form" onSubmit={onVerify}>
-							<label>
-								{t.verifyCode}
-								<input
-									type="text"
-									inputMode="numeric"
-									autoComplete="one-time-code"
-									pattern="[0-9]{6}"
-									maxLength={6}
-									value={otpCode}
-									onChange={(e) =>
-										setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-									}
-									required
-								/>
-							</label>
-							{verifyKind === "reset" ? (
-								<>
-									<label>
-										{t.newPassword}
-										<input
-											type="password"
-											autoComplete="new-password"
-											value={password}
-											onChange={(e) => setPassword(e.target.value)}
-											onKeyDown={onKeyEvent}
-											onKeyUp={onKeyEvent}
-											minLength={10}
-											required
-										/>
-									</label>
-									<label>
-										{t.confirmPassword}
-										<input
-											type="password"
-											autoComplete="new-password"
-											value={confirmPassword}
-											onChange={(e) => setConfirmPassword(e.target.value)}
-											onKeyDown={onKeyEvent}
-											onKeyUp={onKeyEvent}
-											minLength={10}
-											required
-										/>
-									</label>
-									{capsOn ? (
-										<p
-											className="caps-indicator is-on"
-											role="status"
-											aria-live="polite"
-										>
-											{t.capsOn}
-										</p>
-									) : null}
-									<ul className="password-rules" aria-label={t.newPassword}>
-										<li className={resetRules.minLength ? "is-ok" : undefined}>
-											{t.passwordRuleLen}
-										</li>
-										<li className={resetRules.hasLetter ? "is-ok" : undefined}>
-											{t.passwordRuleLetter}
-										</li>
-										<li className={resetRules.hasNumber ? "is-ok" : undefined}>
-											{t.passwordRuleNumber}
-										</li>
-										<li className={resetRules.matches ? "is-ok" : undefined}>
-											{t.passwordRuleMatch}
-										</li>
-									</ul>
-								</>
-							) : null}
-							<button
-								className="btn btn-primary auth-submit"
-								type="submit"
-								disabled={
-									busy ||
-									otpCode.length !== 6 ||
-									(verifyKind === "reset" && !resetStrong)
-								}
-							>
-								{verifyKind === "reset" ? t.resetSubmit : t.verifySubmit}
-							</button>
-						</form>
-						<p className="auth-footnotes">
-							<button
-								type="button"
-								onClick={onResend}
-								disabled={busy || resendIn > 0}
-							>
-								{resendIn > 0
-									? t.resendIn.replace("{seconds}", String(resendIn))
-									: t.resend}
-							</button>
-							<span aria-hidden="true">·</span>
-							<button
-								type="button"
-								onClick={() => {
-									setVerifyKind(null);
-									setOtpCode("");
-									setConfirmPassword("");
-									if (verifyKind === "reset" || verifyKind === "passwordless") {
-										setPassword("");
-									}
-								}}
-							>
-								{t.verifyClose}
-							</button>
-						</p>
-					</div>
-				</div>
-			) : null}
-		</>
+			<AuthVerifyDialog
+				open={Boolean(verifyKind)}
+				kind={verifyKind}
+				title={verifyTitle}
+				hint={verifyHint}
+				copy={t}
+				otpCode={otpCode}
+				onOtpCode={setOtpCode}
+				password={password}
+				onPassword={setPassword}
+				confirmPassword={confirmPassword}
+				onConfirmPassword={setConfirmPassword}
+				capsOn={capsOn}
+				onKeyEvent={onKeyEvent}
+				resetRules={resetRules}
+				resetStrong={resetStrong}
+				busy={busy}
+				resendIn={resendIn}
+				onVerify={onVerify}
+				onResend={onResend}
+				onClose={closeVerify}
+			/>
+		</div>
 	);
 }

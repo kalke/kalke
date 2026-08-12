@@ -1,4 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { SurfacePanel } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	emailChangeResend,
 	emailChangeStart,
@@ -11,6 +15,21 @@ import { PasswordPanel } from "./PasswordPanel";
 import { useDashboard } from "./useDashboard";
 
 type Props = { lang: Lang };
+
+function Field({
+	label,
+	children,
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="grid gap-2">
+			<Label>{label}</Label>
+			{children}
+		</div>
+	);
+}
 
 export function Profile({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -129,80 +148,114 @@ export function Profile({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathProfile}</p>
-			<h1>{t.profileTitle}</h1>
-			<p className="section-intro">{t.profileIntro}</p>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathProfile}
+			</p>
+			<h1 className="font-display mb-3 text-3xl font-semibold tracking-tight">
+				{t.profileTitle}
+			</h1>
+			<p className="mb-8 max-w-2xl text-muted">{t.profileIntro}</p>
 
-			<section className="profile-section surface-panel" aria-labelledby="profile-identity">
-				<h2 id="profile-identity">{t.profileIdentityTitle}</h2>
-				<p className="playground-muted">{t.profileIdentityHint}</p>
-				<form className="playground-form" onSubmit={onSaveName}>
-					<label>
-						{t.name}
-						<input
+			<SurfacePanel
+				className="mb-6 grid gap-4"
+				aria-labelledby="profile-identity"
+			>
+				<h2
+					id="profile-identity"
+					className="font-display text-lg font-semibold tracking-tight"
+				>
+					{t.profileIdentityTitle}
+				</h2>
+				<p className="text-sm text-muted">{t.profileIdentityHint}</p>
+				<form className="grid max-w-sm gap-4" onSubmit={onSaveName}>
+					<Field label={t.name}>
+						<Input
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							autoComplete="name"
 							maxLength={120}
 							required
 						/>
-					</label>
-					<label>
-						{t.email}
-						<input value={user.email} readOnly disabled />
-					</label>
-					{nameErr ? <p className="playground-error">{nameErr}</p> : null}
-					{nameMsg ? <p className="playground-muted">{nameMsg}</p> : null}
-					<button className="btn btn-primary" type="submit" disabled={busy}>
+					</Field>
+					<Field label={t.email}>
+						<Input value={user.email} readOnly disabled />
+					</Field>
+					{nameErr ? (
+						<p
+							className="rounded-md border border-danger/45 bg-danger-bg px-3 py-2 text-sm text-danger"
+							role="alert"
+						>
+							{nameErr}
+						</p>
+					) : null}
+					{nameMsg ? <p className="text-sm text-muted">{nameMsg}</p> : null}
+					<Button type="submit" disabled={busy}>
 						{t.profileSaveName}
-					</button>
+					</Button>
 				</form>
-			</section>
+			</SurfacePanel>
 
-			<section className="profile-section surface-panel" aria-labelledby="profile-email">
-				<h2 id="profile-email">{t.profileEmailTitle}</h2>
-				<p className="playground-muted">{t.profileEmailHint}</p>
+			<SurfacePanel className="mb-6 grid gap-4" aria-labelledby="profile-email">
+				<h2
+					id="profile-email"
+					className="font-display text-lg font-semibold tracking-tight"
+				>
+					{t.profileEmailTitle}
+				</h2>
+				<p className="text-sm text-muted">{t.profileEmailHint}</p>
 				{!emailPending ? (
-					<form className="playground-form" onSubmit={onStartEmail}>
-						<label>
-							{t.profileNewEmail}
-							<input
+					<form className="grid max-w-sm gap-4" onSubmit={onStartEmail}>
+						<Field label={t.profileNewEmail}>
+							<Input
 								type="email"
 								value={newEmail}
 								onChange={(e) => setNewEmail(e.target.value)}
 								autoComplete="email"
 								required
 							/>
-						</label>
-						{emailErr ? <p className="playground-error">{emailErr}</p> : null}
-						{emailMsg ? <p className="playground-muted">{emailMsg}</p> : null}
-						<button className="btn btn-primary" type="submit" disabled={busy}>
+						</Field>
+						{emailErr ? (
+							<p
+								className="rounded-md border border-danger/45 bg-danger-bg px-3 py-2 text-sm text-danger"
+								role="alert"
+							>
+								{emailErr}
+							</p>
+						) : null}
+						{emailMsg ? <p className="text-sm text-muted">{emailMsg}</p> : null}
+						<Button type="submit" disabled={busy}>
 							{t.profileEmailSendCode}
-						</button>
+						</Button>
 					</form>
 				) : (
-					<form className="playground-form" onSubmit={onVerifyEmail}>
-						<p className="playground-muted">
+					<form className="grid max-w-sm gap-4" onSubmit={onVerifyEmail}>
+						<p className="text-sm text-muted">
 							{t.verifyHint.replace("{email}", emailPending)}
 						</p>
-						<label>
-							{t.verifyCode}
-							<input
+						<Field label={t.verifyCode}>
+							<Input
 								value={emailCode}
 								onChange={(e) => setEmailCode(e.target.value)}
 								inputMode="numeric"
 								autoComplete="one-time-code"
 								required
 							/>
-						</label>
-						{emailErr ? <p className="playground-error">{emailErr}</p> : null}
-						{emailMsg ? <p className="playground-muted">{emailMsg}</p> : null}
-						<div className="profile-email-actions">
-							<button className="btn btn-primary" type="submit" disabled={busy}>
+						</Field>
+						{emailErr ? (
+							<p
+								className="rounded-md border border-danger/45 bg-danger-bg px-3 py-2 text-sm text-danger"
+								role="alert"
+							>
+								{emailErr}
+							</p>
+						) : null}
+						{emailMsg ? <p className="text-sm text-muted">{emailMsg}</p> : null}
+						<div className="flex flex-wrap items-center gap-2">
+							<Button type="submit" disabled={busy}>
 								{t.verifySubmit}
-							</button>
-							<button
-								className="btn btn-ghost"
+							</Button>
+							<Button
+								variant="ghost"
 								type="button"
 								disabled={busy || resendIn > 0}
 								onClick={() => void onResendEmail()}
@@ -210,9 +263,9 @@ export function Profile({ lang }: Props) {
 								{resendIn > 0
 									? t.resendIn.replace("{seconds}", String(resendIn))
 									: t.resend}
-							</button>
-							<button
-								className="btn btn-ghost"
+							</Button>
+							<Button
+								variant="ghost"
 								type="button"
 								disabled={busy}
 								onClick={() => {
@@ -223,18 +276,18 @@ export function Profile({ lang }: Props) {
 								}}
 							>
 								{t.profileEmailCancel}
-							</button>
+							</Button>
 						</div>
 					</form>
 				)}
-			</section>
+			</SurfacePanel>
 
-			<section className="profile-section surface-panel" aria-labelledby="password-title">
+			<SurfacePanel className="mb-6" aria-labelledby="password-title">
 				<PasswordPanel lang={lang} />
-			</section>
+			</SurfacePanel>
 
-			<section className="profile-section" aria-labelledby="tokens-heading">
-				<div id="tokens-heading" className="profile-tokens-wrap">
+			<section className="mb-6" aria-labelledby="tokens-heading">
+				<div id="tokens-heading">
 					<ApiTokens lang={lang} embedded />
 				</div>
 			</section>

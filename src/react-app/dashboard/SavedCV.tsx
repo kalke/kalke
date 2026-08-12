@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getExtraction, type ExtractionSummary } from "../api";
 import { copy, type Lang } from "../content";
 import { CvResultView } from "./CvResultView";
@@ -52,32 +54,45 @@ export function SavedCV({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathCvSaved}</p>
-			<h1>{name}</h1>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathCvSaved}
+			</p>
+			<h1 className="font-display mb-3 text-3xl font-semibold tracking-tight">
+				{name}
+			</h1>
 			{item ? (
-				<p className="section-intro">
+				<p className="mb-6 max-w-2xl text-muted">
 					{t.cvSavedAt} {formatSavedAt(item.created_at, lang)}
 					{item.filename ? ` · ${item.filename}` : ""}
 				</p>
 			) : (
-				<p className="section-intro">{t.cvHistoryHint}</p>
+				<p className="mb-6 max-w-2xl text-muted">{t.cvHistoryHint}</p>
 			)}
 
-			<p className="cv-page-actions">
-				<Link className="btn btn-ghost" to="/playground/cv/saved">
+			<p className="mb-6 flex flex-wrap gap-2">
+				<Link
+					className={buttonVariants({ variant: "ghost" })}
+					to="/playground/cv/saved"
+				>
 					{t.cvBackToSaved}
 				</Link>
-				<Link className="btn btn-ghost" to="/playground/cv">
+				<Link
+					className={buttonVariants({ variant: "ghost" })}
+					to="/playground/cv"
+				>
 					{t.cvBackToExtract}
 				</Link>
 			</p>
 
 			{loading ? (
-				<p className="playground-muted">{t.loading}</p>
+				<div className="grid gap-3">
+					<Skeleton className="h-40 w-full" />
+					<p className="text-sm text-muted">{t.loading}</p>
+				</div>
 			) : item ? (
 				<CvResultView lang={lang} result={item.result} title={t.extracted} />
 			) : (
-				<p className="playground-muted">{t.cvNotFound}</p>
+				<p className="text-muted">{t.cvNotFound}</p>
 			)}
 		</>
 	);

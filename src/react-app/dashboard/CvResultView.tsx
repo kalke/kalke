@@ -1,4 +1,7 @@
 import { useMemo, useState } from "react";
+import { SurfacePanel } from "@/components/layout";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { copy, type Lang } from "../content";
 import {
 	extractCvPayload,
@@ -34,16 +37,28 @@ export function CvResultView({ lang, result, title }: Props) {
 	}
 
 	return (
-		<div className="extract-result surface-panel cv-result">
-			<h2>{title ?? t.extracted}</h2>
-			{cv.full_name ? <p className="cv-name">{cv.full_name}</p> : null}
-			{cv.headline ? <p className="cv-headline">{cv.headline}</p> : null}
-			{cv.summary ? <p className="cv-summary">{cv.summary}</p> : null}
+		<SurfacePanel className="my-4 grid gap-4">
+			<h2 className="font-display text-xl font-semibold tracking-tight">
+				{title ?? t.extracted}
+			</h2>
+			{cv.full_name ? (
+				<p className="font-display text-xl font-semibold text-fg">
+					{cv.full_name}
+				</p>
+			) : null}
+			{cv.headline ? (
+				<p className="font-display text-sm text-accent">{cv.headline}</p>
+			) : null}
+			{cv.summary ? (
+				<p className="text-sm leading-relaxed text-muted">{cv.summary}</p>
+			) : null}
 
 			{contactBits.length ? (
-				<section className="cv-section">
-					<h3>{t.cvSectionContact}</h3>
-					<ul className="cv-contact-list">
+				<section className="mt-2">
+					<h3 className="mb-2 font-display text-xs font-semibold tracking-wide text-muted uppercase">
+						{t.cvSectionContact}
+					</h3>
+					<ul className="grid gap-1 text-sm text-fg">
 						{contactBits.map((bit) => (
 							<li key={bit}>{bit}</li>
 						))}
@@ -52,28 +67,43 @@ export function CvResultView({ lang, result, title }: Props) {
 			) : null}
 
 			{skillGroups.length ? (
-				<section className="cv-section cv-skills-section">
-					<h3>{t.cvSectionSkills}</h3>
+				<section className="mt-2">
+					<h3 className="mb-2 font-display text-xs font-semibold tracking-wide text-muted uppercase">
+						{t.cvSectionSkills}
+					</h3>
 					{skillGroups.length > 1 ? (
-						<nav className="cv-skill-nav" aria-label={t.cvSectionSkills}>
+						<nav
+							className="mb-3 flex flex-wrap gap-x-3 gap-y-2"
+							aria-label={t.cvSectionSkills}
+						>
 							{skillGroups.map((g) => (
-								<a key={g.category} href={`#cv-skill-${g.category}`}>
+								<a
+									key={g.category}
+									href={`#cv-skill-${g.category}`}
+									className="font-display text-sm text-accent underline-offset-2 hover:underline focus-visible:underline focus-visible:outline-none"
+								>
 									{skillCategoryLabel(g.category)}
 								</a>
 							))}
 						</nav>
 					) : null}
-					<div className="cv-skill-groups">
+					<div className="grid gap-3.5">
 						{skillGroups.map((g) => (
 							<div
 								key={g.category}
 								id={`cv-skill-${g.category}`}
-								className="cv-skill-group"
+								className="scroll-mt-5"
 							>
-								<h4>{skillCategoryLabel(g.category)}</h4>
-								<ul className="cv-skills">
+								<h4 className="mb-2 font-display text-sm font-semibold text-fg">
+									{skillCategoryLabel(g.category)}
+								</h4>
+								<ul className="flex flex-wrap gap-1.5">
 									{g.items.map((skill) => (
-										<li key={skill}>{skill}</li>
+										<li key={skill}>
+											<Badge variant="outline" className="border-accent/30 bg-accent/10 font-display text-xs font-normal text-fg">
+												{skill}
+											</Badge>
+										</li>
 									))}
 								</ul>
 							</div>
@@ -83,9 +113,11 @@ export function CvResultView({ lang, result, title }: Props) {
 			) : null}
 
 			{cv.experience && cv.experience.length ? (
-				<section className="cv-section">
-					<h3>{t.cvSectionExperience}</h3>
-					<ul className="cv-timeline">
+				<section className="mt-2">
+					<h3 className="mb-2 font-display text-xs font-semibold tracking-wide text-muted uppercase">
+						{t.cvSectionExperience}
+					</h3>
+					<ul className="grid gap-3.5">
 						{cv.experience.map((job, i) => {
 							const start = job.start_date
 								? formatCvDate(job.start_date, lang)
@@ -97,17 +129,20 @@ export function CvResultView({ lang, result, title }: Props) {
 									: "";
 							const range = [start, end].filter(Boolean).join(" – ");
 							return (
-								<li key={`${job.company}-${job.title}-${i}`}>
-									<strong>
+								<li
+									key={`${job.company}-${job.title}-${i}`}
+									className="grid gap-0.5"
+								>
+									<strong className="text-[0.95rem] font-semibold text-fg">
 										{[job.title, job.company].filter(Boolean).join(" · ")}
 									</strong>
 									{range || job.location ? (
-										<span className="cv-meta">
+										<span className="font-display text-xs text-muted">
 											{[range, job.location].filter(Boolean).join(" · ")}
 										</span>
 									) : null}
 									{job.highlights && job.highlights.length ? (
-										<ul className="cv-highlights">
+										<ul className="mt-1.5 grid gap-0.5 border-l border-border pl-3 text-sm leading-snug text-muted">
 											{job.highlights.map((h) => (
 												<li key={h}>{h}</li>
 											))}
@@ -121,9 +156,11 @@ export function CvResultView({ lang, result, title }: Props) {
 			) : null}
 
 			{cv.education && cv.education.length ? (
-				<section className="cv-section">
-					<h3>{t.cvSectionEducation}</h3>
-					<ul className="cv-timeline">
+				<section className="mt-2">
+					<h3 className="mb-2 font-display text-xs font-semibold tracking-wide text-muted uppercase">
+						{t.cvSectionEducation}
+					</h3>
+					<ul className="grid gap-3.5">
 						{cv.education.map((ed, i) => {
 							const start = ed.start_date
 								? formatCvDate(ed.start_date, lang)
@@ -131,15 +168,24 @@ export function CvResultView({ lang, result, title }: Props) {
 							const end = ed.end_date ? formatCvDate(ed.end_date, lang) : "";
 							const range = [start, end].filter(Boolean).join(" – ");
 							return (
-								<li key={`${ed.institution}-${ed.degree}-${i}`}>
-									<strong>
+								<li
+									key={`${ed.institution}-${ed.degree}-${i}`}
+									className="grid gap-0.5"
+								>
+									<strong className="text-[0.95rem] font-semibold text-fg">
 										{[ed.degree, ed.field, ed.institution]
 											.filter(Boolean)
 											.join(" · ")}
 									</strong>
-									{range ? <span className="cv-meta">{range}</span> : null}
+									{range ? (
+										<span className="font-display text-xs text-muted">
+											{range}
+										</span>
+									) : null}
 									{ed.details ? (
-										<span className="cv-meta">{ed.details}</span>
+										<span className="font-display text-xs text-muted">
+											{ed.details}
+										</span>
 									) : null}
 								</li>
 							);
@@ -149,9 +195,11 @@ export function CvResultView({ lang, result, title }: Props) {
 			) : null}
 
 			{cv.languages && cv.languages.length ? (
-				<section className="cv-section">
-					<h3>{t.cvSectionLanguages}</h3>
-					<ul className="cv-contact-list">
+				<section className="mt-2">
+					<h3 className="mb-2 font-display text-xs font-semibold tracking-wide text-muted uppercase">
+						{t.cvSectionLanguages}
+					</h3>
+					<ul className="grid gap-1 text-sm text-fg">
 						{cv.languages.map((langItem, i) => (
 							<li key={`${langItem.name}-${i}`}>
 								{[langItem.name, langItem.level].filter(Boolean).join(" — ")}
@@ -162,16 +210,20 @@ export function CvResultView({ lang, result, title }: Props) {
 			) : null}
 
 			{cv.certifications && cv.certifications.length ? (
-				<section className="cv-section">
-					<h3>{t.cvSectionCertifications}</h3>
-					<ul className="cv-timeline">
+				<section className="mt-2">
+					<h3 className="mb-2 font-display text-xs font-semibold tracking-wide text-muted uppercase">
+						{t.cvSectionCertifications}
+					</h3>
+					<ul className="grid gap-3.5">
 						{cv.certifications.map((c, i) => (
-							<li key={`${c.name}-${i}`}>
-								<strong>
+							<li key={`${c.name}-${i}`} className="grid gap-0.5">
+								<strong className="text-[0.95rem] font-semibold text-fg">
 									{[c.name, c.issuer].filter(Boolean).join(" · ")}
 								</strong>
 								{c.date ? (
-									<span className="cv-meta">{formatCvDate(c.date, lang)}</span>
+									<span className="font-display text-xs text-muted">
+										{formatCvDate(c.date, lang)}
+									</span>
 								) : null}
 							</li>
 						))}
@@ -179,18 +231,18 @@ export function CvResultView({ lang, result, title }: Props) {
 				</section>
 			) : null}
 
-			<button
+			<Button
 				type="button"
-				className="btn btn-ghost"
+				variant="ghost"
 				onClick={() => setShowJson((v) => !v)}
 			>
 				{showJson ? t.resultHideJson : t.resultJson}
-			</button>
+			</Button>
 			{showJson ? (
-				<pre className="playground-result-json">
+				<pre className="mt-3 max-h-88 overflow-auto rounded-md border border-border bg-bg-deep/55 p-3.5 font-display text-xs leading-relaxed break-words whitespace-pre-wrap text-fg">
 					{JSON.stringify(result, null, 2)}
 				</pre>
 			) : null}
-		</div>
+		</SurfacePanel>
 	);
 }

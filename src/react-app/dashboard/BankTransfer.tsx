@@ -11,6 +11,20 @@ import {
 	type BankTransferChallenge,
 } from "../api";
 import { copy, type Lang } from "../content";
+import { SurfacePanel } from "@/components/layout";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { digitsOnly, formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
@@ -23,6 +37,27 @@ type TransferSuccess = {
 	holder: string;
 	originBalance: string;
 };
+
+const selectClassName = cn(
+	"flex h-10 w-full rounded-md border border-input bg-bg-deep px-3 py-2 text-sm text-fg shadow-sm",
+	"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+	"disabled:cursor-not-allowed disabled:opacity-50",
+);
+
+function Field({
+	label,
+	children,
+}: {
+	label: string;
+	children: React.ReactNode;
+}) {
+	return (
+		<div className="grid gap-2">
+			<Label>{label}</Label>
+			{children}
+		</div>
+	);
+}
 
 export function BankTransfer({ lang }: Props) {
 	const t = copy[lang].playground;
@@ -173,54 +208,61 @@ export function BankTransfer({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathBank}</p>
-			<div className="bank-title-row">
-				<h1>{t.bankTransferTitle}</h1>
-				<span className="bank-demo-badge">{t.bankDemoBadge}</span>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathBank}
+			</p>
+			<div className="mb-1 flex flex-wrap items-baseline gap-x-3.5 gap-y-2.5">
+				<h1 className="font-display m-0 text-3xl font-semibold tracking-tight">
+					{t.bankTransferTitle}
+				</h1>
+				<Badge
+					variant="outline"
+					className="border-accent/45 bg-accent/10 text-[0.68rem] font-semibold tracking-[0.08em] text-accent uppercase"
+				>
+					{t.bankDemoBadge}
+				</Badge>
 			</div>
-			<p className="section-intro">{t.bankTransferIntro}</p>
+			<p className="mb-8 text-muted">{t.bankTransferIntro}</p>
 
-			<div className="cv-page-actions bank-page-actions">
-				<Link className="btn btn-ghost" to="/playground/bank">
+			<div className="mb-6 flex flex-wrap gap-2">
+				<Link
+					className={buttonVariants({ variant: "ghost" })}
+					to="/playground/bank"
+				>
 					{t.bankTransferBack}
 				</Link>
 			</div>
 
 			{success ? (
-				<section className="surface-panel bank-success-panel" role="status">
-					<p className="bank-success-title">{t.bankTransferSuccessTitle}</p>
-					<p className="bank-success-amount">
+				<SurfacePanel className="mb-5 grid gap-3" role="status">
+					<p className="font-display m-0 text-sm font-semibold tracking-wide text-accent uppercase">
+						{t.bankTransferSuccessTitle}
+					</p>
+					<p className="font-display m-0 text-[clamp(1.5rem,3.5vw,2rem)] font-semibold tracking-tight text-fg">
 						{formatBankMoney(success.amount, success.currency, lang)}
 					</p>
-					<p className="playground-muted bank-success-meta">
-						{t.bankTransferSuccessDest}: <code>{success.destination}</code>
+					<p className="m-0 text-sm text-muted">
+						{t.bankTransferSuccessDest}: <code className="rounded bg-bg-deep px-1 py-0.5 text-xs">{success.destination}</code>
 						{success.holder ? ` · ${success.holder}` : null}
 					</p>
-					<p className="playground-muted bank-success-meta">
+					<p className="m-0 text-sm text-muted">
 						{t.bankTransferSuccessBalance}:{" "}
-						<strong>
+						<strong className="text-fg">
 							{formatBankMoney(success.originBalance, success.currency, lang)}
 						</strong>
 					</p>
-					<p className="playground-muted">{t.bankTransferOk}</p>
-					<button
-						type="button"
-						className="btn btn-primary"
-						onClick={startAnother}
-					>
+					<p className="m-0 text-sm text-muted">{t.bankTransferOk}</p>
+					<Button type="button" className="w-full sm:w-auto" onClick={startAnother}>
 						{t.bankTransferAnother}
-					</button>
-				</section>
+					</Button>
+				</SurfacePanel>
 			) : (
 				<>
-					<form
-						className="playground-form extract-form bank-transfer-form"
-						onSubmit={onResolve}
-					>
+					<form className="mb-6 grid max-w-lg gap-4" onSubmit={onResolve}>
 						{accounts.length > 0 ? (
-							<label>
-								{t.bankTransferSource}
+							<Field label={t.bankTransferSource}>
 								<select
+									className={selectClassName}
 									value={sourceId}
 									onChange={(e) => setSourceId(e.target.value)}
 									disabled={busy || !!challenge}
@@ -233,18 +275,16 @@ export function BankTransfer({ lang }: Props) {
 										</option>
 									))}
 								</select>
-							</label>
+							</Field>
 						) : null}
 						<div
-							className="bank-mode-toggle"
+							className="grid grid-cols-2 gap-2"
 							role="group"
 							aria-label={t.bankTransferDest}
 						>
-							<button
+							<Button
 								type="button"
-								className={
-									mode === "account" ? "btn btn-primary" : "btn btn-ghost"
-								}
+								variant={mode === "account" ? "default" : "ghost"}
 								disabled={busy || !!challenge}
 								onClick={() => {
 									setMode("account");
@@ -252,12 +292,10 @@ export function BankTransfer({ lang }: Props) {
 								}}
 							>
 								{t.bankTransferDest}
-							</button>
-							<button
+							</Button>
+							<Button
 								type="button"
-								className={
-									mode === "document" ? "btn btn-primary" : "btn btn-ghost"
-								}
+								variant={mode === "document" ? "default" : "ghost"}
 								disabled={busy || !!challenge}
 								onClick={() => {
 									setMode("document");
@@ -265,11 +303,10 @@ export function BankTransfer({ lang }: Props) {
 								}}
 							>
 								CPF
-							</button>
+							</Button>
 						</div>
-						<label>
-							{mode === "account" ? t.bankTransferDest : "CPF"}
-							<input
+						<Field label={mode === "account" ? t.bankTransferDest : "CPF"}>
+							<Input
 								value={destination}
 								onChange={(e) => setDestination(e.target.value)}
 								required
@@ -279,36 +316,33 @@ export function BankTransfer({ lang }: Props) {
 								placeholder={mode === "account" ? "2-9" : "000.000.000-00"}
 								inputMode={mode === "document" ? "numeric" : "text"}
 							/>
-						</label>
-						<button
-							className="btn btn-primary"
+						</Field>
+						<Button
 							type="submit"
 							disabled={busy || !!challenge || !destination.trim()}
 						>
 							{t.bankTransferResolve}
-						</button>
+						</Button>
 					</form>
 
 					{resolved ? (
-						<form
-							className="playground-form extract-form bank-transfer-form"
-							onSubmit={onSendCode}
-						>
-							<section className="surface-panel bank-panel bank-resolve-panel">
-								<p className="bank-resolve-holder">
+						<form className="grid max-w-lg gap-4" onSubmit={onSendCode}>
+							<SurfacePanel className="grid gap-1 p-4">
+								<p className="m-0 text-fg">
 									{t.bankTransferHolder}:{" "}
 									<strong>{resolved.holder_name}</strong>
 								</p>
-								<p className="playground-muted bank-resolve-meta">
-									<code>{resolved.account_display}</code>
+								<p className="m-0 text-sm text-muted">
+									<code className="rounded bg-bg-deep px-1 py-0.5 text-xs">
+										{resolved.account_display}
+									</code>
 									{resolved.document_masked
 										? ` · ${resolved.document_masked}`
 										: null}
 								</p>
-							</section>
-							<label>
-								{t.bankTransferAmount}
-								<input
+							</SurfacePanel>
+							<Field label={t.bankTransferAmount}>
+								<Input
 									value={amount}
 									onChange={(e) => setAmount(e.target.value)}
 									required
@@ -316,107 +350,102 @@ export function BankTransfer({ lang }: Props) {
 									inputMode="decimal"
 									placeholder="25.50"
 								/>
-							</label>
-							<label>
-								{t.bankTransferMemo}
-								<input
+							</Field>
+							<Field label={t.bankTransferMemo}>
+								<Input
 									value={memo}
 									onChange={(e) => setMemo(e.target.value)}
 									disabled={busy || !!challenge}
 									maxLength={280}
 								/>
-							</label>
-							<button
-								className="btn btn-primary"
+							</Field>
+							<Button
 								type="submit"
 								disabled={busy || !!challenge || !amount.trim()}
 							>
 								{t.bankTransferSendCode}
-							</button>
+							</Button>
 						</form>
 					) : null}
 				</>
 			)}
 
-			{challenge ? (
-				<div
-					className="bank-modal"
-					role="dialog"
-					aria-modal="true"
-					aria-labelledby="bank-transfer-otp-title"
-				>
-					<button
-						type="button"
-						className="bank-modal-backdrop"
-						aria-label={t.bankTransferChange}
-						onClick={closeChallenge}
-					/>
-					<div className="bank-modal-card bank-otp-modal-card">
-						<h2 id="bank-transfer-otp-title">{t.bankTransferCodeTitle}</h2>
-						<p className="playground-muted">{codeHint}</p>
-						{challenge.amount ? (
-							<p className="bank-otp-summary">
-								<strong>
-									{formatBankMoney(challenge.amount, "USD", lang)}
-								</strong>
-								{challenge.destination_display ? (
-									<>
-										{" · "}
-										<code>{challenge.destination_display}</code>
-										{challenge.destination_holder
-											? ` · ${challenge.destination_holder}`
-											: null}
-									</>
-								) : null}
-							</p>
-						) : null}
-						<form className="playground-form bank-otp-modal-form" onSubmit={onConfirm}>
-							<label>
-								{t.bankTransferCode}
-								<input
-									className="bank-otp-input"
-									value={code}
-									onChange={(e) =>
-										setCode(digitsOnly(e.target.value).slice(0, 6))
-									}
-									required
-									disabled={busy}
-									inputMode="numeric"
-									autoComplete="one-time-code"
-									placeholder="000000"
-									maxLength={6}
-									autoFocus
-								/>
-							</label>
-							<button
-								className="btn btn-primary"
+			<Dialog
+				open={Boolean(challenge)}
+				onOpenChange={(open) => {
+					if (!open) closeChallenge();
+				}}
+			>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<DialogTitle>{t.bankTransferCodeTitle}</DialogTitle>
+						<DialogDescription>{codeHint}</DialogDescription>
+					</DialogHeader>
+					{challenge?.amount ? (
+						<p className="text-sm text-fg">
+							<strong>
+								{formatBankMoney(challenge.amount, "USD", lang)}
+							</strong>
+							{challenge.destination_display ? (
+								<>
+									{" · "}
+									<code className="rounded bg-bg-deep px-1 py-0.5 text-xs">
+										{challenge.destination_display}
+									</code>
+									{challenge.destination_holder
+										? ` · ${challenge.destination_holder}`
+										: null}
+								</>
+							) : null}
+						</p>
+					) : null}
+					<form className="grid gap-4" onSubmit={onConfirm}>
+						<Field label={t.bankTransferCode}>
+							<Input
+								className="tracking-[0.35em]"
+								value={code}
+								onChange={(e) =>
+									setCode(digitsOnly(e.target.value).slice(0, 6))
+								}
+								required
+								disabled={busy}
+								inputMode="numeric"
+								autoComplete="one-time-code"
+								placeholder="000000"
+								maxLength={6}
+								autoFocus
+							/>
+						</Field>
+						<DialogFooter className="flex-col gap-2 sm:flex-col">
+							<Button
 								type="submit"
+								className="w-full"
 								disabled={busy || code.trim().length < 6}
 							>
 								{t.bankTransferConfirm}
-							</button>
-							<div className="bank-onboarding-actions">
-								<button
+							</Button>
+							<div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+								<Button
 									type="button"
-									className="btn btn-ghost"
+									variant="ghost"
 									disabled={busy}
 									onClick={() => void onResend()}
 								>
 									{busy ? t.bankTransferResendBusy : t.bankTransferResend}
-								</button>
-								<button
+								</Button>
+								<Button
 									type="button"
-									className="btn btn-ghost"
+									variant="ghost"
 									disabled={busy}
 									onClick={closeChallenge}
 								>
 									{t.bankTransferChange}
-								</button>
+								</Button>
 							</div>
-						</form>
-					</div>
-				</div>
-			) : null}
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 }

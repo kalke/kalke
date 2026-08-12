@@ -13,6 +13,20 @@ import {
 	type ExtractProgress,
 } from "../api";
 import { copy, type Lang } from "../content";
+import { SurfacePanel } from "@/components/layout";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
 	ageYears,
 	digitsOnly,
@@ -99,6 +113,23 @@ function strField(data: Record<string, unknown>, ...keys: string[]): string {
 		if (typeof v === "string" && v.trim()) return v.trim();
 	}
 	return "";
+}
+
+function Field({
+	label,
+	children,
+	className,
+}: {
+	label: string;
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<div className={cn("grid gap-2", className)}>
+			<Label>{label}</Label>
+			{children}
+		</div>
+	);
 }
 
 export function BankOnboarding({ lang }: Props) {
@@ -320,41 +351,63 @@ export function BankOnboarding({ lang }: Props) {
 
 	return (
 		<>
-			<p className="eyebrow">{t.pathBank}</p>
-			<div className="bank-title-row">
-				<h1>{t.bankOnboardingTitle}</h1>
-				<span className="bank-demo-badge">{t.bankDemoBadge}</span>
+			<p className="mb-2 font-display text-xs tracking-[0.18em] text-accent-cool uppercase">
+				{t.pathBank}
+			</p>
+			<div className="mb-1 flex flex-wrap items-baseline gap-x-3.5 gap-y-2.5">
+				<h1 className="font-display m-0 text-3xl font-semibold tracking-tight">
+					{t.bankOnboardingTitle}
+				</h1>
+				<Badge
+					variant="outline"
+					className="border-accent/45 bg-accent/10 text-[0.68rem] font-semibold tracking-[0.08em] text-accent uppercase"
+				>
+					{t.bankDemoBadge}
+				</Badge>
 			</div>
-			<p className="section-intro">{t.bankOnboardingIntro}</p>
+			<p className="mb-4 text-muted">{t.bankOnboardingIntro}</p>
 
 			{meta ? (
-				<p className="playground-muted">
+				<p className="mb-4 text-sm text-muted">
 					{meta.disclaimer} · {meta.welcome_amount} {meta.currency}
 				</p>
 			) : null}
 
-			<p className="bank-step-progress" aria-live="polite">
+			<p className="mb-2 text-sm text-muted" aria-live="polite">
 				{step + 1} / {stepLabels.length}
-				<span className="bank-step-progress-label"> · {stepLabels[step]}</span>
+				<span className="text-fg"> · {stepLabels[step]}</span>
 			</p>
-			<ol className="bank-stepper" aria-label="Onboarding steps">
+			<ol
+				className="mb-6 flex list-none flex-wrap gap-2 p-0"
+				aria-label="Onboarding steps"
+			>
 				{stepLabels.map((label, i) => {
 					const state =
 						i < step ? "done" : i === step ? "current" : "pending";
 					return (
-						<li key={label} className={`bank-step bank-step-${state}`}>
-							<span className="bank-step-index">{i + 1}</span>
-							<span className="bank-step-label">{label}</span>
+						<li
+							key={label}
+							className={cn(
+								"inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs",
+								state === "current" &&
+									"border-accent/50 bg-accent/10 text-accent",
+								state === "done" &&
+									"border-accent-cool/40 bg-cool-soft text-accent-cool",
+								state === "pending" && "border-border text-muted",
+							)}
+						>
+							<span className="font-semibold tabular-nums">{i + 1}</span>
+							<span className="hidden sm:inline">{label}</span>
 						</li>
 					);
 				})}
 			</ol>
 
-			<section className="playground-panel bank-panel">
-				<div className="playground-form extract-form">
+			<SurfacePanel className="mb-5">
+				<div className="grid gap-4">
 					{step === 0 ? (
 						<>
-							<p>{t.bankWizardIdHint}</p>
+							<p className="m-0 text-fg">{t.bankWizardIdHint}</p>
 							<FileDropzone
 								file={idFile}
 								onFile={setIdFile}
@@ -365,67 +418,65 @@ export function BankOnboarding({ lang }: Props) {
 								dropRemove={t.dropRemove}
 							/>
 							{progress ? (
-								<div className="extract-progress" role="status">
-									<div className="extract-progress-head">
+								<div className="grid gap-2" role="status">
+									<div className="flex justify-between text-sm text-muted">
 										<span>{progress.stage}</span>
 										<span>{Math.round(progress.percent)}%</span>
 									</div>
-									<div className="extract-progress-track">
+									<div className="h-1.5 overflow-hidden rounded-full bg-border">
 										<div
-											className="extract-progress-bar"
+											className="h-full rounded-full bg-accent transition-[width] duration-200"
 											style={{ width: `${progress.percent}%` }}
 										/>
 									</div>
 								</div>
 							) : null}
-							<div className="bank-onboarding-actions">
-								<button
+							<div className="mt-1 grid gap-2">
+								<Button
 									type="button"
-									className="btn btn-primary"
+									className="min-h-11 w-full touch-manipulation"
 									disabled={busy || !idFile}
 									onClick={onExtractId}
 								>
 									{t.bankWizardExtract}
-								</button>
-								<button
+								</Button>
+								<Button
 									type="button"
-									className="btn btn-ghost"
+									variant="ghost"
+									className="min-h-11 w-full touch-manipulation"
 									disabled={busy}
 									onClick={() => setStep(1)}
 								>
 									{t.bankWizardSkipId}
-								</button>
+								</Button>
 							</div>
 						</>
 					) : null}
 
 					{step === 1 ? (
 						<>
-							<label>
-								{t.bankWizardFullName}
-								<input
+							<Field label={t.bankWizardFullName}>
+								<Input
 									value={form.full_name}
 									onChange={(e) => patch({ full_name: e.target.value })}
 									disabled={busy}
 								/>
-							</label>
-							<label>
-								{t.bankWizardDob}
-								<input
+							</Field>
+							<Field label={t.bankWizardDob}>
+								<Input
 									type="date"
 									value={form.birth_date}
 									onChange={(e) => patch({ birth_date: e.target.value })}
 									disabled={busy}
 								/>
-							</label>
+							</Field>
 							{form.birth_date ? (
-								<p className="playground-muted">
+								<p className="m-0 text-sm text-muted">
 									{t.bankWizardAge}: {ageYears(form.birth_date)}
 								</p>
 							) : null}
-							<label>
-								{t.bankWizardDocument}
-								<input
+							<Field label={t.bankWizardDocument}>
+								<Input
 									value={form.document_number}
 									onChange={(e) =>
 										patch({ document_number: digitsOnly(e.target.value) })
@@ -433,71 +484,64 @@ export function BankOnboarding({ lang }: Props) {
 									disabled={busy}
 									inputMode="numeric"
 								/>
-							</label>
+							</Field>
 						</>
 					) : null}
 
 					{step === 2 ? (
 						<>
-							<label>
-								CEP
-								<input
+							<Field label="CEP">
+								<Input
 									value={maskCep(form.cep)}
 									onChange={(e) => patch({ cep: digitsOnly(e.target.value) })}
 									onBlur={onCepBlur}
 									disabled={busy || cepLoading}
 									inputMode="numeric"
 								/>
-							</label>
+							</Field>
 							{cepLoading ? (
-								<p className="playground-muted">{t.bankWizardCepLoading}</p>
+								<p className="m-0 text-sm text-muted">{t.bankWizardCepLoading}</p>
 							) : null}
-							<label>
-								{t.bankWizardStreet}
-								<input
+							<Field label={t.bankWizardStreet}>
+								<Input
 									value={form.street}
 									onChange={(e) => patch({ street: e.target.value })}
 									disabled={busy}
 								/>
-							</label>
-							<div className="bank-field-row">
-								<label>
-									{t.bankWizardNumber}
-									<input
+							</Field>
+							<div className="grid min-w-0 grid-cols-2 gap-3">
+								<Field label={t.bankWizardNumber}>
+									<Input
 										value={form.number}
 										onChange={(e) => patch({ number: e.target.value })}
 										disabled={busy}
 									/>
-								</label>
-								<label>
-									{t.bankWizardComplement}
-									<input
+								</Field>
+								<Field label={t.bankWizardComplement}>
+									<Input
 										value={form.complement}
 										onChange={(e) => patch({ complement: e.target.value })}
 										disabled={busy}
 									/>
-								</label>
+								</Field>
 							</div>
-							<label>
-								{t.bankWizardNeighborhood}
-								<input
+							<Field label={t.bankWizardNeighborhood}>
+								<Input
 									value={form.neighborhood}
 									onChange={(e) => patch({ neighborhood: e.target.value })}
 									disabled={busy}
 								/>
-							</label>
-							<div className="bank-field-row">
-								<label className="bank-field-grow">
-									{t.bankWizardCity}
-									<input
+							</Field>
+							<div className="grid min-w-0 grid-cols-[1fr_5.5rem] gap-3">
+								<Field label={t.bankWizardCity} className="min-w-0">
+									<Input
 										value={form.city}
 										onChange={(e) => patch({ city: e.target.value })}
 										disabled={busy}
 									/>
-								</label>
-								<label className="bank-field-uf">
-									UF
-									<input
+								</Field>
+								<Field label="UF">
+									<Input
 										value={form.state}
 										onChange={(e) =>
 											patch({ state: e.target.value.toUpperCase().slice(0, 2) })
@@ -506,49 +550,52 @@ export function BankOnboarding({ lang }: Props) {
 										maxLength={2}
 										autoCapitalize="characters"
 									/>
-								</label>
+								</Field>
 							</div>
 						</>
 					) : null}
 
 					{step === 3 ? (
 						<>
-							<label>
-								Email
-								<input
+							<Field label="Email">
+								<Input
 									type="email"
 									value={form.email}
 									onChange={(e) => patch({ email: e.target.value })}
 									disabled={busy}
 								/>
-							</label>
-							<label>
-								{t.bankWizardPhone}
-								<input
+							</Field>
+							<Field label={t.bankWizardPhone}>
+								<Input
 									value={maskPhone(form.phone)}
 									onChange={(e) => patch({ phone: digitsOnly(e.target.value) })}
 									disabled={busy}
 									inputMode="tel"
 								/>
-							</label>
+							</Field>
 						</>
 					) : null}
 
 					{step === 4 ? (
 						<>
-							<p>{t.bankWizardTermsSummary}</p>
-							<button
+							<p className="m-0 text-fg">{t.bankWizardTermsSummary}</p>
+							<Button
 								type="button"
-								className="btn btn-ghost"
+								variant="ghost"
 								onClick={() => setTermsOpen(true)}
 							>
 								{t.bankWizardViewTerms}
-							</button>
+							</Button>
 							<label
-								className={`playground-consent${form.terms_accepted ? " is-checked" : ""}${termsError ? " is-error" : ""}`}
+								className={cn(
+									"flex cursor-pointer items-start gap-3 rounded-md border border-border bg-bg-deep/40 p-3 transition-colors",
+									form.terms_accepted && "border-accent/45 bg-accent/5",
+									termsError && "border-danger aria-invalid:border-danger",
+								)}
 							>
 								<input
 									type="checkbox"
+									className="mt-0.5 size-4 accent-[var(--accent)]"
 									checked={form.terms_accepted}
 									onChange={(e) => {
 										patch({ terms_accepted: e.target.checked });
@@ -556,98 +603,134 @@ export function BankOnboarding({ lang }: Props) {
 									}}
 									disabled={busy}
 								/>
-								<span className="playground-consent-copy">
-									<span className="playground-consent-text">{t.bankTosLabel}</span>
-								</span>
+								<span className="text-sm text-fg">{t.bankTosLabel}</span>
 							</label>
 						</>
 					) : null}
 
 					{step === 5 ? (
-						<form onSubmit={onConfirm}>
-							<dl className="bank-review">
+						<form className="grid gap-4" onSubmit={onConfirm}>
+							<dl className="m-0 grid gap-3">
 								<div>
-									<dt>{t.bankWizardFullName}</dt>
-									<dd>
+									<dt className="mb-0.5 text-xs text-muted">
+										{t.bankWizardFullName}
+									</dt>
+									<dd className="m-0 text-fg">
 										{form.full_name}{" "}
-										<button type="button" className="linkish" onClick={() => setStep(1)}>
+										<button
+											type="button"
+											className="text-accent underline-offset-4 hover:underline"
+											onClick={() => setStep(1)}
+										>
 											{t.bankWizardEdit}
 										</button>
 									</dd>
 								</div>
 								<div>
-									<dt>{t.bankWizardDob}</dt>
-									<dd>{form.birth_date}</dd>
+									<dt className="mb-0.5 text-xs text-muted">{t.bankWizardDob}</dt>
+									<dd className="m-0 text-fg">{form.birth_date}</dd>
 								</div>
 								<div>
-									<dt>{t.bankWizardDocument}</dt>
-									<dd>{form.document_number}</dd>
+									<dt className="mb-0.5 text-xs text-muted">
+										{t.bankWizardDocument}
+									</dt>
+									<dd className="m-0 text-fg">{form.document_number}</dd>
 								</div>
 								<div>
-									<dt>{t.bankWizardStreet}</dt>
-									<dd>
+									<dt className="mb-0.5 text-xs text-muted">
+										{t.bankWizardStreet}
+									</dt>
+									<dd className="m-0 text-fg">
 										{form.street}, {form.number} — {form.city}/{form.state}{" "}
-										<button type="button" className="linkish" onClick={() => setStep(2)}>
+										<button
+											type="button"
+											className="text-accent underline-offset-4 hover:underline"
+											onClick={() => setStep(2)}
+										>
 											{t.bankWizardEdit}
 										</button>
 									</dd>
 								</div>
 								<div>
-									<dt>Email</dt>
-									<dd>
+									<dt className="mb-0.5 text-xs text-muted">Email</dt>
+									<dd className="m-0 text-fg">
 										{form.email} / {maskPhone(form.phone)}{" "}
-										<button type="button" className="linkish" onClick={() => setStep(3)}>
+										<button
+											type="button"
+											className="text-accent underline-offset-4 hover:underline"
+											onClick={() => setStep(3)}
+										>
 											{t.bankWizardEdit}
 										</button>
 									</dd>
 								</div>
 							</dl>
-							<button className="btn btn-primary" type="submit" disabled={busy}>
+							<Button className="w-full" type="submit" disabled={busy}>
 								{t.bankWizardConfirm}
-							</button>
+							</Button>
 						</form>
 					) : null}
 
 					{step > 0 && step < 5 ? (
-						<div className="bank-onboarding-actions">
-							<button type="button" className="btn btn-ghost" onClick={goBack} disabled={busy}>
+						<div className="mt-1 grid gap-2">
+							<Button
+								type="button"
+								variant="ghost"
+								className="min-h-11 w-full touch-manipulation"
+								onClick={goBack}
+								disabled={busy}
+							>
 								{t.bankWizardBack}
-							</button>
-							<button type="button" className="btn btn-primary" onClick={goNext} disabled={busy}>
+							</Button>
+							<Button
+								type="button"
+								className="min-h-11 w-full touch-manipulation"
+								onClick={goNext}
+								disabled={busy}
+							>
 								{t.bankWizardNext}
-							</button>
+							</Button>
 						</div>
 					) : null}
 				</div>
-			</section>
+			</SurfacePanel>
 
-			<p className="bank-skip-cta">
-				<button type="button" className="btn btn-ghost" disabled={busy} onClick={onSkip}>
+			<p className="mb-2 mt-4">
+				<Button
+					type="button"
+					variant="ghost"
+					className="min-h-11 touch-manipulation"
+					disabled={busy}
+					onClick={onSkip}
+				>
 					{t.bankSkipDueDiligence}
-				</button>
+				</Button>
 			</p>
-			<p className="cv-page-actions">
-				<Link className="btn btn-ghost" to="/playground/bank">
+			<p className="mb-0">
+				<Link
+					className={buttonVariants({ variant: "ghost" })}
+					to="/playground/bank"
+				>
 					{t.bankTransferBack}
 				</Link>
 			</p>
 
-			{termsOpen ? (
-				<div className="bank-modal" role="dialog" aria-modal="true">
-					<div className="bank-modal-card">
-						<h2>{t.bankWizardViewTerms}</h2>
-						<p>{t.bankTosLabel}</p>
-						<p className="playground-muted">{meta?.disclaimer}</p>
-						<button
-							type="button"
-							className="btn btn-primary bank-modal-close"
-							onClick={() => setTermsOpen(false)}
-						>
+			<Dialog open={termsOpen} onOpenChange={setTermsOpen}>
+				<DialogContent className="max-w-md">
+					<DialogHeader>
+						<DialogTitle>{t.bankWizardViewTerms}</DialogTitle>
+						<DialogDescription>{t.bankTosLabel}</DialogDescription>
+					</DialogHeader>
+					{meta?.disclaimer ? (
+						<p className="text-sm text-muted">{meta.disclaimer}</p>
+					) : null}
+					<DialogFooter>
+						<Button type="button" onClick={() => setTermsOpen(false)}>
 							OK
-						</button>
-					</div>
-				</div>
-			) : null}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 }
