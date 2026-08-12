@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import {
 	bankCepLookup,
 	bankMeta,
@@ -11,6 +11,7 @@ import {
 	extractDocument,
 	listExtractions,
 	type BankMeta,
+	type BankOnboardingHolder,
 	type ExtractProgress,
 } from "../api";
 import { copy, type Lang } from "../content";
@@ -58,7 +59,7 @@ type WizardState = {
 	terms_accepted: boolean;
 };
 
-const STORAGE_KEY = "kalke-bank-onboarding-v1";
+const STORAGE_PREFIX = "kalke-bank-onboarding-v1";
 const STEPS = [
 	"ID document",
 	"Account holder",
@@ -89,9 +90,13 @@ type PersistedWizard = {
 	step: Step;
 };
 
-function loadPersisted(): PersistedWizard | null {
+function storageKey(accountId: string): string {
+	return accountId ? `${STORAGE_PREFIX}:${accountId}` : STORAGE_PREFIX;
+}
+
+function loadPersisted(key: string): PersistedWizard | null {
 	try {
-		const raw = sessionStorage.getItem(STORAGE_KEY);
+		const raw = sessionStorage.getItem(key);
 		if (!raw) return null;
 		const parsed = JSON.parse(raw) as Partial<PersistedWizard> &
 			Partial<WizardState>;
@@ -189,12 +194,47 @@ function Field({
 	);
 }
 
+function holderPrefill(
+	holder: BankOnboardingHolder | null | undefined,
+	form: WizardState,
+): Partial<WizardState> {
+	if (!holder) return {};
+	const patch: Partial<WizardState> = {};
+	if (!form.full_name.trim() && holder.full_name) {
+		patch.full_name = holder.full_name;
+	}
+	if (!form.birth_date && holder.birth_date) {
+		patch.birth_date = holder.birth_date.slice(0, 10);
+	}
+	if (!form.document_number.trim() && holder.document_number) {
+		patch.document_number = holder.document_number;
+	}
+	if (!form.cep.trim() && holder.cep) patch.cep = holder.cep;
+	if (!form.street.trim() && holder.street) patch.street = holder.street;
+	if (!form.number.trim() && holder.number) patch.number = holder.number;
+	if (!form.complement.trim() && holder.complement) {
+		patch.complement = holder.complement;
+	}
+	if (!form.neighborhood.trim() && holder.neighborhood) {
+		patch.neighborhood = holder.neighborhood;
+	}
+	if (!form.city.trim() && holder.city) patch.city = holder.city;
+	if (!form.state.trim() && holder.state) patch.state = holder.state;
+	if (!form.email.trim() && holder.email) patch.email = holder.email;
+	if (!form.phone.trim() && holder.phone) patch.phone = holder.phone;
+	return patch;
+}
+
 export function BankOnboarding({ lang }: Props) {
 	const t = copy[lang].playground;
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
+	const accountId = searchParams.get("account") ?? "";
+	const persistKey = storageKey(accountId);
 	const { busy, setBusy, setError } = useDashboard();
 	const [meta, setMeta] = useState<BankMeta | null>(null);
-	const persisted = useMemo(() => loadPersisted(), []);
+	const persisted = useMemo(() => loadPersisted(persistKey), [persistKey]);
+	const [boundAccountId, setBoundAccountId] = useState(accountId);
 	const [step, setStep] = useState<Step>(() => persisted?.step ?? 0);
 	const [form, setForm] = useState<WizardState>(() => persisted?.form ?? empty);
 	const [idFile, setIdFile] = useState<File | null>(null);
@@ -204,11 +244,18 @@ export function BankOnboarding({ lang }: Props) {
 	const [termsError, setTermsError] = useState(false);
 
 	useEffect(() => {
+		const loaded = loadPersisted(persistKey);
+		setForm(loaded?.form ?? empty);
+		setStep(loaded?.step ?? 0);
+		setBoundAccountId(accountId);
+	}, [accountId, persistKey]);
+
+	useEffect(() => {
 		sessionStorage.setItem(
-			STORAGE_KEY,
+			persistKey,
 			JSON.stringify({ form, step } satisfies PersistedWizard),
 		);
-	}, [form, step]);
+	}, [form, step, persistKey]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -216,15 +263,23 @@ export function BankOnboarding({ lang }: Props) {
 			try {
 				const [m, status] = await Promise.all([
 					bankMeta().catch(() => null),
-					bankOnboarding().catch(() => null),
+					bankOnboarding(accountId || undefined).catch(() => null),
 				]);
 				if (cancelled) return;
 				if (m) setMeta(m);
+				if (status?.account_id) setBoundAccountId(status.account_id);
 				const hasIdDoc = Boolean(
 					status?.documents?.some((d) => d.doc_type === "identity_document"),
 				);
-				const inferred = inferStepFromForm(form, hasIdDoc);
-				setStep((current) => Math.max(current, inferred) as Step);
+				setForm((current) => {
+					const patch = holderPrefill(status?.holder, current);
+					const next = Object.keys(patch).length
+						? { ...current, ...patch }
+						: current;
+					const inferred = inferStepFromForm(next, hasIdDoc);
+					setStep((s) => Math.max(s, inferred) as Step);
+					return next;
+				});
 			} catch {
 				/* optional */
 			}
@@ -232,8 +287,7 @@ export function BankOnboarding({ lang }: Props) {
 		return () => {
 			cancelled = true;
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps -- mount resume only
-	}, []);
+	}, [accountId]);
 
 	const stepLabels = useMemo(
 		() =>
@@ -298,7 +352,8 @@ export function BankOnboarding({ lang }: Props) {
 		setError("");
 		setProgress(null);
 		try {
-			await bankOnboardingStart();
+			const started = await bankOnboardingStart(boundAccountId || undefined);
+			if (started.account_id) setBoundAccountId(started.account_id);
 			const extracted = await extractDocument(
 				idFile,
 				"identity_document",
@@ -315,6 +370,7 @@ export function BankOnboarding({ lang }: Props) {
 					doc_type: "identity_document",
 					pde_extraction_id: typeof latest?.id === "string" ? latest.id : null,
 					summary,
+					account_id: boundAccountId || undefined,
 				});
 				patch({
 					full_name:
@@ -362,9 +418,11 @@ export function BankOnboarding({ lang }: Props) {
 		setBusy(true);
 		setError("");
 		try {
-			await bankOnboardingStart();
-			await bankOnboardingSkip(crypto.randomUUID());
-			sessionStorage.removeItem(STORAGE_KEY);
+			const started = await bankOnboardingStart(boundAccountId || undefined);
+			const target = started.account_id || boundAccountId || undefined;
+			if (started.account_id) setBoundAccountId(started.account_id);
+			await bankOnboardingSkip(crypto.randomUUID(), target);
+			sessionStorage.removeItem(persistKey);
 			navigate("/playground/bank", { replace: true });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.bankOnboardingError);
@@ -383,9 +441,12 @@ export function BankOnboarding({ lang }: Props) {
 		setBusy(true);
 		setError("");
 		try {
-			await bankOnboardingStart();
+			const started = await bankOnboardingStart(boundAccountId || undefined);
+			const target = started.account_id || boundAccountId || undefined;
+			if (started.account_id) setBoundAccountId(started.account_id);
 			await bankOnboardingComplete(
 				{
+					account_id: target,
 					full_name: form.full_name.trim(),
 					birth_date: form.birth_date,
 					document_number: digitsOnly(form.document_number),
@@ -403,7 +464,7 @@ export function BankOnboarding({ lang }: Props) {
 				},
 				crypto.randomUUID(),
 			);
-			sessionStorage.removeItem(STORAGE_KEY);
+			sessionStorage.removeItem(persistKey);
 			navigate("/playground/bank", { replace: true });
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.bankOnboardingError);

@@ -517,13 +517,31 @@ export type BankOnboardingDoc = {
 	pde_extraction_id?: string | null;
 };
 
+export type BankOnboardingHolder = {
+	full_name?: string | null;
+	birth_date?: string | null;
+	document_type?: string | null;
+	document_number?: string | null;
+	cep?: string | null;
+	street?: string | null;
+	number?: string | null;
+	complement?: string | null;
+	neighborhood?: string | null;
+	city?: string | null;
+	state?: string | null;
+	email?: string | null;
+	phone?: string | null;
+};
+
 export type BankOnboardingStatus = {
 	onboarding_status: string;
+	account_id?: string | null;
 	session_id?: string | null;
 	session_status?: string | null;
 	documents: BankOnboardingDoc[];
 	skippable: boolean;
 	demo: boolean;
+	holder?: BankOnboardingHolder | null;
 };
 
 export type BankTransferResult = {
@@ -564,6 +582,7 @@ export type BankCepResult = {
 };
 
 export type BankOnboardingCompleteInput = {
+	account_id?: string;
 	full_name: string;
 	birth_date: string;
 	document_number: string;
@@ -579,6 +598,12 @@ export type BankOnboardingCompleteInput = {
 	terms_accepted: boolean;
 	accepted_at?: string;
 };
+
+function withAccountQuery(path: string, accountId?: string | null): string {
+	if (!accountId) return path;
+	const join = path.includes("?") ? "&" : "?";
+	return `${path}${join}account_id=${encodeURIComponent(accountId)}`;
+}
 
 async function bankJson<T>(path: string, init: RequestInit = {}): Promise<T> {
 	const res = await authFetch(path, init);
@@ -766,14 +791,21 @@ export async function bankCepLookup(cep: string): Promise<BankCepResult> {
 	return bankJson(`/v1/bank/cep/${encodeURIComponent(cep)}`);
 }
 
-export async function bankOnboarding(): Promise<BankOnboardingStatus> {
-	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding");
+export async function bankOnboarding(
+	accountId?: string | null,
+): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>(
+		withAccountQuery("/v1/bank/onboarding", accountId),
+	);
 }
 
-export async function bankOnboardingStart(): Promise<BankOnboardingStatus> {
-	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/start", {
-		method: "POST",
-	});
+export async function bankOnboardingStart(
+	accountId?: string | null,
+): Promise<BankOnboardingStatus> {
+	return bankJson<BankOnboardingStatus>(
+		withAccountQuery("/v1/bank/onboarding/start", accountId),
+		{ method: "POST" },
+	);
 }
 
 export async function bankOnboardingConsent(
@@ -787,35 +819,46 @@ export async function bankOnboardingConsent(
 
 export async function bankOnboardingSkip(
 	idempotencyKey?: string,
+	accountId?: string | null,
 ): Promise<BankAccount> {
-	return bankJson<BankAccount>("/v1/bank/onboarding/skip", {
-		method: "POST",
-		headers: idempotencyKey
-			? { "Idempotency-Key": idempotencyKey }
-			: undefined,
-	});
+	return bankJson<BankAccount>(
+		withAccountQuery("/v1/bank/onboarding/skip", accountId),
+		{
+			method: "POST",
+			headers: idempotencyKey
+				? { "Idempotency-Key": idempotencyKey }
+				: undefined,
+		},
+	);
 }
 
 export async function bankOnboardingDocuments(input: {
 	doc_type: "identity_document" | "address_proof";
 	pde_extraction_id?: string | null;
 	summary?: Record<string, unknown> | null;
+	account_id?: string | null;
 }): Promise<BankOnboardingStatus> {
-	return bankJson<BankOnboardingStatus>("/v1/bank/onboarding/documents", {
-		method: "POST",
-		body: JSON.stringify(input),
-	});
+	return bankJson<BankOnboardingStatus>(
+		withAccountQuery("/v1/bank/onboarding/documents", input.account_id),
+		{
+			method: "POST",
+			body: JSON.stringify(input),
+		},
+	);
 }
 
 export async function bankOnboardingComplete(
 	input: BankOnboardingCompleteInput,
 	idempotencyKey?: string,
 ): Promise<BankAccount> {
-	return bankJson<BankAccount>("/v1/bank/onboarding/complete", {
-		method: "POST",
-		headers: idempotencyKey
-			? { "Idempotency-Key": idempotencyKey }
-			: undefined,
-		body: JSON.stringify(input),
-	});
+	return bankJson<BankAccount>(
+		withAccountQuery("/v1/bank/onboarding/complete", input.account_id),
+		{
+			method: "POST",
+			headers: idempotencyKey
+				? { "Idempotency-Key": idempotencyKey }
+				: undefined,
+			body: JSON.stringify(input),
+		},
+	);
 }

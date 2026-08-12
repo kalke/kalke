@@ -6,7 +6,10 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SurfacePanel } from "@/components/layout";
 import { cn } from "@/lib/utils";
-import { isBankOnboardingIncomplete } from "./bankOnboardingStatus";
+import {
+	bankOnboardingPath,
+	isBankOnboardingIncomplete,
+} from "./bankOnboardingStatus";
 import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
@@ -74,7 +77,7 @@ export function BankDashboard({ lang }: Props) {
 					<p className="text-fg">{t.bankNoAccount}</p>
 					<div className="flex flex-wrap gap-2">
 						<Button asChild>
-							<Link to="/playground/bank/onboarding" viewTransition>
+							<Link to={bankOnboardingPath()} viewTransition>
 								{t.bankOpenAccount}
 							</Link>
 						</Button>
@@ -128,7 +131,7 @@ export function BankDashboard({ lang }: Props) {
 									buttonVariants(),
 									"min-h-11 justify-center text-center touch-manipulation sm:col-span-2",
 								)}
-								to="/playground/bank/onboarding"
+								to={bankOnboardingPath(account.id)}
 								viewTransition
 							>
 								{t.bankContinueOnboarding}
@@ -173,7 +176,7 @@ export function BankDashboard({ lang }: Props) {
 									buttonVariants({ variant: "ghost" }),
 									"min-h-11 justify-center text-center touch-manipulation",
 								)}
-								to="/playground/bank/onboarding"
+								to={bankOnboardingPath(account.id)}
 								viewTransition
 							>
 								{t.bankGoOnboarding}

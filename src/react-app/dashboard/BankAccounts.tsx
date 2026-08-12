@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { bankAccounts, bankOpenAdditionalAccount, type BankAccount } from "../api";
 import { copy, type Lang } from "../content";
 import { SurfacePanel } from "@/components/layout";
@@ -8,7 +8,10 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { isBankOnboardingIncomplete } from "./bankOnboardingStatus";
+import {
+	bankOnboardingPath,
+	isBankOnboardingIncomplete,
+} from "./bankOnboardingStatus";
 import { formatBankMoney } from "./bankValidation";
 import { useDashboard } from "./useDashboard";
 
@@ -17,6 +20,7 @@ type Props = { lang: Lang };
 export function BankAccounts({ lang }: Props) {
 	const t = copy[lang].playground;
 	const { busy, setBusy, setError } = useDashboard();
+	const navigate = useNavigate();
 	const [rows, setRows] = useState<BankAccount[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [q, setQ] = useState("");
@@ -66,14 +70,14 @@ export function BankAccounts({ lang }: Props) {
 
 	const canOpenExtra =
 		rows.length > 0 && rows.every((row) => !isBankOnboardingIncomplete(row));
-	const anyIncomplete = rows.some(isBankOnboardingIncomplete);
+	const firstIncomplete = rows.find(isBankOnboardingIncomplete);
 
 	async function onOpenExtra() {
 		setBusy(true);
 		setError("");
 		try {
-			await bankOpenAdditionalAccount(crypto.randomUUID());
-			await reload();
+			const created = await bankOpenAdditionalAccount(crypto.randomUUID());
+			navigate(bankOnboardingPath(created.id));
 		} catch (err) {
 			setError(err instanceof Error ? err.message : t.bankOpenExtraError);
 		} finally {
@@ -114,7 +118,7 @@ export function BankAccounts({ lang }: Props) {
 				>
 					{busy ? t.bankOpenExtraBusy : t.bankOpenExtraAccount}
 				</Button>
-				{!anyIncomplete ? (
+				{!firstIncomplete ? (
 					<Link
 						className={buttonVariants({ variant: "ghost" })}
 						to="/playground/bank/transfer"
@@ -125,7 +129,7 @@ export function BankAccounts({ lang }: Props) {
 				) : (
 					<Link
 						className={buttonVariants()}
-						to="/playground/bank/onboarding"
+						to={bankOnboardingPath(firstIncomplete.id)}
 						viewTransition
 					>
 						{t.bankContinueOnboarding}
@@ -153,7 +157,7 @@ export function BankAccounts({ lang }: Props) {
 					<p className="text-fg">{t.bankAccountsEmpty}</p>
 					<div>
 						<Button asChild>
-							<Link to="/playground/bank/onboarding" viewTransition>
+							<Link to={bankOnboardingPath()} viewTransition>
 								{t.bankOpenAccount}
 							</Link>
 						</Button>
@@ -164,7 +168,7 @@ export function BankAccounts({ lang }: Props) {
 					{filtered.map((row) => {
 						const incomplete = isBankOnboardingIncomplete(row);
 						const href = incomplete
-							? "/playground/bank/onboarding"
+							? bankOnboardingPath(row.id)
 							: "/playground/bank";
 						return (
 							<li key={row.id}>
