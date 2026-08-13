@@ -54,6 +54,4 @@ app.use("/api/*", async (c, next) => {
 
 app.get("/api/health", (c) => c.json({ ok: true, site: "kalke.dev" }));
 
-app.all("*", (c) => c.env.ASSETS.fetch(c.req.raw));
-
 export default app;
